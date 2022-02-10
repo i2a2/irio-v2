@@ -1,0 +1,23 @@
+Contents:
+/opt/codac-5.3
+/opt/codac-5.3/lib
+/opt/codac-5.3/lib/libirioCore.so
+
+Requires:
+rpmlib(VersionedDependencies) <= 3.0.3-1
+codac-core-5.3-common
+codac-core-5.3-kmod-nirio-lib
+/bin/sh
+/bin/sh
+rpmlib(FileDigests) <= 4.6.0-1
+rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+rpmlib(CompressedFileNames) <= 3.0.4-1
+rpmlib(PayloadIsXz) <= 5.2-1
+
+Provides:
+codac-core-5.3(irio)
+codac-core-5.3-irio = 5.3b2
+codac-core-irio = 5.3b2.v1.1.1
+libirioCore.so()(64bit)
+codac-core-5.3-irio = 5.3b2.v1.1.1-0.el6
+codac-core-5.3-irio(x86-64) = 5.3b2.v1.1.1-0.el6

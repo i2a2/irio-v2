@@ -1,0 +1,26 @@
+Contents:
+/opt/codac-6.4
+/opt/codac-6.4/lib
+/opt/codac-6.4/lib/libirioCore.so
+
+Requires:
+codac-core-6.4-common
+codac-core-6.4-kmod-nirio-lib
+/bin/sh
+/bin/sh
+rpmlib(FileDigests) <= 4.6.0-1
+rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+rpmlib(CompressedFileNames) <= 3.0.4-1
+rpmlib(PayloadIsXz) <= 5.2-1
+
+Provides:
+codac-core-6.4(irio)
+codac-core-6.4-irio = 6.4a1
+codac-core-6.4-irio = 6.4a1.v1.1.2-0.el7
+codac-core-6.4-irio(x86-64) = 6.4a1.v1.1.2-0.el7
+codac-core-irio = 6.4a1.v1.1.2
+libirioCore.so()(64bit)
+
+Obsoletes:
+
+Conflicts:

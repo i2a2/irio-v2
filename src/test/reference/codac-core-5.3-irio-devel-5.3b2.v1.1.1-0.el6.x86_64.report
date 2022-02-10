@@ -1,0 +1,32 @@
+Contents:
+/opt/codac-5.3
+/opt/codac-5.3/include
+/opt/codac-5.3/include/irioCore
+/opt/codac-5.3/include/irioCore/irioDataTypes.h
+/opt/codac-5.3/include/irioCore/irioDriver.h
+/opt/codac-5.3/include/irioCore/irioError.h
+/opt/codac-5.3/include/irioCore/irioHandlerAnalog.h
+/opt/codac-5.3/include/irioCore/irioHandlerDMA.h
+/opt/codac-5.3/include/irioCore/irioHandlerDMAGPU.h
+/opt/codac-5.3/include/irioCore/irioHandlerDigital.h
+/opt/codac-5.3/include/irioCore/irioHandlerImage.h
+/opt/codac-5.3/include/irioCore/irioHandlerSG.h
+/opt/codac-5.3/include/irioCore/irioResourceFinder.h
+/opt/codac-5.3/lib
+/opt/codac-5.3/lib/libirioCore.a
+
+Requires:
+rpmlib(VersionedDependencies) <= 3.0.3-1
+codac-core-5.3-common
+codac-core-5.3-irio
+rpmlib(FileDigests) <= 4.6.0-1
+rpmlib(PayloadFilesHavePrefix) <= 4.0-1
+rpmlib(CompressedFileNames) <= 3.0.4-1
+rpmlib(PayloadIsXz) <= 5.2-1
+
+Provides:
+codac-core-5.3(irio)
+codac-core-5.3-irio-devel = 5.3b2
+codac-core-irio-devel = 5.3b2.v1.1.1
+codac-core-5.3-irio-devel = 5.3b2.v1.1.1-0.el6
+codac-core-5.3-irio-devel(x86-64) = 5.3b2.v1.1.1-0.el6
