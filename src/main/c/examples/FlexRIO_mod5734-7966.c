@@ -87,15 +87,13 @@ int main (int argc, char **argv)
 	irioDrv_t p_DrvPvt;
 	TStatus status;
 	irio_initStatus(&status);
-	int myStatus=0;
-	int i=0;
-	int valueReadI32=0;
+	int myStatus;
 
-	int auxAI9Value=0;
-	int sampleCounter=0;
-	int positiveTest=0;
-	int negativeTest=0;
-
+	int valueReadI32;
+	int auxAI9Value;
+	int sampleCounter;
+	int elementsRead;
+	int i;
 	
 	int verbosity=1;
 
@@ -103,12 +101,13 @@ int main (int argc, char **argv)
 	char *bitfileName=NULL;
 	char *NIriomodel=NULL;
 
+	int DMATtoHOSTBlockNWords;
+	int DMATtoHOSTNCh;
+	int samplingrate;
+	int numOfSamplesToShow;
 
-	int DMATtoHOSTBlockNWords=0;
-	int DMATtoHOSTNCh=0;
-	int samplingrate=0;
-
-	int numOfSamplesToShow=0;
+	uint64_t *dataBuffer=NULL;
+	short int *auxDataBuffer=NULL;
 
 	int coupling =0;
 	if (argc != 4) {
@@ -122,11 +121,6 @@ int main (int argc, char **argv)
 	asprintf(&filePath,"%s/resourceTest/%s/",get_current_dir_name(),argv[2]);
 	asprintf(&bitfileName,"FlexRIOMod5734_%s",argv[2]);
 	asprintf(&NIriomodel,"PXIe-%sR",argv[2]);
-
-	uint64_t *dataBuffer=NULL;
-	short int *auxDataBuffer=NULL;
-	int elementsRead=0;
-	dataBuffer=(uint64_t *)malloc(4096*8);///4096 data block size
 
 	// initialize the RIO device calling the irio_initDriver
 	msgtest(0,irio_initDriver);
@@ -146,6 +140,7 @@ int main (int argc, char **argv)
 	/**
 	 * DEBUG MODE CONFIGURATION: OFF MODE
 	 */
+	valueReadI32 = 0;
 	msgtest(2,irio_setDebugMode & irio_getDebugMode);
 	printf("[irio_setDebugMode function] DebugMode set to 0 (OFF)\n");
 	myStatus=irio_setDebugMode(&p_DrvPvt,0,&status); // Debug mode set to OFF
@@ -198,18 +193,16 @@ int main (int argc, char **argv)
    /**
 	* auxAI9 WILL BE READ, AND 2048 DIGITAL VALUE IS EXPECTED
 	*/
+	auxAI9Value=0;
 	msgtest(6,irio_getAuxAI);
 	myStatus=irio_getAuxAI(&p_DrvPvt,9,&auxAI9Value,&status);
 	printf("The auxAI9 register must have the same value as the output of the signal generator: in this case 2048\n");
 	printf("[irio_getAuxAI function] auxAI9 read %d\n",auxAI9Value);
 	msgerr(myStatus,6,"irio_getAuxAI",&status,verbosity,0);
+
 	/**
 	 * DMA FUNCTION TESTS
 	 */
-	sampleCounter=0;
-	positiveTest=0;
-	negativeTest=0;
-	elementsRead=0;
 
 	/**
 	 * DMA CLEANING
@@ -250,14 +243,18 @@ int main (int argc, char **argv)
 //	msgerr(myStatus,10,"irio_setAICoupling & irio_getAICoupling",&status,verbosity,0);
 
 
+	//TODO: Esto está aislado de lo demás, pertenece al test 10 comentado o al
+	//      test 11? Hay que comprobar que esos setters son correctos.
+	//      No puedo arreglar error cppCheck con esto así
+
 	// setting DC mode directly.
 		coupling=atoi(argv[3]);
     // This part is setting the DC coupling for channel 0 only
 		myStatus=irio_setAuxAO(&p_DrvPvt,6,3,&status); //3 is the command to change the DC coupling
-		myStatus=irio_setAuxAO(&p_DrvPvt,7,0,&status); //1 is the channel to setup; 0 in this example
-		myStatus=irio_setAuxAO(&p_DrvPvt,8,coupling,&status); //1 is DC mode
-		myStatus=irio_setAuxDO(&p_DrvPvt,6,0,&status); //Rising edge generation
-		myStatus=irio_setAuxDO(&p_DrvPvt,6,1,&status); //Rising edge generation
+		myStatus|=irio_setAuxAO(&p_DrvPvt,7,0,&status); //1 is the channel to setup; 0 in this example
+		myStatus|=irio_setAuxAO(&p_DrvPvt,8,coupling,&status); //1 is DC mode
+		myStatus|=irio_setAuxDO(&p_DrvPvt,6,0,&status); //Rising edge generation
+		myStatus|=irio_setAuxDO(&p_DrvPvt,6,1,&status); //Rising edge generation
 
 	/**
 	 * DMA ENABLE
@@ -283,17 +280,14 @@ int main (int argc, char **argv)
 	myStatus|=irio_getDAQStartStop(&p_DrvPvt,&valueReadI32,&status);
 	printf("[irio_getDAQStartStop function] DAQStartStop read %d\n",valueReadI32);
 	msgerr(myStatus,12,"irio_setDAQStartStop irio_getDAQStartStop",&status,verbosity,1);
-    DMATtoHOSTBlockNWords=p_DrvPvt.DMATtoHOSTBlockNWords[0];
-	DMATtoHOSTNCh=p_DrvPvt.DMATtoHOSTNCh[0];
-
-	sampleCounter=0;
-	elementsRead=0;
 	
-	
-
 	/**
     * LOOP FOR ACQUIRING 1 BLOCK AND ONLY SHOW 51 SAMPLES
 	*/
+	DMATtoHOSTBlockNWords=p_DrvPvt.DMATtoHOSTBlockNWords[0];
+	DMATtoHOSTNCh=p_DrvPvt.DMATtoHOSTNCh[0];
+	sampleCounter=0;
+	elementsRead=0;
 
 	do{
 		myStatus=irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer, &elementsRead,&status);
@@ -314,9 +308,9 @@ int main (int argc, char **argv)
 		{
 			usleep(((1/(double)samplingrate)*DMATtoHOSTBlockNWords)*500000);// we wait at least half the duration of the block in microseconds
 		}
-	}while (sampleCounter<1);
-	msgerr(myStatus,18,"irio_getDMATtoHostData & irio_setDAQStartStop",&status,verbosity,0);
+	}	while (sampleCounter<1);
 	myStatus=irio_setDAQStartStop(&p_DrvPvt,0,&status); // Data acquisition is stopped
+	msgerr(myStatus,18,"irio_getDMATtoHostData & irio_setDAQStartStop",&status,verbosity,0);
 
 	/**
 	 * IRIO CLOSE DRIVER

@@ -105,7 +105,6 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 	local_status=irio_initFileSearch(p_DrvPvt,TMP_FILE,(void**)&fileContent,status);
 	if (local_status==IRIO_success){
 		int found=0;
-		int end=0;
 		char* deviceInfo=NULL;
 		char* port=NULL;
 		char serialNo[20];
@@ -115,16 +114,20 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 		if((deviceInfo=strstr(fileContent,STRINGNAME_RESOURCEINIT))==NULL){
 			irio_mergeStatus(status,HardwareNotFound_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR No hardware found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 			local_status |= IRIO_error;
-			end=1;
 		}
 		#else
 			deviceInfo=fileContent;
 		#endif
-		while(!found && !end){//Search while the device has not been found and still no errors
+		while(!found){//Search while the device has not been found and still no errors
 			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT))!=NULL){//Still devices to search
-				sscanf(deviceInfo,"%s",port);
+				int aux;
+				char * auxLength;
+				sscanf(deviceInfo+3, "%d", &aux);
+				auxLength = (char*) calloc (aux, sizeof(int));
+				sprintf(auxLength, "%d", aux);
+				// TODO: Damos por hecho que todos los dispositivos se llaman RIOX
+				snprintf(port, strlen(deviceInfo)+strlen(auxLength), "RIO%d", aux);
 			}else{
-				end=1;
 				break;
 			}
 			//Search fields values
@@ -212,14 +215,20 @@ int findDeviceInfo(irioDrv_t *p_DrvPvt, const char* fileContent, const char* toS
 		irio_mergeStatus(status,ListRIODevicesParsing_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Finding %s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
 		local_status |= IRIO_error;
 	}else{
-		//If found pattern move pointer before colon and scan the value
-		aux=strstr(aux,":");
-		if(sscanf(aux,"%*s %s",info)==0){
+		int auxLength;
+		//If found pattern move pointer before hexadecimal value and scan the value
+		aux=strstr(aux,"0x");
+		char* findNL = strchr(aux, '\n');
+		if(findNL == NULL){
+			return IRIO_error;
+		}
+		auxLength = (int)(findNL - aux);
+
+		if (snprintf(info, auxLength+1, "%s", aux) <= 0) {
 			irio_mergeStatus(status,ListRIODevicesParsing_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
 			local_status|= IRIO_error;
 		}
 	}
-
 	if(local_status<IRIO_error){
 		return local_status;
 	}else{

@@ -98,12 +98,10 @@ int main (int argc, char **argv)
 	char *bitfileName=NULL;
 	char *NIriomodel=NULL;
 
-
 	if (argc != 3) {
 			usage(argv[0]);
 			return 1;
 	}
-
 
 	asprintf(&filePath,"%s/resourceTest/%s/",get_current_dir_name(),argv[2]);
 	asprintf(&bitfileName,"FlexRIOnoModule_%s",argv[2]);
@@ -130,14 +128,15 @@ int main (int argc, char **argv)
 
 	///iRIOCore testing: irio_setAuxAO irio_getAuxAI functions
 	msgtest(2,irio_setAuxAO irio_getAuxAO irio_getAuxAI);
+	//TODO: Jc No habria que generalizarlo para todas las auxAO que haya declarados en el bitfile y no siempre a 6?
 	for(i=0;i<6;i++)
 	{
 		printf("[irio_setAuxAO function] value 0 is set in auxAO%d \n",i);
-		myStatus|=irio_setAuxAO(&p_DrvPvt,i,0,&status);
+		myStatus=irio_setAuxAO(&p_DrvPvt,i,0,&status);
 		myStatus|=irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
 		printf("[irio_getAuxAO function] value read from auxAO%d is:%d\n",i, aivalue);
 
-		myStatus=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
+		myStatus|=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
 		printf("[irio_getAuxAI function] value read from auxAI%d is:%d\n\n",i, aivalue);
 
 		if(aivalue!=0)
@@ -165,7 +164,7 @@ int main (int argc, char **argv)
 	{
 
 		printf("[irio_setAuxDO function] value 0 is set in auxDO%d \n",i);
-		myStatus|=irio_setAuxDO(&p_DrvPvt,i,0,&status);
+		myStatus=irio_setAuxDO(&p_DrvPvt,i,0,&status);
 		myStatus|=irio_getAuxDO(&p_DrvPvt,i,&aivalue,&status);
 		printf("[irio_getAuxDO function] value read from auxDO%d is:%d\n",i, aivalue);
 		myStatus|=irio_getAuxDI(&p_DrvPvt,i,&aivalue,&status);

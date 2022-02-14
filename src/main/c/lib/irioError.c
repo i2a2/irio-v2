@@ -55,6 +55,7 @@ int irio_mergeStatus(TStatus* status,TErrorDetailCode code, int printMsg, const 
 	char* newMsg = NULL;
 	if(vasprintf(&newMsg,format,argptr)<=0){
 		printf("\n\nERROR in irio_mergeStatus\n\n");
+		va_end(argptr);
 		return -1;
 	}
 

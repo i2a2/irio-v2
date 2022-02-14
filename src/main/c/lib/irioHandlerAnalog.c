@@ -147,8 +147,8 @@ int irio_findAnalogOutputs(irioDrv_t* p_DrvPvt, TStatus* status){
 	irio_initStatus(&local_status);
 	irio_initStatus(&accum_status);
 	TIRIOStatusCode local_code = IRIO_success;
-	TIRIOStatusCode local_code1 = IRIO_success;
-	TIRIOStatusCode local_code2 = IRIO_success;
+	TIRIOStatusCode local_code1;
+	TIRIOStatusCode local_code2;
 	int max_analogoutputs=p_DrvPvt->max_analogoutputs;
 	int i;
 	int count=0;
@@ -381,6 +381,7 @@ int irio_getAuxAO(irioDrv_t* p_DrvPvt,int n,int32_t* value, TStatus* status){
 			local_status |= IRIO_warning;
 		}
 	}else{
+		//TODO: Jc No habría que poner Error code?
 		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUXAO,n);
 		local_status |= IRIO_warning;
 	}

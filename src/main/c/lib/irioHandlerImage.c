@@ -322,7 +322,7 @@ int irio_sendCLuart(irioDrv_t* p_DrvPvt, const char *msg, int msg_size,TStatus* 
 	int i;
 	NiFpga_Bool TxReady;
 	uint8_t aux;
-	NiFpga_Status fpgaStatus= NiFpga_Status_Success;
+	NiFpga_Status fpgaStatus;
 
 	if(!p_DrvPvt->enumuartTxReady.found || !p_DrvPvt->enumuartTxByte.found || !p_DrvPvt->enumuartTransmit.found){
 		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"%s[%s,%d]-(%s) WARNING Some of UART mandatory resources for sending messages were not found. Can not send UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);

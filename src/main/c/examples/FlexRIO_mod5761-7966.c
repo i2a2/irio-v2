@@ -86,16 +86,18 @@ int main (int argc, char **argv)
 	irioDrv_t p_DrvPvt;
 	TStatus status;
 	irio_initStatus(&status);
-	int myStatus=0;
-	int i=0;
-	int valueReadI32=0;
+	int myStatus;
 
-	int auxAI9Value=0;
-	int sampleCounter=0;
+	int valueReadI32;
+	int auxAI9Value;
+	int sampleCounter;
+	int elementsRead;
+	int i;
+
 	int positiveTest=0;
 	int negativeTest=0;
 
-	int accIncr=0;
+	int accIncr;
 	int verbosity=1;
 
 	char *filePath=NULL;
@@ -103,13 +105,13 @@ int main (int argc, char **argv)
 	char *NIriomodel=NULL;
 
 
-	int DMATtoHOSTBlockNWords=0;
-	int DMATtoHOSTNCh=0;
-	int samplingrate=0;
+	int DMATtoHOSTBlockNWords;
+	int DMATtoHOSTNCh;
+	int samplingrate;
 
-	int numOfSamplesToShow=0;
+	int numOfSamplesToShow;
 
-	int coupling =0;
+	int coupling;
 	if (argc != 4) {
 			usage(argv[0]);
 			return 1;
@@ -124,7 +126,6 @@ int main (int argc, char **argv)
 
 	uint64_t *dataBuffer=NULL;
 	short int *auxDataBuffer=NULL;
-	int elementsRead=0;
 	dataBuffer=(uint64_t *)malloc(4096*8);///4096 data block size
 
 	// initialize the RIO device calling the irio_initDriver
@@ -226,6 +227,7 @@ int main (int argc, char **argv)
 	/**
 	 * DMA SAMPLING RATE CONFIGURATION
 	 */
+
 	msgtest(9,irio_setDMATtoHostSamplingRate & irio_getDMATtoHostSamplingRate);
 	printf("FPGA Clock reference (Fref value) is: %d Hz\n", p_DrvPvt.Fref);
 	printf("[irio_setDMATtoHostSamplingRate function] Sampling rate for DMA0 set to %dS/s\n", 500000);
@@ -321,8 +323,6 @@ int main (int argc, char **argv)
 	myStatus|=irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	msgerr(myStatus,13,"setSGFreq setSGUpdateRate setDAQStartStop getDMATtoHostData setDMATtoHostEnable setUpDMAsTtoHost",&status,verbosity,1);
 
-
-
 	/**
 	 * WAVEFORM GENERATOR RECONFIGURATION FOR TESTING SAMPLINGRATE AND SIGNAL GENERATION FREQUENCIES
 	 */
@@ -358,7 +358,6 @@ int main (int argc, char **argv)
 	printf("[irio_getSGAmp function] SGAmp0 read %d, meaning %fV \n", valueReadI32, valueReadI32/p_DrvPvt.CVDAC); // Amplitude configured (digital value) for WG0 is 4096
 	msgerr(myStatus,16,"irio_setSGAmp & irio_getSGAmp",&status,verbosity,0);
 
-
 	/**
 	 * WG0 CONFIGURED WITH SINE SIGNAL PATTERN
 	 */
@@ -372,8 +371,6 @@ int main (int argc, char **argv)
 	usleep(100000);
 	myStatus|=irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
 	msgerr(myStatus,17,"irio_setSGSignalType & irio_getSGSignalType (& irio_setAOEnable)",&status,verbosity,0);
-
-
 
 	sampleCounter=0;
 	elementsRead=0;
@@ -410,7 +407,6 @@ int main (int argc, char **argv)
 		}
 	}while (sampleCounter<1);
 	msgerr(myStatus,18,"irio_getDMATtoHostData & irio_setDAQStartStop",&status,verbosity,0);
-
 
 	/**
 	 * IRIO CLOSE DRIVER
