@@ -185,7 +185,7 @@ typedef struct TResourcePort{
  */
 typedef struct TResourcePort_64{
 	uint8_t found;
-	uint32_t value;
+	uint64_t value;
 }TResourcePort_64;
 
 /**
