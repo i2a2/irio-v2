@@ -293,6 +293,64 @@ int irio_findResourceEnum(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t
 	}
 }
 
+int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t index, TResourcePort_64* port,TStatus* status,int printErrMsg){
+	TIRIOStatusCode local_status = IRIO_success;
+	char* baseName = NULL;
+	int sys_status=0;
+	port->found=0;
+	if(index>=0){
+		sys_status = asprintf(&baseName,"%s%d",resourceName,index);
+	}else{
+		sys_status = asprintf(&baseName,"%s",resourceName);
+	}
+
+	if(sys_status < 0){
+		printf("[%s,%d]-(%s)ERROR Syscall failed.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		status->detailCode=MemoryAllocation_Error;
+		status->code=IRIO_error;
+		return IRIO_error;
+	}
+
+	char* aux = NULL; //first initialized to NULL to avoid valgrind warning
+	char *aux2=NULL;
+	aux2=p_DrvPvt->headerFile;
+	char* completeName = NULL;
+	sys_status = asprintf(&completeName,"%s%s%s",STRINGNAME_PREFIX,p_DrvPvt->projectName,baseName);
+	if(sys_status < 0){
+		printf("[%s,%d]-(%s)ERROR Syscall failed.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		status->detailCode=MemoryAllocation_Error;
+		status->code=IRIO_error;
+		return IRIO_error;
+	}
+	aux=strstr(aux2,completeName);
+	//Move the file pointer right before the port name.
+	if(aux==NULL){
+		irio_mergeStatus(status,ResourceNotFound_Error,printErrMsg,"[%s,%d]-(%s)ERROR Finding %s.\n",__func__,__LINE__,p_DrvPvt->appCallID,completeName);
+		local_status = IRIO_error;
+	}else
+	//Read the port value
+	if(sscanf(aux,"%*s %*s %lX",&port->value)==0){//First, try to read an hexadecimal value
+		//TODO: Review if formats lX and ld support variable uint64_t
+		if (sscanf(aux,"%*s %*s %ld",&port->value)==0){//If failed, try to read a decimal value
+			irio_mergeStatus(status,ResourceValueNotValid_Error,printErrMsg,"[%s,%d]-(%s) ERROR Value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,completeName);
+			local_status = IRIO_error;
+		}else{
+			port->found=1;
+		}
+	}else{
+		port->found=1;
+	}
+
+	free(completeName);
+	free(baseName);
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
 int irio_findHeaderString(irioDrv_t *p_DrvPvt, char* fileContent, const char* toSearch, char** str,TStatus* status){
 	char* aux;
 	char *indexcoma1;

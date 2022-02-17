@@ -363,11 +363,13 @@ int allocFlexRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status){
 	p_DrvPvt->enumAnalogInput = calloc(p_DrvPvt->max_analoginputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanaloginputs = FLEXRIO_MAX_AUXA_IN;
 	p_DrvPvt->enumauxAI = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAI_64 = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort_64));
 	p_DrvPvt->max_analogoutputs = FLEXRIO_MAX_ANALOGS_OUT;
 	p_DrvPvt->enumAnalogOutput= calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->enumAOEnable = calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanalogoutputs = FLEXRIO_MAX_AUXA_OUT;
 	p_DrvPvt->enumauxAO = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAO_64 = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort_64));
 
 	//Digital Limits
 	p_DrvPvt->max_digitalsinputs = FLEXRIO_MAX_DIGITALS;

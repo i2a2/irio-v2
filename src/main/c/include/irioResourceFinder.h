@@ -107,6 +107,22 @@ int irio_closeFileSearch(irioDrv_t *p_DrvPvt, void** fileContent,TStatus* status
 int irio_findResourceEnum(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t index, TResourcePort* port,TStatus* status,int printErrMsg);
 
 /**
+ * Search 64 bits resource port
+ *
+ * Search a resource port identified by its name (and number if necessary).
+ * Map resource port in the given struct.
+ * Errors will be prompted if the resource was not found or the port information could not be read.
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] resourceName Name of the port to search
+ * @param[in] index Number of the resource. Concatenated to resourceName if greater than -1.
+ * @param[out] port 64 bits Resource port
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t index, TResourcePort_64* port,TStatus* status,int printErrMsg);
+
+/**
  * Search string value in header file
  *
  * Searches the macro that defines a value for the given string in the file content.

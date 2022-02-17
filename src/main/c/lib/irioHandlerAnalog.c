@@ -47,7 +47,9 @@
 #define STRINGNAME_ANALOGOUTPUT "_ControlI32_AO"
 #define STRINGNAME_AOENABLE "_ControlBool_AOEnable"
 #define STRINGNAME_AUXAI "_IndicatorI32_auxAI"
+#define STRINGNAME_AUX64AI "_IndicatorI64_aux64AI"
 #define STRINGNAME_AUXAO "_ControlI32_auxAO"
+#define STRINGNAME_AUX64AO "_ControlI64_aux64AO"
 ///@}
 
 int irio_findAnalogs(irioDrv_t* p_DrvPvt, TStatus* status){
@@ -70,7 +72,11 @@ int irio_findAuxAnalogs(irioDrv_t* p_DrvPvt, TStatus* status){
 
 	local_status |= irio_findAuxAnalogInputs(p_DrvPvt,status);
 
+	local_status |= irio_findAuxAnalogInputs_64(p_DrvPvt,status);
+
 	local_status |= irio_findAuxAnalogOutputs(p_DrvPvt,status);
+
+	local_status |= irio_findAuxAnalogOutputs_64(p_DrvPvt,status);
 
 	if(local_status<IRIO_error){
 		return local_status;
@@ -119,10 +125,10 @@ int irio_findAuxAnalogInputs(irioDrv_t* p_DrvPvt,TStatus* status){
 	int count=0;
 
 	if(p_DrvPvt->verbosity){
-		printf("[%s,%d]-(%s) TRACE Auxiliary Analog Inputs found:",__func__,__LINE__,p_DrvPvt->appCallID);
+		printf("[%s,%d]-(%s) TRACE 32 bits Auxiliary Analog Inputs found:",__func__,__LINE__,p_DrvPvt->appCallID);
 	}
 
-	//Aux Analog Inputs are optional. If something fails, clean the error.
+	//32 bits Aux Analog Inputs are optional. If something fails, clean the error.
 	for(i=0;i<max_auxanaloginputs;i++){
 		if(irio_findResourceEnum(p_DrvPvt,STRINGNAME_AUXAI,i,&p_DrvPvt->enumauxAI[i],&local_status,0)==IRIO_success){
 			if(p_DrvPvt->verbosity){
@@ -135,7 +141,38 @@ int irio_findAuxAnalogInputs(irioDrv_t* p_DrvPvt,TStatus* status){
 
 	if(p_DrvPvt->verbosity){
 		printf("\n");
-		printf("[%s,%d]-(%s) TRACE TOTAL Auxiliary Analog Inputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
+		printf("[%s,%d]-(%s) TRACE TOTAL 32 bits Auxiliary Analog Inputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
+	}
+
+	return IRIO_success;
+}
+
+int irio_findAuxAnalogInputs_64(irioDrv_t* p_DrvPvt,TStatus* status){
+	//Search for 64 bits aux analog inputs
+	TStatus local_status;
+	irio_initStatus(&local_status);
+	int max_auxanaloginputs=p_DrvPvt->max_auxanaloginputs;
+	int i;
+	int count=0;
+
+	if(p_DrvPvt->verbosity){
+		printf("[%s,%d]-(%s) TRACE 64 bits Auxiliary Analog Inputs found:",__func__,__LINE__,p_DrvPvt->appCallID);
+	}
+
+	//64 bits Aux Analog Inputs are optional. If something fails, clean the error.
+	for(i=0;i<max_auxanaloginputs;i++){
+		if(irio_findResourceEnum_64(p_DrvPvt,STRINGNAME_AUX64AI,i,&p_DrvPvt->enumauxAI_64[i],&local_status,0)==IRIO_success){
+			if(p_DrvPvt->verbosity){
+				printf("aux64AI%d, ",i);
+			}
+			count++;
+		}
+		irio_resetStatus(&local_status);
+	}
+
+	if(p_DrvPvt->verbosity){
+		printf("\n");
+		printf("[%s,%d]-(%s) TRACE TOTAL 32 bits Auxiliary Analog Inputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
 	}
 
 	return IRIO_success;
@@ -208,10 +245,10 @@ int irio_findAuxAnalogOutputs(irioDrv_t* p_DrvPvt, TStatus* status){
 	int count=0;
 
 	if(p_DrvPvt->verbosity){
-		printf("[%s,%d]-(%s) TRACE Auxiliary Analog Outputs found:",__func__,__LINE__,p_DrvPvt->appCallID);
+		printf("[%s,%d]-(%s) TRACE 32 bits Auxiliary Analog Outputs found:",__func__,__LINE__,p_DrvPvt->appCallID);
 	}
 
-	//Aux Analog Outputs are optional. If something fails, clean the error.
+	//32 bits Aux Analog Outputs are optional. If something fails, clean the error.
 	for(i=0;i<max_auxanalogoutputs;i++){
 		if(irio_findResourceEnum(p_DrvPvt,STRINGNAME_AUXAO,i,&p_DrvPvt->enumauxAO[i],&local_status,0)==IRIO_success){
 			if(p_DrvPvt->verbosity){
@@ -224,8 +261,41 @@ int irio_findAuxAnalogOutputs(irioDrv_t* p_DrvPvt, TStatus* status){
 
 	if(p_DrvPvt->verbosity){
 		printf("\n");
-		printf("[%s,%d]-(%s) TRACE TOTAL Auxiliary Analog Outputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
+		printf("[%s,%d]-(%s) TRACE TOTAL 32 bits Auxiliary Analog Outputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
 	}
+
+	return IRIO_success;
+}
+
+int irio_findAuxAnalogOutputs_64(irioDrv_t* p_DrvPvt, TStatus* status){
+
+	//Search for 64 bits aux analog outputs
+	TStatus local_status;
+	irio_initStatus(&local_status);
+	int i;
+	int max_auxanalogoutputs=p_DrvPvt->max_auxanalogoutputs;
+	int count=0;
+
+	if(p_DrvPvt->verbosity){
+		printf("[%s,%d]-(%s) TRACE 64 bits Auxiliary Analog Outputs found:",__func__,__LINE__,p_DrvPvt->appCallID);
+	}
+
+	//64 bits Aux Analog Outputs are optional. If something fails, clean the error.
+	for(i=0;i<max_auxanalogoutputs;i++){
+		if(irio_findResourceEnum_64(p_DrvPvt,STRINGNAME_AUX64AO,i,&p_DrvPvt->enumauxAO_64[i],&local_status,0)==IRIO_success){
+			if(p_DrvPvt->verbosity){
+				printf("aux64AO%d, ",i);
+			}
+			count++;
+		}
+		irio_resetStatus(&local_status);
+	}
+
+	if(p_DrvPvt->verbosity){
+		printf("\n");
+		printf("[%s,%d]-(%s) TRACE TOTAL 64 bits Auxiliary Analog Outputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
+	}
+
 	return IRIO_success;
 }
 
@@ -265,6 +335,27 @@ int irio_getAuxAI(irioDrv_t* p_DrvPvt,int n,int32_t* value, TStatus* status){
 		}
 	}else{
 		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUXAI,n);
+		local_status |= IRIO_warning;
+	}
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_getAuxAI_64(irioDrv_t* p_DrvPvt,int n,int64_t* value, TStatus* status){
+	TIRIOStatusCode local_status = IRIO_success;
+	if(n>=0 && n<(p_DrvPvt->max_auxanaloginputs) && p_DrvPvt->enumauxAI_64[n].found){
+		NiFpga_Status fpgaStatus = NiFpga_Status_Success;
+		fpgaStatus=NiFpga_ReadI64(p_DrvPvt->session,p_DrvPvt->enumauxAI_64[n].value,value);
+		if(NiFpga_IsError(fpgaStatus)){
+			irio_mergeStatus(status,Read_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error reading %s%d. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUX64AI,n,fpgaStatus);
+			local_status |= IRIO_warning;
+		}
+	}else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUX64AI,n);
 		local_status |= IRIO_warning;
 	}
 
@@ -381,8 +472,28 @@ int irio_getAuxAO(irioDrv_t* p_DrvPvt,int n,int32_t* value, TStatus* status){
 			local_status |= IRIO_warning;
 		}
 	}else{
-		//TODO: Jc No habría que poner Error code?
 		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUXAO,n);
+		local_status |= IRIO_warning;
+	}
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_getAuxAO_64(irioDrv_t* p_DrvPvt,int n,int64_t* value, TStatus* status){
+	TIRIOStatusCode local_status = IRIO_success;
+	if(n>=0 && n<(p_DrvPvt->max_auxanalogoutputs) && p_DrvPvt->enumauxAO_64[n].found){
+		NiFpga_Status fpgaStatus = NiFpga_Status_Success;
+		fpgaStatus=NiFpga_ReadI64(p_DrvPvt->session,p_DrvPvt->enumauxAO_64[n].value,value);
+		if(NiFpga_IsError(fpgaStatus)){
+			irio_mergeStatus(status,Read_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error reading %s%d. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUX64AO,n,fpgaStatus);
+			local_status |= IRIO_warning;
+		}
+	}else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUX64AO,n);
 		local_status |= IRIO_warning;
 	}
 
@@ -404,6 +515,27 @@ int irio_setAuxAO(irioDrv_t* p_DrvPvt,int n,int32_t value, TStatus* status){
 		}
 	}else{
 		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUXAO,n);
+		local_status |= IRIO_warning;
+	}
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_setAuxAO_64(irioDrv_t* p_DrvPvt,int n,int64_t value, TStatus* status){
+	TIRIOStatusCode local_status = IRIO_success;
+	if(n>=0 && n<(p_DrvPvt->max_auxanalogoutputs) && p_DrvPvt->enumauxAO_64[n].found){
+		NiFpga_Status fpgaStatus = NiFpga_Status_Success;
+		fpgaStatus=NiFpga_WriteI64(p_DrvPvt->session,p_DrvPvt->enumauxAO_64[n].value,value);
+		if(NiFpga_IsError(fpgaStatus)){
+			irio_mergeStatus(status,Write_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error writing %s%d. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUX64AO,n,fpgaStatus);
+			local_status |= IRIO_warning;
+		}
+	}else{
+		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_AUX64AO,n);
 		local_status |= IRIO_warning;
 	}
 
