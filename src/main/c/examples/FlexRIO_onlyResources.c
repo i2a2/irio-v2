@@ -162,6 +162,33 @@ int main (int argc, char **argv)
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 	msgerr(myStatus,2,"MAXIO Test",&status,verbosity,0);
 
+	//NEW TEST
+	//TODO: Hay que pensar cómo dejar estos ejemplos
+	// 2 opciones: dejar este test como una sub-versión del anterior (Test 2 + Test 2.1)
+	//             o modificar el Test 2 para que solo tenga en cuenta el bitfile con la
+	//             modificacion de los puertos de 64 bits
+	//-----------------all possible FlexRIO I/O resources Test including 64 bits auxiliary analog I/O
+	msgtest(2,MAXIO Test 64 bits);
+	asprintf(&bitfileName,"FlexRIOonlyResources_%s_64",argv[2]);
+	printf("Test 2.1: MAXIO including 64 bits auxiliary analog I/O ports. It should be Found:\n");
+	printf("1 DMA\n");
+	printf("2 AO\n");
+	printf("16 aux32AI\n");
+	printf("16 aux64AI\n");
+	printf("16 aux32AO\n");
+	printf("16 aux64AO\n");
+	printf("16 auxDI\n");
+	printf("16 auxDO\n");
+	printf("54 DI \n");
+	printf("54 DO \n");
+	printf("2 SG\n");
+
+//	asprintf(&VIName,"FlexRIOonlyResources_%s",riomodel_folder);
+	myStatus=irio_initDriver("testMAXIO",argv[1],NIriomodel,bitfileName,"V1.1",verbosity,filePath,filePath,&p_DrvPvt,&status);
+	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+	msgerr(myStatus,2,"MAXIO Test",&status,verbosity,0);
+
+
 	msgtest(3,Missing resources test);
 	printf("[Bug7516] This tests checks the correct order in error messages when verbosity=1 \n");
 	printf("Test 3: Missing resources. It should be Found:\n");
