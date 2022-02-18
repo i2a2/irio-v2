@@ -128,7 +128,8 @@ int main (int argc, char **argv)
 
 	///iRIOCore testing: irio_setAuxAO irio_getAuxAI functions
 	msgtest(2,irio_setAuxAO irio_getAuxAO irio_getAuxAI);
-	//TODO: Jc No habria que generalizarlo para todas las auxAO que haya declarados en el bitfile y no siempre a 6?
+	//TODO: Generalizarlo para todas las auxAO que haya declarados en el bitfile y no siempre a 6
+	//      No hardcodear
 	for(i=0;i<6;i++)
 	{
 		printf("[irio_setAuxAO function] value 0 is set in auxAO%d \n",i);
