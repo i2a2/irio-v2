@@ -172,7 +172,7 @@ int irio_findAuxAnalogInputs_64(irioDrv_t* p_DrvPvt,TStatus* status){
 
 	if(p_DrvPvt->verbosity){
 		printf("\n");
-		printf("[%s,%d]-(%s) TRACE TOTAL 32 bits Auxiliary Analog Inputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
+		printf("[%s,%d]-(%s) TRACE TOTAL 64 bits Auxiliary Analog Inputs found: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,count);
 	}
 
 	return IRIO_success;
