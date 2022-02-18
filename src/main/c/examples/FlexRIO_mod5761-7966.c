@@ -78,7 +78,7 @@ void usage(char *name) {
                 "Use lsrio.py to identify the RIO devices included in the fast controller\n"
         		"\n"
                 "Usage: %s <SERIAL_NUMBER> <RIOMODEL> <NI5761 Coupling AC=0,DC=1>\n"
-                "Example: %s 01666C59 7965 0\n", name, name);
+                "Example: %s 0x01666C59 7965 0\n", name, name);
 }
 
 int main (int argc, char **argv)

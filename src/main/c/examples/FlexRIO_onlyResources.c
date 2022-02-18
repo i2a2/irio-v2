@@ -81,7 +81,7 @@ void usage(char *name) {
                 "Use lsrio.py to identify the RIO devices included in the fast controller\n"
         		"\n"
                 "Usage: %s <SERIAL_NUMBER> <RIOMODEL> \n"
-                "Example: %s 01666C59 7965 \n", name, name);
+                "Example: %s 0x01666C59 7965 \n", name, name);
 }
 //TODO: This app is pending of rebuiding bitfiles with sufix 7965
 int main (int argc, char **argv)
