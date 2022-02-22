@@ -19,10 +19,10 @@ TestUtilsIRIO::TestUtilsIRIO()
 	{
 }
 
-void TestUtilsIRIO::setInferface(const std::string& device_name) {
+//void TestUtilsIRIO::setInferface(const std::string& device_name) {
 //	m_pInterface = nds::tests::TestControlSystemInterfaceImpl::getInstance(device_name);
-	m_deviceName = device_name;
-}
+//	m_deviceName = device_name;
+//}
 
 //nds::tests::TestControlSystemInterfaceImpl* TestUtilsIRIO::getPInterface() {
 //	return m_pInterface;
@@ -87,33 +87,33 @@ void TestUtilsIRIO::setInferface(const std::string& device_name) {
 //	return " :: "+errorSource+" :: "+errorSeverity+" :: "+errorMessage;
 //}
 //
-void writeTempFile(std::string filepath, std::vector<std::vector<float>> matrix, float samplingrate, std::uint32_t initial_channel){
-	std::fstream temFile;
-	temFile.open(filepath, std::fstream::trunc | std::ios_base::out  );
-	if (!temFile) {
-		std::cout<<"Error creating plotting temporal file"<<std::endl;
-	}
-	else {
-//		std::cout<<"WRITING FILE WITH "<<matrix.size()<<" CHANNELS"<<std::endl;
-		for (unsigned int col = 0; col < matrix.size(); col++) {
-			for (unsigned int cell = 0; cell < matrix[col].size(); cell++) {
-				temFile << std::to_string(matrix[col][cell])<<",";
-			}
-			temFile.seekp(-1,std::ios_base::seekdir::_S_end);
-			temFile<<std::endl;
-			//temFile.flush();
-		}
-		temFile.close();
-
-//		std::cout<<"This is the filepath: "<<filepath<<std::endl;
-		std::string command = "python ./ploter.py "+filepath+" "+std::to_string(samplingrate)+" "+std::to_string(initial_channel);
-		std::system(command.c_str());
-	}
-
-	if (std::remove(filepath.c_str())){
-		std::cout<<"Error deleting plotting temporal file"<<std::endl;
-	}
-}
+//void writeTempFile(std::string filepath, std::vector<std::vector<float>> matrix, float samplingrate, std::uint32_t initial_channel){
+//	std::fstream temFile;
+//	temFile.open(filepath, std::fstream::trunc | std::ios_base::out  );
+//	if (!temFile) {
+//		std::cout<<"Error creating plotting temporal file"<<std::endl;
+//	}
+//	else {
+////		std::cout<<"WRITING FILE WITH "<<matrix.size()<<" CHANNELS"<<std::endl;
+//		for (unsigned int col = 0; col < matrix.size(); col++) {
+//			for (unsigned int cell = 0; cell < matrix[col].size(); cell++) {
+//				temFile << std::to_string(matrix[col][cell])<<",";
+//			}
+//			temFile.seekp(-1,std::ios_base::seekdir::_S_end);
+//			temFile<<std::endl;
+//			//temFile.flush();
+//		}
+//		temFile.close();
+//
+////		std::cout<<"This is the filepath: "<<filepath<<std::endl;
+//		std::string command = "python ./ploter.py "+filepath+" "+std::to_string(samplingrate)+" "+std::to_string(initial_channel);
+//		std::system(command.c_str());
+//	}
+//
+//	if (std::remove(filepath.c_str())){
+//		std::cout<<"Error deleting plotting temporal file"<<std::endl;
+//	}
+//}
 //
 //
 //std::vector<std::vector<float>> TestUtilsIRIO::readDMAPVs(const std::string& DMANode,
