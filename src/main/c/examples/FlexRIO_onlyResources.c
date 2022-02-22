@@ -190,6 +190,7 @@ int main (int argc, char **argv)
 
 
 	msgtest(3,Missing resources test);
+	asprintf(&bitfileName,"FlexRIOonlyResources_%s",argv[2]);
 	printf("[Bug7516] This tests checks the correct order in error messages when verbosity=1 \n");
 	printf("Test 3: Missing resources. It should be Found:\n");
 	printf("1 AO + Error finding AO1Enable\n");
