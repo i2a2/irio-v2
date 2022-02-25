@@ -31,8 +31,8 @@ LIBPATH :=-L../../../lib -Wl,-rpath=$(LIBDIR) -L/opt/codac/lib
 
 #############################################################################
 
-CXXFLAGS +=$(INCLUDES) --coverage -MMD -MP -g -Wall -std=c++11
-LDFLAGS +=$(LIBPATH) -lpthread   -lirioCore -ldl -lrt -lgtest -lboost_regex
+CXXFLAGS +=$(INCLUDES) --coverage -MMD -MP -g -Wall -std=c++11 --coverage
+LDFLAGS +=$(LIBPATH) -lpthread   -lirioCore -ldl -lrt -lgtest -lboost_regex --coverage
 
 #TESTS_OBJS := $(patsubst $(EXAMPLESDIR)/%.cpp, %.o, $(wildcard $(EXAMPLESDIR)/*.cpp))
 TESTS_OBJS := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
@@ -43,7 +43,7 @@ TESTS_OBJS := $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 all: $(TEST)
 
 $(TEST): $(TESTS_OBJS) 
-	$(CXX) $^ --coverage -o $@ $(LDFLAGS)
+	$(CXX) $^  -o $@ $(LDFLAGS)
 
 
 clean:

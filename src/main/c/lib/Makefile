@@ -60,7 +60,7 @@ OBJS= $(SRCS_LIB:%.c=$(OBJECT_DIR)/%.o)
 ifdef CODAC_ROOT
 LDFLAGS += -lNiFpga -lniflexrio  -L$(CODAC_ROOT)/lib --coverage -fprofile-arcs -ftest-coverage -lgcov
 INCLUDE_DIRS += -I$(CODAC_ROOT)/include
-CFLAGS += -DOPEN_VERSION_NIRIO
+CFLAGS += -DOPEN_VERSION_NIRIO --coverage
 else 
 SUPPORT_SRC += ../support/NiFpga.c
 SUPPORT_OBJ = $(addprefix $(OBJECT_DIR)/, $(subst .c,.o,$(notdir $(SUPPORT_SRC))))
