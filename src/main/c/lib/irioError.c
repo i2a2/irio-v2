@@ -80,9 +80,7 @@ int irio_mergeStatus(TStatus* status,TErrorDetailCode code, int printMsg, const 
 		}
 	}
 
-	if(status->detailCode==Success){
-		status->detailCode=code;
-	}else if(code<0 && code<status->detailCode){
+	if(status->detailCode==Success || (code<0 && code<status->detailCode)){
 		status->detailCode=code;
 	}
 
@@ -97,6 +95,7 @@ int irio_mergeStatus(TStatus* status,TErrorDetailCode code, int printMsg, const 
 	return 0;
 }
 
+//TODO: Todos los valores no se evalúan en el código...
 int irio_getErrorString(TErrorDetailCode error, char** str){
 	*str=NULL;
 	switch(error){
