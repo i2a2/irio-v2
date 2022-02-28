@@ -161,7 +161,11 @@ int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const c
 	//Init file for resource search
 		//First build the header path
 	char* headerPath=NULL;
-	asprintf(&headerPath,"%s%s%s%s",headerDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,".h");
+
+	if (headerDir[strlen(headerDir)-1] != '/')
+		asprintf(&headerPath,"%s/%s%s%s",headerDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,".h");
+	else
+		asprintf(&headerPath,"%s%s%s%s",headerDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,".h");
 
 	//Call for file init
 	local_status |= irio_initFileSearch(p_DrvPvt,headerPath,(void**)&p_DrvPvt->headerFile,status);
@@ -175,7 +179,11 @@ int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const c
 
 	//Build bitfilePath
 	char* bitFilePath=NULL;
-	asprintf(&bitFilePath,"%s%s%s%s",bitfileDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,STRINGNAME_BITFILEEXT);
+
+	if (bitfileDir[strlen(headerDir)-1] != '/')
+		asprintf(&bitFilePath,"%s/%s%s%s",bitfileDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,STRINGNAME_BITFILEEXT);
+	else
+		asprintf(&bitFilePath,"%s%s%s%s",bitfileDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,STRINGNAME_BITFILEEXT);
 
 	//Configure target and dowload bitfile
 	if(local_status<IRIO_error){
