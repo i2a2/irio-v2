@@ -25,9 +25,6 @@ static int verbosity = 1;
 
 using namespace std;
 
-// Modified IRIO Library function
-static std::string getErrorString(const TStatus& status);
-
 /**
  * Test verifies driver’s ability to read and testing resources in the FPGA.
  * This test is related to the following requirements:
@@ -96,7 +93,17 @@ TEST(TP_onlyResources, functional)
 	EXPECT_EQ((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+
+		// Formato C
+//		char * detailStr = NULL;
+//		irio_getErrorString(status.detailCode, &detailStr);
+//		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+
+		// Formato C++
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 	}
 
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
@@ -104,8 +111,11 @@ TEST(TP_onlyResources, functional)
 	EXPECT_EQ((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
-		std::cerr << "Closing driver..." << std::endl;
+
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 	}
 }
 
@@ -151,16 +161,23 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 	}
 
+	// TODO: Este test es el único que cierra la sesión correctamente, debido a que en IRIO se pasa el parámetro p_DrvPvt->session inicializado
+	//       en algún lugar en vez de pasarlo como al inicializarse mal la FPGA. Revisar IRIO
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
-		std::cerr << "Closing driver..." << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 	}
 }
 
@@ -208,7 +225,10 @@ TEST(TP_onlyResources, wrongFilePath)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 		}
 
 	irio_closeDriver(&p_DrvPvt,0, &status);
@@ -216,7 +236,10 @@ TEST(TP_onlyResources, wrongFilePath)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 		std::cerr << "Closing driver..." << std::endl;
 		}
 }
@@ -265,7 +288,10 @@ TEST(TP_onlyResources, wrongBitfileName)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 		}
 
 	irio_closeDriver(&p_DrvPvt,0, &status);
@@ -273,7 +299,10 @@ TEST(TP_onlyResources, wrongBitfileName)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 		std::cerr << "Closing driver..." << std::endl;
 		}
 }
@@ -319,7 +348,10 @@ TEST(TP_onlyResources, wrongRIOSerial)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 	}
 
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
@@ -327,7 +359,10 @@ TEST(TP_onlyResources, wrongRIOSerial)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 		std::cerr << "Closing driver..." << std::endl;
 	}
 }
@@ -374,7 +409,10 @@ TEST(TP_onlyResources, wrongRIODevice)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 	}
 
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
@@ -382,117 +420,10 @@ TEST(TP_onlyResources, wrongRIODevice)
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
 		std::cerr << "Closing driver..." << std::endl;
 	}
-}
-
-// TODO: Esta función se puede llevar a un header aparte. Crear header si se crean más funciones
-static std::string getErrorString(const TStatus& status){
-	std::string error;
-	switch(status.detailCode){
-		case Generic_Error:
-			error = "Error generated outside IRIO. Check error messages for more detailed information";
-			break;
-		case HardwareNotFound_Error:
-			error="Specified RIO device not found. Review specified serial number.";
-			break;
-		case BitfileDownload_Error:
-			error="Error occurr downloading the bitfile. Check if bitfile was compiled for the specified target.";
-			break;
-		case InitDone_Error://!< Could not configure adapter module
-			error="Init done wait ended in timeout. Check if the connected adapter module is the intended and is properly connected.\n Check the initialization logic in of the project.";
-			break;
-		case IOModule_Error:			//!< IO module/s check error
-			error="Connected IO module is not the expected IO Module\n Review bitfile downloaded.";
-			break;
-		case NIRIO_API_Error:
-			error="NI-RIO C API returned error. Check returned error in error log.";
-			break;
-		case ListRIODevicesCommand_Error:
-			error="System call for listing connected RIO devices failed. Check if NI-RIO driver is installed and the executable is accessible.";
-			break;
-		case ListRIODevicesParsing_Error:
-			error="Failed to parse system call for listing connected RIO. Check version of NI-RIO Driver installed.";
-			break;
-		case SignatureNotFound_Error:
-			error="Can't find bitfile signature string in the given header file. Check NI FPGA C API Generator version used.";
-			break;
-		case ResourceNotFound_Error:
-			error="A mandatory resource wasn't found. Check error messages to find missing resources.";
-			break;
-		case SignatureValueNotValid_Error:
-			error="Can't read value of bitfile signature in the given header file. Check NI FPGA C API Generator version used.";
-			break;
-		case ResourceValueNotValid_Error:
-			error="Can't read address of a resource in the given header file. Check NI FPGA C API Generator version used.";
-			break;
-		case MemoryAllocation_Error:
-			error="IRIO tried to allocate memory unsuccessfully. Check possible memory leaks in user application.";
-			break;
-		case BitfileNotFound_Error:
-			error="Bitfile file for specified project was not found. Check project name and search path.";
-			break;
-		case HeaderNotFound_Error:
-			error="Header file for specified project was not found. Check project name and search path.";
-			break;
-		case FileAccess_Error:
-			error="A problem occur while reading a file. Check file permissions.";
-			break;
-		case FileNotFound_Error:
-			error="Tried to open a file and failed. Check file name and search path.";
-			break;
-		case FeatureNotImplemented_Error:
-			error="The target device or device profile are not supported. Check values in the project with the design rules";
-			break;
-		case Success:
-			error="Device status is OK";
-			break;
-		case TemporaryFileDelete_Warning:
-			error="Could not delete temporary file. Check /tmp/ folder permissions or previous warnings/errors.";
-			break;
-		case ResourceNotFound_Warning: //!< Part of optional resource not found (e.g. AO0 Present but AOEnable0 not present)
-			error="An optional resource (or part of it for complex resources) wasn't found. Check error messages to find missing resources.";
-			break;
-		case FPGAAlreadyRunning_Warning:	//!< Tried to change FPGAStart after FPGA was started/FPGA was started (bitfile downloaded was already in the FPGA)
-			error="Tried change FPGAStart value after FPGA was started or FPGA was started before downloading the bitfile (previous session). If this is not the intended behaviour, reset the FPGA.";
-			break;
-		case Read_NIRIO_Warning:
-			error="Tried to access an existing FPGA resource unsuccessfully. Check error messages to find NI-RIO driver error code.";
-			break;
-		case Read_Resource_Warning:		//!< Tried to access a not-present resource
-			error="Tried to access a non-existing FPGA resource. Check implemented resources in the project or enabling verbosity mode in irio_initDriver call.";
-			break;
-		case Write_NIRIO_Warning:
-			error="Tried to write in an existing FPGA resource unsuccessfully. Check error messages to find NI-RIO driver error code.";
-			break;
-		case Write_Resource_Warning:
-			error="Tried to write in a non-existing FPGA resource. Check implemented resources in the project or enabling verbosity mode in irio_initDriver call.";
-			break;
-		case ConfigDMA_Warning:			//!< Attempt to Configure, Start or Stop DMA failed
-			error="Tried to configure/start/stop DMA FIFO unsuccessfully. Check error messages to find NI-RIO driver error code.";
-			break;
-		case ConfigUART_Warning:			//!< Timeout for setting baudrate
-			error="Tried to configure UART baud rate unsuccessfully. UART seems busy.";
-			break;
-		case ValueOOB_Warning:
-			error="Tried to write a value Out of Bounds. Check design rules for operational range.";
-			break;
-		case Generic_Warning:
-			error="Warning generated outside IRIO. Check warning messages for more detailed information";
-			break;
-		case DAQtimeout_Warning:
-			error="Timeout reached when waiting for data from data acquisition";
-			break;
-		case CLSLinetimeout_Warning:
-			error="Timeout reached when waiting for cameralink serial data";
-			break;
-		case ResourceRelease_Warning:
-			error="NIRIO error while releasing Fifo elements";
-			break;
-		default:
-			error="Error code not defined";
-			break;
-	}
-	return error;
 }
