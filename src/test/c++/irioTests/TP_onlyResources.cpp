@@ -94,12 +94,6 @@ TEST(TP_onlyResources, functional)
 	if (myStatus > IRIO_success) {
 		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
 
-		// Formato C
-//		char * detailStr = NULL;
-//		irio_getErrorString(status.detailCode, &detailStr);
-//		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-
-		// Formato C++
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -147,7 +141,7 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 	TStatus status;
 	irio_initStatus(&status);
 
-	myStatus = irio_initDriver("wrongFPGAVersion",
+	myStatus = irio_initDriver("wrongFPGAVersionTest",
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -334,7 +328,7 @@ TEST(TP_onlyResources, wrongRIOSerial)
 	TStatus status;
 	irio_initStatus(&status);
 
-	myStatus = irio_initDriver("wrongRIOSerial",
+	myStatus = irio_initDriver("wrongRIOSerialTest",
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -395,7 +389,7 @@ TEST(TP_onlyResources, wrongRIODevice)
 	TStatus status;
 	irio_initStatus(&status);
 
-	myStatus = irio_initDriver("wrongRIODevice",
+	myStatus = irio_initDriver("wrongRIODeviceTest",
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
