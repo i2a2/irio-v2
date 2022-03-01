@@ -11,9 +11,11 @@
 #define FWHT   "\x1b[37m"	//Foreground color, White
 #define BBLA   "\x1b[40m"	//Background color, Black
 #define RST    "\x1B[0m"	//Foreground color, Reset
+#define FCYN   "\x1b[36m"	//Foreground color, Cyan
 
 class TestUtilsIRIO
 {
+public:
 	static void displayTitle(const std::string& msg, const std::string& forecolor=FWHT, const std::string& backcolor=BBLA) {
 		std::cout<<forecolor<<backcolor<<"+-----------------------------------------------------------------------------"<<std::endl;
 		std::cout<<msg<<std::endl;
