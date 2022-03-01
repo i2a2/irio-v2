@@ -15,6 +15,7 @@
 
 class TestUtilsIRIO
 {
+public:
 	static void displayTitle(const std::string& msg, const std::string& forecolor=FWHT, const std::string& backcolor=BBLA) {
 		std::cout<<forecolor<<backcolor<<"+-----------------------------------------------------------------------------"<<std::endl;
 		std::cout<<msg<<std::endl;
