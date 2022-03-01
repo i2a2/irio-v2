@@ -21,20 +21,19 @@ extern "C" {
 #include "testUtils-IRIO.h"
 
 // Always max verbosity
-int verbosity = 1;
+static int verbosity = 1;
 
 using namespace std;
 
 // Modified IRIO Library function
-std::string getErrorString(const TStatus& status);
+static std::string getErrorString(const TStatus& status);
 
 /**
  * Test verifies driver’s ability to read and testing resources in the FPGA.
  * This test is related to the following requirements:
  *
- * PXIE7966R
  * PXIE7965R
- * PXIE7961R
+ * PXIE7966R
  * The execution of this test requires to have an environment variable indicating the
  * serial number of the RIO board to be used. Execute in a command shell the lsrio.py command
  * execute export RIOSerial=0x..........
@@ -44,8 +43,8 @@ std::string getErrorString(const TStatus& status);
 TEST(TP_onlyResources, functional)
 {
 	// It is supposed that every parameter that can fail (rioSerial, rioDevice, filePath, bitfileName)
-	// are correct. In next GoogleTest this parameters are going to be tested
-	// when its values are wrong to catch different exceptions
+	// are correct. In next GoogleTests this parameters are going to be tested
+	// when its values are wrong to catch different IRIO errors
 
 	std::string testName = "TP_onlyResources: Functional test";
 	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
@@ -72,6 +71,17 @@ TEST(TP_onlyResources, functional)
 	TStatus status;
 	irio_initStatus(&status);
 
+	printf("Resources user should found: \n");
+	printf("1 DMA\n");
+	printf("2 AO\n");
+	printf("16 auxAI\n");
+	printf("16 auxAO\n");
+	printf("16 auxDI\n");
+	printf("16 auxDO\n");
+	printf("54 DI \n");
+	printf("54 DO \n");
+	printf("2 SG\n");
+
 	myStatus = irio_initDriver("functionalTest",
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
@@ -85,7 +95,7 @@ TEST(TP_onlyResources, functional)
 
 	EXPECT_EQ((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code(0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
 	}
 
@@ -99,9 +109,63 @@ TEST(TP_onlyResources, functional)
 	}
 }
 
-TEST(TP_onlyResources, wrongPath)
+TEST(TP_onlyResources, wrongFPGAVersion)
 {
-	std::string exception;
+	std::string testName = "TP_onlyResources: Wrong FPGA version test";
+	std::string testDescription = "Test verifies driver’s ability to detect that the NIRIO model is not correct";
+
+	// Wrong FPGA Version
+	std::string FPGAversion = "V1.0";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+
+	// TODO: Mejorar path, no puede ir hardcodeado
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
+
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+	irio_initStatus(&status);
+
+	myStatus = irio_initDriver("wrongFPGAVersion",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	EXPECT_NE((int) status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+	}
+
+	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_NE((int) status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
+		std::cerr << "Closing driver..." << std::endl;
+	}
+}
+
+TEST(TP_onlyResources, wrongFilePath)
+{
 	int myStatus;
 	irioDrv_t p_DrvPvt;
 	TStatus status;
@@ -123,9 +187,10 @@ TEST(TP_onlyResources, wrongPath)
 
 	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	// Wrong bitfile path
+	std::string filePath = "WrongPath/";
 
-	std::string bitfileName = "wrongPathTest";
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
 	irio_initStatus(&status);
 
@@ -142,7 +207,7 @@ TEST(TP_onlyResources, wrongPath)
 
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code(0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
 		}
 
@@ -150,12 +215,68 @@ TEST(TP_onlyResources, wrongPath)
 
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code(0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
 		std::cerr << "Closing driver..." << std::endl;
 		}
 }
 
+TEST(TP_onlyResources, wrongBitfileName)
+{
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+
+	std::string testName = "TP_onlyResources: Wrong bitfile name test";
+	std::string testDescription = "Test verifies driver’s ability to detect that bitfile name is not correct";
+
+	// User don't have to know what FPGA Version is used
+	std::string FPGAversion = "V1.1";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// TODO: Mejorar path, no puede ir hardcodeado
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+
+	// Wrong bitfile name
+	std::string bitfileName = "WrongBitfileName";
+
+	irio_initStatus(&status);
+
+	myStatus = irio_initDriver("wrongBitfileNameTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	EXPECT_NE((int) status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
+		}
+
+	irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_NE((int) status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl << std::endl;
+		std::cerr << "Closing driver..." << std::endl;
+		}
+}
 
 TEST(TP_onlyResources, wrongRIOSerial)
 {
@@ -169,7 +290,7 @@ TEST(TP_onlyResources, wrongRIOSerial)
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIOSerial = "0x0001";
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
@@ -197,7 +318,7 @@ TEST(TP_onlyResources, wrongRIOSerial)
 
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code(0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
 	}
 
@@ -222,11 +343,10 @@ TEST(TP_onlyResources, wrongRIODevice)
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIODevice = "0001";
 	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
-//	ASSERT_FALSE(RIODevice!="7965" && RIODevice!="7966");
 	ASSERT_TRUE(RIODevice!="7965" && RIODevice!="7966");
 
 
@@ -253,7 +373,7 @@ TEST(TP_onlyResources, wrongRIODevice)
 
 	EXPECT_NE((int) status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code(0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
+		std::cerr << "Runtime error code (0-Success; 1-Warning; 2-Error): " << status.code << std::endl;
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << getErrorString(status) << std::endl;
 	}
 
@@ -267,12 +387,12 @@ TEST(TP_onlyResources, wrongRIODevice)
 	}
 }
 
-
-std::string getErrorString(const TStatus& status){
+// TODO: Esta función se puede llevar a un header aparte. Crear header si se crean más funciones
+static std::string getErrorString(const TStatus& status){
 	std::string error;
 	switch(status.detailCode){
 		case Generic_Error:
-			error = "Error generated outside irio. Check error messages for more detailed information";
+			error = "Error generated outside IRIO. Check error messages for more detailed information";
 			break;
 		case HardwareNotFound_Error:
 			error="Specified RIO device not found. Review specified serial number.";
@@ -359,7 +479,7 @@ std::string getErrorString(const TStatus& status){
 			error="Tried to write a value Out of Bounds. Check design rules for operational range.";
 			break;
 		case Generic_Warning:
-			error="Warning generated outside irio. Check warning messages for more detailed information";
+			error="Warning generated outside IRIO. Check warning messages for more detailed information";
 			break;
 		case DAQtimeout_Warning:
 			error="Timeout reached when waiting for data from data acquisition";
@@ -376,5 +496,3 @@ std::string getErrorString(const TStatus& status){
 	}
 	return error;
 }
-
-
