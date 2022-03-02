@@ -99,7 +99,7 @@ TEST(TP_onlyResources, CPUDAQ)
 		delete detailStr;
 	}
 
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -169,7 +169,7 @@ TEST(TP_onlyResources, CPUIMAQ)
 		delete detailStr;
 	}
 
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -180,13 +180,13 @@ TEST(TP_onlyResources, CPUIMAQ)
 	}
 }
 
+// It is supposed that every parameter that can fail (rioSerial, rioDevice, filePath, bitfileName, ...)
+// are correct. In next GoogleTests this parameters are going to be tested
+// when its values are wrong to catch different IRIO errors
+
 // Hereafter onlyResources bitfile
 TEST(TP_onlyResources, onlyResources)
 {
-	// It is supposed that every parameter that can fail (rioSerial, rioDevice, filePath, bitfileName)
-	// are correct. In next GoogleTests this parameters are going to be tested
-	// when its values are wrong to catch different IRIO errors
-
 	std::string testName = "TP_onlyResources: Functional test of bitfile onlyResources";
 	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
@@ -243,7 +243,7 @@ TEST(TP_onlyResources, onlyResources)
 		delete detailStr;
 	}
 
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -300,18 +300,17 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
 		delete detailStr;
+		std::cerr << "IRIO Library is designed to create a session before check FPGA version, so irio_closeDriver() must run successfully" << std::endl;
+		std::cerr << "Closing driver... " << std::endl;
 	}
 
-	// TODO: Este test es el único que cierra la sesión correctamente, debido a que en IRIO se pasa el parámetro p_DrvPvt->session inicializado
-	//       en algún lugar en vez de pasarlo como al inicializarse mal la FPGA. Revisar IRIO
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
-
-	EXPECT_NE(status.detailCode, IRIO_success);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
 		delete detailStr;
+		std::cerr << "Closing driver (twice)... " << std::endl;
 	}
 }
 
@@ -363,7 +362,7 @@ TEST(TP_onlyResources, wrongFilePath)
 		delete detailStr;
 	}
 
-	irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -424,7 +423,7 @@ TEST(TP_onlyResources, wrongBitfileName)
 		delete detailStr;
 	}
 
-	irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -483,7 +482,7 @@ TEST(TP_onlyResources, wrongRIOSerial)
 		delete detailStr;
 	}
 
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -542,7 +541,7 @@ TEST(TP_onlyResources, wrongRIODevice)
 		delete detailStr;
 	}
 
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -607,7 +606,7 @@ TEST(TP_onlyResources, differentModel_Serial)
 		delete detailStr;
 	}
 
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
@@ -679,20 +678,17 @@ TEST(TP_onlyResources, wrongBitfileResources)
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
 		delete detailStr;
+		std::cerr << "IRIO Library is designed to create a session before check bitfile resources, so irio_closeDriver() must run successfully" << std::endl;
+		std::cerr << "Closing driver... " << std::endl;
 	}
 
-	// TODO: Este test es el único que cierra la sesión correctamente, debido a que en IRIO se pasa el parámetro p_DrvPvt->session inicializado
-	//       en algún lugar en vez de pasarlo como al inicializarse mal la FPGA. Revisar IRIO
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
-
-	EXPECT_TRUE(((int)status.detailCode!=IRIO_success) &&
-			    ((status.detailCode==ResourceNotFound_Error) || (status.detailCode==ResourceNotFound_Warning)));
+	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
 		delete detailStr;
-		std::cerr << "Closing driver..." << std::endl;
+		std::cerr << "Closing driver (twice)... " << std::endl;
 	}
 }
 
