@@ -24,8 +24,8 @@ extern "C" {
 static int verbosity = 1;
 
 // Environment variables
-static std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-static std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+static std::string RIODevice;
+static std::string RIOSerial;
 
 /**
  * Test verifies driver’s ability to read and testing resources in the FPGA.
@@ -39,13 +39,155 @@ static std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
  * execute export RIODevice=xxxx, where xxxx = 7965, 7966
  */
 
-TEST(TP_onlyResources, functional)
+// CPUDAQ bitfile
+TEST(TP_onlyResources, CPUDAQ)
+{
+	std::string testName = "TP_onlyResources: Functional test of bitfile CPUDAQ";
+	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
+
+	// User don't have to know what FPGA Version is used
+	std::string FPGAversion = "V1.0";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// TODO: Mejorar path, no puede ir hardcodeado
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIO_CPUDAQ_"+RIODevice;
+
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+	irio_initStatus(&status);
+
+	printf("Resources user should found: \n");
+	printf("2 DMAs\n");
+	printf("2 AI\n");
+	printf("2 AO\n");
+	printf("2 auxAI\n");
+	printf("2 auxAO\n");
+	printf("2 DI\n");
+	printf("2 DO\n");
+	printf("2 auxDI\n");
+	printf("2 auxDO\n");
+	printf("2 SG\n\n");
+
+	myStatus = irio_initDriver("functionalCPUDAQTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	EXPECT_EQ(status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+	}
+
+	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_EQ(status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+	}
+}
+
+// CPUIMAQ bitfile
+TEST(TP_onlyResources, CPUIMAQ)
+{
+	std::string testName = "TP_onlyResources: Functional test of bitfile CPUIMAQ";
+	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
+
+	// User don't have to know what FPGA Version is used
+	std::string FPGAversion = "V1.0";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// TODO: Mejorar path, no puede ir hardcodeado
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIO_CPUIMAQ_"+RIODevice;
+
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+	irio_initStatus(&status);
+
+	printf("Resources user should found: \n");
+	printf("1 IMAQ DMAs\n");
+	printf("1 CLConfig\n");
+	printf("1 CLUART\n");
+	printf("2 auxAI\n");
+	printf("2 auxAO\n");
+	printf("2 DI\n");
+	printf("2 DO\n");
+	printf("2 auxDI\n");
+	printf("2 auxDO\n\n");
+
+	myStatus = irio_initDriver("functionalCPUIMAQTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	EXPECT_EQ(status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+	}
+
+	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_EQ(status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+	}
+}
+
+// Hereafter onlyResources bitfile
+TEST(TP_onlyResources, onlyResources)
 {
 	// It is supposed that every parameter that can fail (rioSerial, rioDevice, filePath, bitfileName)
 	// are correct. In next GoogleTests this parameters are going to be tested
 	// when its values are wrong to catch different IRIO errors
 
-	std::string testName = "TP_onlyResources: Functional test";
+	std::string testName = "TP_onlyResources: Functional test of bitfile onlyResources";
 	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
 	// User don't have to know what FPGA Version is used
@@ -53,6 +195,10 @@ TEST(TP_onlyResources, functional)
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
@@ -78,7 +224,7 @@ TEST(TP_onlyResources, functional)
 	printf("54 DO \n");
 	printf("2 SG\n\n");
 
-	myStatus = irio_initDriver("functionalTest",
+	myStatus = irio_initDriver("functionalOnlyResourcesTest",
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -89,9 +235,8 @@ TEST(TP_onlyResources, functional)
 							   &p_DrvPvt,
 							   &status);
 
-	EXPECT_EQ((int) status.detailCode, IRIO_success);
+	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -100,9 +245,8 @@ TEST(TP_onlyResources, functional)
 
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 
-	EXPECT_EQ((int) status.detailCode, IRIO_success);
+	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -120,6 +264,10 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
@@ -146,9 +294,8 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 							   &p_DrvPvt,
 							   &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -159,9 +306,8 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 	//       en algún lugar en vez de pasarlo como al inicializarse mal la FPGA. Revisar IRIO
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -179,6 +325,10 @@ TEST(TP_onlyResources, wrongFilePath)
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
@@ -205,9 +355,8 @@ TEST(TP_onlyResources, wrongFilePath)
 							   &p_DrvPvt,
 							   &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -216,9 +365,8 @@ TEST(TP_onlyResources, wrongFilePath)
 
 	irio_closeDriver(&p_DrvPvt,0, &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -237,6 +385,10 @@ TEST(TP_onlyResources, wrongBitfileName)
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
@@ -264,9 +416,8 @@ TEST(TP_onlyResources, wrongBitfileName)
 							   &p_DrvPvt,
 							   &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -275,9 +426,8 @@ TEST(TP_onlyResources, wrongBitfileName)
 
 	irio_closeDriver(&p_DrvPvt,0, &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -297,6 +447,8 @@ TEST(TP_onlyResources, wrongRIOSerial)
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	RIOSerial = "0x0001";
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
@@ -323,9 +475,8 @@ TEST(TP_onlyResources, wrongRIOSerial)
 							   &p_DrvPvt,
 							   &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -334,9 +485,8 @@ TEST(TP_onlyResources, wrongRIOSerial)
 
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -356,7 +506,9 @@ TEST(TP_onlyResources, wrongRIODevice)
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	RIODevice = "0x001";
+	// Environment variables
+	RIODevice = "0001";
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice!="7965" && RIODevice!="7966");
@@ -382,9 +534,8 @@ TEST(TP_onlyResources, wrongRIODevice)
 							   &p_DrvPvt,
 							   &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -393,9 +544,8 @@ TEST(TP_onlyResources, wrongRIODevice)
 
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 
-	EXPECT_NE((int) status.detailCode, IRIO_success);
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		std::cerr << "Runtime error code (1-Warning; 2-Error): " << status.code << std::endl;
 		char* detailStr = new char;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
@@ -403,3 +553,146 @@ TEST(TP_onlyResources, wrongRIODevice)
 		std::cerr << "Closing driver..." << std::endl;
 	}
 }
+
+// This test is supossed to fail if not a 7966 device model is passed as environment variable
+TEST(TP_onlyResources, differentModel_Serial)
+{
+	std::string testName = "TP_onlyResources: RIO device model does not match its serial number";
+	std::string testDescription = "Test verifies driver’s ability to detect that RIO device model does not match its serial number";
+
+	// User don't have to know what FPGA Version is used
+	std::string FPGAversion = "V1.1";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+
+	// 7966 model as a environment variable
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	// Serial number of a 7965R model
+	RIOSerial = "0x01666C59";
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+
+	// TODO: Mejorar path, no puede ir hardcodeado
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
+
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+	irio_initStatus(&status);
+
+	myStatus = irio_initDriver("differentModel_Serial",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	EXPECT_NE(status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+	}
+
+	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_NE(status.detailCode, IRIO_success);
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+		std::cerr << "Closing driver..." << std::endl;
+	}
+}
+
+TEST(TP_onlyResources, wrongBitfileResources)
+{
+	std::string testName = "TP_onlyResources: Wrong bitfile resources";
+	std::string testDescription = "Test verifies driver’s ability to detect that all expected resources are not implemented in the bitfile";
+
+	// User don't have to know what FPGA Version is used
+	std::string FPGAversion = "V1.1";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+
+	// TODO: Mejorar path, no puede ir hardcodeado
+	// Path of  a bitfile with missing resources
+	std::string filePath = "../../../main/c/examples/resourceFail/"+RIODevice+"/";
+
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
+
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+	irio_initStatus(&status);
+
+	printf("Resources user should found:\n");
+	printf("1 AO + Error finding AO1Enable\n");
+	printf("16 auxAI\n");
+	printf("16 auxAO\n");
+	printf("16 auxDI\n");
+	printf("16 auxDO\n");
+	printf("54 DI \n");
+	printf("54 DO \n");
+	printf("0 SG + Error finding SGFref0 and SGSignalType1\n");
+	printf("0 DMAs + Error finding DMATtoHOSTSamplingRate0\n\n");
+
+	myStatus = irio_initDriver("wrongBitfileResourcesTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	EXPECT_TRUE(((int)status.detailCode!=IRIO_success) &&
+			    ((status.detailCode==ResourceNotFound_Error) || (status.detailCode==ResourceNotFound_Warning)));
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+	}
+
+	// TODO: Este test es el único que cierra la sesión correctamente, debido a que en IRIO se pasa el parámetro p_DrvPvt->session inicializado
+	//       en algún lugar en vez de pasarlo como al inicializarse mal la FPGA. Revisar IRIO
+	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_TRUE(((int)status.detailCode!=IRIO_success) &&
+			    ((status.detailCode==ResourceNotFound_Error) || (status.detailCode==ResourceNotFound_Warning)));
+	if (myStatus > IRIO_success) {
+		char* detailStr = new char;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
+		delete detailStr;
+		std::cerr << "Closing driver..." << std::endl;
+	}
+}
+
