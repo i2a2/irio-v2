@@ -73,7 +73,7 @@ TEST(TP_noModule, functional) {
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
-							   FPGAversion.c_str(),
+							   "V1",
 							   verbosity,
 							   filePath.c_str(),
 							   filePath.c_str(),
@@ -83,47 +83,36 @@ TEST(TP_noModule, functional) {
 	// In TP_onlyResources test all parameters of irio_initDriver has been tested, so
 	// in this test they are suppose that are not going to be incorrect.
 	// Critical failure and aborting execution if something fail
-	EXPECT_EQ(status.detailCode, IRIO_success);
+
 	if (myStatus > IRIO_success) {
 		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
 		free(detailStr);
-
-		//TODO: Permitido en GoogleTest?
-		std::cout << "CRITICAL FALIURE Aborting execution" << std::endl;
-		exit(-1);
+		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
+	ASSERT_EQ(status.detailCode, IRIO_success);
 
 	std::cout << std::endl << "Testing FPGA start mode" << std::endl << std::endl;
 	std::cout << "FPGA hardware logic is started (\"Running\") Value " << 1 << std::endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning, not error
-	EXPECT_NE(status.detailCode, IRIO_error);
-
 	// TODO: Comprobar que no saca mensajes redundantes
-	if (myStatus == IRIO_warning) {
+	if (myStatus > IRIO_success) {
 		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
 		free(detailStr);
 	}
-	else if(myStatus == IRIO_error) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+	ASSERT_NE(status.detailCode, IRIO_error);
 
-		//TODO: Permitido en GoogleTest?
-		std::cout << "CRITICAL FALIURE Aborting execution" << std::endl;
-		exit(-1);
-	}
 	// This function does not modify status neither myStatus, it is not necessary to check that variables
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	std::cout << "FPGA State is: " << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << std::endl << std::endl;
 
-	//TODO: 100us sleep  usleep(100); only if necessary
+	usleep(100);
 
 	std::cout << "Testing auxiliary analog I/O ports" << std::endl << std::endl;
 	// It is known prior to the execution of the test that there are ten auxiliary analog input ports
@@ -139,6 +128,8 @@ TEST(TP_noModule, functional) {
 			free(detailStr);
 		}
 
+		EXPECT_NE(status.detailCode, IRIO_error);
+
 		myStatus=irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			char* detailStr = nullptr;
@@ -149,6 +140,8 @@ TEST(TP_noModule, functional) {
 		else
 			std::cout << "[irio_getAuxAO function] value read from auxAO" << i << "is: " << aivalue << std::endl;
 
+		EXPECT_NE(status.detailCode, IRIO_error);
+
 		myStatus=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			char* detailStr = nullptr;
@@ -158,6 +151,9 @@ TEST(TP_noModule, functional) {
 		}
 		else
 			std::cout << "[irio_getAuxAI function] value read from auxAI" << i << "is: " << aivalue << std::endl << std::endl;
+
+		EXPECT_NE(status.detailCode, IRIO_error);
+
 
 		if(aivalue!=analogValue)
 			irio_mergeStatus(&status,Generic_Error,verbosity,"AuxAI%d expected value 0, read value: %d [ERROR]\n",i,aivalue);
@@ -172,6 +168,8 @@ TEST(TP_noModule, functional) {
 			free(detailStr);
 		}
 
+		EXPECT_NE(status.detailCode, IRIO_error);
+
 		myStatus=irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			char* detailStr = nullptr;
@@ -182,6 +180,8 @@ TEST(TP_noModule, functional) {
 		else
 			std::cout << "[irio_getAuxAO function] value read from auxAO" << i << "is: " << aivalue << std::endl;
 
+		EXPECT_NE(status.detailCode, IRIO_error);
+
 		myStatus=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			char* detailStr = nullptr;
@@ -191,6 +191,8 @@ TEST(TP_noModule, functional) {
 		}
 		else
 			std::cout << "[irio_getAuxAI function] value read from auxAI" << i << "is: " << aivalue << std::endl << std::endl;
+
+		EXPECT_NE(status.detailCode, IRIO_error);
 
 		if(aivalue!=analogValue)
 			irio_mergeStatus(&status,Generic_Error,verbosity,"AuxAI%d expected value 1,read value: %d [ERROR]\n",i,aivalue);
@@ -279,21 +281,98 @@ TEST(TP_noModule, functional) {
 
 	std::cout << "Testing the close of the driver" << std::endl << std::endl;
 
-	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	std::cout << "Closing driver..." << std::endl;
+	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
 }
 
 
+// Tests to catch errors
 
+TEST(TP_noModule, setFPGATwice) {
+	std::string testName = "TP_noModule: Set FPGA twice test";
+	std::string testDescription = "Test verifies driver’s ability to check that the FPGA is started twice";
 
+	// User doesn't have to know what FPGA Version is used
+	std::string FPGAversion = "V1.1";
 
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
 
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// TODO: Mejorar path, no puede ir hardcodeado
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIOnoModule_"+RIODevice;
 
+	int aivalue = 0;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+	irio_initStatus(&status);
 
+	std::cout << "Testing driver initialization" << std::endl << std::endl;
+	myStatus = irio_initDriver("functionalNoModuleTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
 
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	ASSERT_EQ(status.detailCode, IRIO_success);
 
+	std::cout << std::endl << "Testing FPGA start mode" << std::endl << std::endl;
+	std::cout << "First start of the FPGA, no error expected" << std::endl;
+	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	ASSERT_NE(status.detailCode, IRIO_error);
+	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
+	std::cout << "FPGA State is: " << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << std::endl << std::endl;
+
+	std::cout << "Second start of the FPGA, error/warning expected" << std::endl;
+	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	EXPECT_NE(status.detailCode, IRIO_success);
+
+	std::cout << "Closing driver..." << std::endl;
+	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+}
 
 
 
