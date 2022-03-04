@@ -68,17 +68,17 @@ TEST(TP_onlyResources, CPUDAQ)
 	TStatus status;
 	irio_initStatus(&status);
 
-	printf("Resources user should found: \n");
-	printf("2 DMAs\n");
-	printf("2 AI\n");
-	printf("2 AO\n");
-	printf("2 auxAI\n");
-	printf("2 auxAO\n");
-	printf("2 DI\n");
-	printf("2 DO\n");
-	printf("2 auxDI\n");
-	printf("2 auxDO\n");
-	printf("2 SG\n\n");
+	std::cout << "Resources user should found:" << std::endl;
+	std::cout << "2 DMAs" << std::endl;
+	std::cout << "2 AI" << std::endl;
+	std::cout << "2 AO" << std::endl;
+	std::cout << "2 auxAI" << std::endl;
+	std::cout << "2 auxAO" << std::endl;
+	std::cout << "2 DI" << std::endl;
+	std::cout << "2 DO" << std::endl;
+	std::cout << "2 auxDI" << std::endl;
+	std::cout << "2 auxDO" << std::endl;
+	std::cout << "2 SG" << std::endl << std::endl;
 
 	myStatus = irio_initDriver("functionalCPUDAQTest",
 							   RIOSerial.c_str(),
@@ -93,20 +93,20 @@ TEST(TP_onlyResources, CPUDAQ)
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 }
 
@@ -139,16 +139,16 @@ TEST(TP_onlyResources, CPUIMAQ)
 	TStatus status;
 	irio_initStatus(&status);
 
-	printf("Resources user should found: \n");
-	printf("1 IMAQ DMAs\n");
-	printf("1 CLConfig\n");
-	printf("1 CLUART\n");
-	printf("2 auxAI\n");
-	printf("2 auxAO\n");
-	printf("2 DI\n");
-	printf("2 DO\n");
-	printf("2 auxDI\n");
-	printf("2 auxDO\n\n");
+	std::cout << "Resources user should found:" << std::endl;
+	std::cout << "1 IMAQ DMAs" << std::endl;
+	std::cout << "1 CLConfig" << std::endl;
+	std::cout << "1 CLUART" << std::endl;
+	std::cout << "2 auxAI" << std::endl;
+	std::cout << "2 auxAO" << std::endl;
+	std::cout << "2 DI" << std::endl;
+	std::cout << "2 DO" << std::endl;
+	std::cout << "2 auxDI" << std::endl;
+	std::cout << "2 auxDO" << std::endl << std::endl;
 
 	myStatus = irio_initDriver("functionalCPUIMAQTest",
 							   RIOSerial.c_str(),
@@ -163,20 +163,20 @@ TEST(TP_onlyResources, CPUIMAQ)
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 }
 
@@ -213,16 +213,16 @@ TEST(TP_onlyResources, onlyResources)
 	TStatus status;
 	irio_initStatus(&status);
 
-	printf("Resources user should found: \n");
-	printf("1 DMA\n");
-	printf("2 AO\n");
-	printf("16 auxAI\n");
-	printf("16 auxAO\n");
-	printf("16 auxDI\n");
-	printf("16 auxDO\n");
-	printf("54 DI \n");
-	printf("54 DO \n");
-	printf("2 SG\n\n");
+	std::cout << "Resources user should found:" << std::endl;
+	std::cout << "1 DMA" << std::endl;
+	std::cout << "2 AO" << std::endl;
+	std::cout << "16 auxAI" << std::endl;
+	std::cout << "16 auxAO" << std::endl;
+	std::cout << "16 auxDI" << std::endl;
+	std::cout << "16 auxDO" << std::endl;
+	std::cout << "54 DI" << std::endl;
+	std::cout << "54 DO" << std::endl;
+	std::cout << "2 SG" << std::endl << std::endl;
 
 	myStatus = irio_initDriver("functionalOnlyResourcesTest",
 							   RIOSerial.c_str(),
@@ -237,20 +237,20 @@ TEST(TP_onlyResources, onlyResources)
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_EQ(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 }
 
@@ -296,20 +296,22 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "IRIO Library is designed to create a session before check FPGA version, so irio_closeDriver() must run successfully" << std::endl;
 		std::cerr << "Closing driver... " << std::endl;
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "Closing driver (twice)... " << std::endl;
 	}
 }
@@ -356,20 +358,20 @@ TEST(TP_onlyResources, wrongFilePath)
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "Closing driver..." << std::endl;
 	}
 }
@@ -417,20 +419,20 @@ TEST(TP_onlyResources, wrongBitfileName)
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "Closing driver..." << std::endl;
 	}
 }
@@ -476,20 +478,20 @@ TEST(TP_onlyResources, wrongRIOSerial)
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "Closing driver..." << std::endl;
 	}
 }
@@ -535,20 +537,20 @@ TEST(TP_onlyResources, wrongRIODevice)
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "Closing driver..." << std::endl;
 	}
 }
@@ -600,20 +602,20 @@ TEST(TP_onlyResources, differentModel_Serial)
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 
 	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "Closing driver..." << std::endl;
 	}
 }
@@ -649,16 +651,16 @@ TEST(TP_onlyResources, wrongBitfileResources)
 	TStatus status;
 	irio_initStatus(&status);
 
-	printf("Resources user should found:\n");
-	printf("1 AO + Error finding AO1Enable\n");
-	printf("16 auxAI\n");
-	printf("16 auxAO\n");
-	printf("16 auxDI\n");
-	printf("16 auxDO\n");
-	printf("54 DI \n");
-	printf("54 DO \n");
-	printf("0 SG + Error finding SGFref0 and SGSignalType1\n");
-	printf("0 DMAs + Error finding DMATtoHOSTSamplingRate0\n\n");
+	std::cout << "Resources user should found:" << std::endl;
+	std::cout << "1 AO + Error finding AO1Enable" << std::endl;
+	std::cout << "16 auxAI" << std::endl;
+	std::cout << "16 auxAO" << std::endl;
+	std::cout << "16 auxDI" << std::endl;
+	std::cout << "16 auxDO" << std::endl;
+	std::cout << "54 DI" << std::endl;
+	std::cout << "54 DO" << std::endl;
+	std::cout << "0 SG + Error finding SGFref0 and SGSignalType1" << std::endl;
+	std::cout << "0 DMAs + Error finding DMATtoHOSTSamplingRate0" << std::endl << std::endl;
 
 	myStatus = irio_initDriver("wrongBitfileResourcesTest",
 							   RIOSerial.c_str(),
@@ -674,20 +676,22 @@ TEST(TP_onlyResources, wrongBitfileResources)
 	EXPECT_TRUE(((int)status.detailCode!=IRIO_success) &&
 			    ((status.detailCode==ResourceNotFound_Error) || (status.detailCode==ResourceNotFound_Warning)));
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "IRIO Library is designed to create a session before check bitfile resources, so irio_closeDriver() must run successfully" << std::endl;
 		std::cerr << "Closing driver... " << std::endl;
 	}
 
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
+
+	EXPECT_NE(status.detailCode, IRIO_success);
 	if (myStatus > IRIO_success) {
-		char* detailStr = new char;
+		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl;
-		delete detailStr;
+		free(detailStr);
 		std::cerr << "Closing driver (twice)... " << std::endl;
 	}
 }

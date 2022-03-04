@@ -128,8 +128,9 @@ int main (int argc, char **argv)
 
 	///iRIOCore testing: irio_setAuxAO irio_getAuxAI functions
 	msgtest(2,irio_setAuxAO irio_getAuxAO irio_getAuxAI);
-	//TODO: Generalizarlo para todas las auxAO que haya declarados en el bitfile y no siempre a 6
-	//      No hardcodear
+
+	// It is known prior to the execution of the test that there are ten auxiliary analog input ports
+	// but only six auxiliary analog output ports instantiated
 	for(i=0;i<6;i++)
 	{
 		printf("[irio_setAuxAO function] value 0 is set in auxAO%d \n",i);
@@ -161,6 +162,9 @@ int main (int argc, char **argv)
 
 	///iRIOCore testing: irio_setAuxDO irio_getAuxDI functions
 	msgtest(3,irio_setAuxDO irio_getAuxDO irio_getAuxDI);
+
+	// It is known prior to the execution of the test that there are only six auxiliary digital
+	//input and six auxiliary digital output ports instantiated
 	for(i=0;i<6;i++)
 	{
 
