@@ -24,8 +24,20 @@ extern "C" {
 static int verbosity = 1;
 
 // Environment variables
-static std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-static std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+static std::string RIODevice;
+static std::string RIOSerial;
+
+static std::string testName;
+static std::string testDescription;
+
+static std::string FPGAversion;
+static std::string NIRIOmodel;
+static std::string filePath;
+static std::string bitfileName;
+
+static int myStatus;
+static irioDrv_t p_DrvPvt;
+static TStatus status;
 
 /**
  * Test verifies driver’s ability to check the correct communication and interconnection
@@ -41,12 +53,9 @@ static std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
  */
 
 TEST(TP_noModule, functional) {
-	std::string testName = "TP_noModule: Functional test of bitfile noModule";
-	std::string testDescription = "Test verifies driver’s ability to check the "
+	testName = "TP_noModule: Functional test of bitfile noModule";
+	testDescription = "Test verifies driver’s ability to check the "
 			"correct communication and interconnection between auxiliary I/O analog/digital FPGA registers";
-
-	// User doesn't have to know what FPGA Version is used
-	std::string FPGAversion = "V1.1";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
@@ -54,18 +63,17 @@ TEST(TP_noModule, functional) {
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
-	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// User doesn't have to know what FPGA Version is used
+	FPGAversion = "V1.1";
+	NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	std::string bitfileName = "FlexRIOnoModule_"+RIODevice;
+	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	bitfileName = "FlexRIOnoModule_"+RIODevice;
 
 	int FPGATemp=0;
 	int aivalue=0;
 	int i=0;
 
-	int myStatus;
-	irioDrv_t p_DrvPvt;
-	TStatus status;
 	irio_initStatus(&status);
 
 	std::cout << "Testing driver initialization" << std::endl << std::endl;
@@ -73,7 +81,7 @@ TEST(TP_noModule, functional) {
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
-							   "V1",
+							   FPGAversion.c_str(),
 							   verbosity,
 							   filePath.c_str(),
 							   filePath.c_str(),
@@ -82,7 +90,7 @@ TEST(TP_noModule, functional) {
 
 	// In TP_onlyResources test all parameters of irio_initDriver has been tested, so
 	// in this test they are suppose that are not going to be incorrect.
-	// Critical failure and aborting execution if something fail
+	// Critical failure and closing driver if something fail
 
 	if (myStatus > IRIO_success) {
 		char* detailStr = nullptr;
@@ -98,8 +106,7 @@ TEST(TP_noModule, functional) {
 	std::cout << "FPGA hardware logic is started (\"Running\") Value " << 1 << std::endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
-	// IRIO can manage success or warning, not error
-	// TODO: Comprobar que no saca mensajes redundantes
+	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
 		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
@@ -153,7 +160,6 @@ TEST(TP_noModule, functional) {
 			std::cout << "[irio_getAuxAI function] value read from auxAI" << i << "is: " << aivalue << std::endl << std::endl;
 
 		EXPECT_NE(status.detailCode, IRIO_error);
-
 
 		if(aivalue!=analogValue)
 			irio_mergeStatus(&status,Generic_Error,verbosity,"AuxAI%d expected value 0, read value: %d [ERROR]\n",i,aivalue);
@@ -295,11 +301,8 @@ TEST(TP_noModule, functional) {
 // Tests to catch errors
 
 TEST(TP_noModule, setFPGATwice) {
-	std::string testName = "TP_noModule: Set FPGA twice test";
-	std::string testDescription = "Test verifies driver’s ability to check that the FPGA is started twice";
-
-	// User doesn't have to know what FPGA Version is used
-	std::string FPGAversion = "V1.1";
+	testName = "TP_noModule: Set FPGA twice test";
+	testDescription = "Test verifies driver’s ability to check that the FPGA is started twice";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
@@ -307,16 +310,15 @@ TEST(TP_noModule, setFPGATwice) {
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
-	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// User doesn't have to know what FPGA Version is used
+	FPGAversion = "V1.1";
+	NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	std::string bitfileName = "FlexRIOnoModule_"+RIODevice;
+	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	bitfileName = "FlexRIOnoModule_"+RIODevice;
 
 	int aivalue = 0;
 
-	int myStatus;
-	irioDrv_t p_DrvPvt;
-	TStatus status;
 	irio_initStatus(&status);
 
 	std::cout << "Testing driver initialization" << std::endl << std::endl;
@@ -336,6 +338,8 @@ TEST(TP_noModule, setFPGATwice) {
 		irio_getErrorString(status.detailCode, &detailStr);
 		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
 		free(detailStr);
+		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
 
@@ -350,6 +354,7 @@ TEST(TP_noModule, setFPGATwice) {
 		free(detailStr);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
+
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	std::cout << "FPGA State is: " << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << std::endl << std::endl;
 
@@ -372,6 +377,209 @@ TEST(TP_noModule, setFPGATwice) {
 		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
 		free(detailStr);
 	}
+}
+
+TEST(TP_noModule, setFPGASessionClose) {
+	testName = "TP_noModule: Start FPGA after a failure on the driver's initialization. Condition: there has to be the driver's session close";
+	testDescription = "Test verifies driver’s ability to check bitfile is already downloaded and running on the FPGA";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	// User don't have to know what FPGA Version is used
+	FPGAversion = "V1.1";
+	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// TODO: Mejorar path, no puede ir hardcodeado
+	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	bitfileName = "FlexRIOnoModule_"+RIODevice;
+
+	int aivalue=0;
+
+	irio_initStatus(&status);
+
+	std::cout << "Testing driver initialization" << std::endl << std::endl;
+	myStatus = irio_initDriver("functionalNoModuleTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   "wrongBitfile",
+							   FPGAversion.c_str(),
+							   verbosity,
+							   filePath.c_str(),
+							   "wrongFilePath",
+							   &p_DrvPvt,
+							   &status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	EXPECT_NE(status.detailCode, IRIO_success);
+
+	std::cout << std::endl << "Testing FPGA start mode" << std::endl << std::endl;
+	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	EXPECT_NE(status.detailCode, IRIO_success);
+	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
+	std::cout << "FPGA State is: " << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << std::endl << std::endl;
+	if (aivalue == 0)
+		std::cout << "IRIO can not initialize the FPGA if there is not a driver's session open" << std::endl;
+
+	std::cout << "Closing driver..." << std::endl;
+	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	EXPECT_NE(status.detailCode, IRIO_success);
+}
+
+TEST(TP_noModule, setFPGAwithSessionOpen) {
+	testName = "TP_noModule: Start FPGA after a failure on the driver's initialization. Condition: there has to be the driver's session open";
+	testDescription = "Test verifies driver’s ability to check bitfile is already downloaded and running on the FPGA";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	// User don't have to know what FPGA Version is used
+	FPGAversion = "V1.1";
+	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// TODO: Mejorar path, no puede ir hardcodeado
+	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	bitfileName = "FlexRIOnoModule_"+RIODevice;
+
+	int aivalue=0;
+
+	irio_initStatus(&status);
+
+	std::cout << "Testing driver initialization" << std::endl << std::endl;
+	myStatus = irio_initDriver("functionalNoModuleTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   "wrongVersion",
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	ASSERT_NE(status.detailCode, IRIO_success);
+
+	std::cout << std::endl << "Testing FPGA start mode" << std::endl << std::endl;
+	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	ASSERT_NE(status.detailCode, IRIO_success);
+	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
+	std::cout << "FPGA State is: " << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << std::endl << std::endl;
+	if (aivalue == 1)
+		std::cout << "IRIO can initialize the FPGA if there is a driver's session open despite the driver initialization failure."
+				"Must close the driver to restart the FPGA." << std::endl;
+
+	std::cout << "Closing driver..." << std::endl;
+	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	EXPECT_NE(status.detailCode, IRIO_success);
+}
+
+TEST(TP_noModule, setFPGAwithoutClosingDriver) {
+	testName = "TP_noModule: Start FPGA after not closing latest driver used";
+	testDescription = "Test verifies driver’s ability to check bitfile is already downloaded and running on the FPGA";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+
+	// User don't have to know what FPGA Version is used
+	FPGAversion = "V1.1";
+	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	// TODO: Mejorar path, no puede ir hardcodeado
+	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	bitfileName = "FlexRIOnoModule_"+RIODevice;
+
+	int aivalue=0;
+
+	irio_initStatus(&status);
+
+	std::cout << "Testing driver initialization" << std::endl << std::endl;
+	myStatus = irio_initDriver("functionalNoModuleTest",
+							   RIOSerial.c_str(),
+							   NIRIOmodel.c_str(),
+							   bitfileName.c_str(),
+							   "wrongVersion",
+							   verbosity,
+							   filePath.c_str(),
+							   filePath.c_str(),
+							   &p_DrvPvt,
+							   &status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	ASSERT_NE(status.detailCode, IRIO_success);
+
+	std::cout << std::endl << "Testing FPGA start mode" << std::endl << std::endl;
+	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
+
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	ASSERT_NE(status.detailCode, IRIO_success);
+	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
+	std::cout << "FPGA State is: " << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << std::endl << std::endl;
+	if (aivalue == 1)
+		std::cout << "IRIO can initialize the FPGA if there is a driver's session open despite the driver initialization failure."
+				"Must close the driver to restart the FPGA." << std::endl;
+
+	std::cout << "Closing driver..." << std::endl;
+	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+	if (myStatus > IRIO_success) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
+	}
+	EXPECT_NE(status.detailCode, IRIO_success);
 }
 
 
