@@ -49,7 +49,8 @@
 #ifdef CLOSE_VERSION_NIRIO
 	#define DRV_CALL "lsni -v "
 #else
-	#define DRV_CALL "lsrio.py "
+
+	#define DRV_CALL "lsrio "
 #endif
 #define TMP_FILE "/tmp/RIOinfo.txt"
 #define RM_CALL "rm -f "

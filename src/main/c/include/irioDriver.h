@@ -29,7 +29,7 @@
 
 #ifndef IRIODRIVER_H
 #define IRIODRIVER_H
-#define IRIOVERSION "1.1.2"
+#define IRIOVERSION "1.2.0"
 #include "irioDataTypes.h"
 
 #include <stdint.h>
