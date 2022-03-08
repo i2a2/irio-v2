@@ -23,22 +23,6 @@ extern "C" {
 // Always max verbosity
 static int verbosity = 1;
 
-// Environment variables
-static std::string RIODevice;
-static std::string RIOSerial;
-
-static std::string testName;
-static std::string testDescription;
-
-static std::string FPGAversion;
-static std::string NIRIOmodel;
-static std::string filePath;
-static std::string bitfileName;
-
-static int myStatus;
-static irioDrv_t p_DrvPvt;
-static TStatus status;
-
 /**
  * Test verifies driver’s ability to read and testing resources in the FPGA.
  * This test is related to the following requirements:
@@ -54,26 +38,29 @@ static TStatus status;
 // CPUDAQ bitfile
 TEST(TP_onlyResources, CPUDAQ)
 {
-	testName = "TP_onlyResources: Functional test of bitfile CPUDAQ";
-	testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
+	std::string testName = "TP_onlyResources: Functional test of bitfile CPUDAQ";
+	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.0";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.0";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	bitfileName = "FlexRIO_CPUDAQ_"+RIODevice;
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIO_CPUDAQ_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	std::cout << "Resources user should found:" << std::endl;
@@ -121,26 +108,29 @@ TEST(TP_onlyResources, CPUDAQ)
 // CPUIMAQ bitfile
 TEST(TP_onlyResources, CPUIMAQ)
 {
-	testName = "TP_onlyResources: Functional test of bitfile CPUIMAQ";
-	testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
+	std::string testName = "TP_onlyResources: Functional test of bitfile CPUIMAQ";
+	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.0";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.0";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	bitfileName = "FlexRIO_CPUIMAQ_"+RIODevice;
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIO_CPUIMAQ_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	std::cout << "Resources user should found:" << std::endl;
@@ -191,26 +181,29 @@ TEST(TP_onlyResources, CPUIMAQ)
 // Hereafter onlyResources bitfile
 TEST(TP_onlyResources, onlyResources)
 {
-	testName = "TP_onlyResources: Functional test of bitfile onlyResources";
-	testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
+	std::string testName = "TP_onlyResources: Functional test of bitfile onlyResources";
+	std::string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.0";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.1";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	std::cout << "Resources user should found:" << std::endl;
@@ -256,27 +249,30 @@ TEST(TP_onlyResources, onlyResources)
 
 TEST(TP_onlyResources, wrongFPGAVersion)
 {
-	testName = "TP_onlyResources: Wrong FPGA version test";
-	testDescription = "Test verifies driver’s ability to detect that FPGA version is not correct";
+	std::string testName = "TP_onlyResources: Wrong FPGA version test";
+	std::string testDescription = "Test verifies driver’s ability to detect that FPGA version is not correct";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// Wrong FPGA Version
-	FPGAversion = "V1.0";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.0";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	myStatus = irio_initDriver("wrongFPGAVersionTest",
@@ -314,27 +310,30 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 
 TEST(TP_onlyResources, wrongFilePath)
 {
-	testName = "TP_onlyResources: Wrong file path test";
-	testDescription = "Test verifies driver’s ability to detect that path where bitfiles are located is not correct";
+	std::string testName = "TP_onlyResources: Wrong file path test";
+	std::string testDescription = "Test verifies driver’s ability to detect that path where bitfiles are located is not correct";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.1";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.1";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// Wrong bitfile path
-	filePath = "WrongPath/";
+	std::string filePath = "WrongPath/";
 
-	bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	myStatus = irio_initDriver("wrongFilePathTest",
@@ -370,28 +369,31 @@ TEST(TP_onlyResources, wrongFilePath)
 
 TEST(TP_onlyResources, wrongBitfileName)
 {
-	testName = "TP_onlyResources: Wrong bitfile name test";
-	testDescription = "Test verifies driver’s ability to detect that bitfile name is not correct";
+	std::string testName = "TP_onlyResources: Wrong bitfile name test";
+	std::string testDescription = "Test verifies driver’s ability to detect that bitfile name is not correct";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.1";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.1";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
 
 	// Wrong bitfile name
-	bitfileName = "WrongBitfileName";
+	std::string bitfileName = "WrongBitfileName";
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	myStatus = irio_initDriver("wrongBitfileNameTest",
@@ -427,26 +429,29 @@ TEST(TP_onlyResources, wrongBitfileName)
 
 TEST(TP_onlyResources, wrongRIOSerial)
 {
-	testName = "TP_onlyResources: Wrong RIO serial number test";
-	testDescription = "Test verifies driver’s ability to detect that FlexRIO device's serial number is not correct.";
+	std::string testName = "TP_onlyResources: Wrong RIO serial number test";
+	std::string testDescription = "Test verifies driver’s ability to detect that FlexRIO device's serial number is not correct.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = "0x0001";
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = "0x0001";
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.1";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.1";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	myStatus = irio_initDriver("wrongRIOSerialTest",
@@ -482,25 +487,28 @@ TEST(TP_onlyResources, wrongRIOSerial)
 
 TEST(TP_onlyResources, wrongRIODevice)
 {
-	testName = "TP_onlyResources: Wrong RIO device test";
-	testDescription = "Test verifies driver’s ability to detect that FlexRIO device is not correct";
+	std::string testName = "TP_onlyResources: Wrong RIO device test";
+	std::string testDescription = "Test verifies driver’s ability to detect that FlexRIO device is not correct";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = "0001";
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = "0001";
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice!="7965" && RIODevice!="7966");
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.1";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.1";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
-	bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	myStatus = irio_initDriver("wrongRIODeviceTest",
@@ -537,31 +545,32 @@ TEST(TP_onlyResources, wrongRIODevice)
 // This test is supossed to fail if not a 7966 device model is passed as environment variable
 TEST(TP_onlyResources, differentModel_Serial)
 {
-	testName = "TP_onlyResources: RIO device model does not match its serial number";
-	testDescription = "Test verifies driver’s ability to detect that RIO device model does not match its serial number";
-
-
+	std::string testName = "TP_onlyResources: RIO device model does not match its serial number";
+	std::string testDescription = "Test verifies driver’s ability to detect that RIO device model does not match its serial number";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
 	// 7966 model as a environment variable
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	// Serial number of a 7965R model
-	RIOSerial = "0x01666C59";
+	std::string RIOSerial = "0x01666C59";
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.1";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.1";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
-	filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	std::string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
 
-	bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	myStatus = irio_initDriver("differentModel_Serial",
@@ -597,28 +606,31 @@ TEST(TP_onlyResources, differentModel_Serial)
 
 TEST(TP_onlyResources, wrongBitfileResources)
 {
-	testName = "TP_onlyResources: Wrong bitfile resources";
-	testDescription = "Test verifies driver’s ability to detect that all expected resources are not implemented in the bitfile";
+	std::string testName = "TP_onlyResources: Wrong bitfile resources";
+	std::string testDescription = "Test verifies driver’s ability to detect that all expected resources are not implemented in the bitfile";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-	RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	std::string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	std::string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	FPGAversion = "V1.1";
-	NIRIOmodel = "PXIe-"+RIODevice+"R";
+	std::string FPGAversion = "V1.1";
+	std::string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	// TODO: Mejorar path, no puede ir hardcodeado
 	// Path of  a bitfile with missing resources
-	filePath = "../../../main/c/examples/resourceFail/"+RIODevice+"/";
+	std::string filePath = "../../../main/c/examples/resourceFail/"+RIODevice+"/";
 
-	bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	std::string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
+	int myStatus;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
 	irio_initStatus(&status);
 
 	std::cout << "Resources user should found:" << std::endl;
