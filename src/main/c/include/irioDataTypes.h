@@ -179,6 +179,16 @@ typedef struct TResourcePort{
 }TResourcePort;
 
 /**
+ * Type for FPGA Resources only for auxiliary analog I/O, 64 bits
+ *
+ * Stores whether the resource was found or not and its offset
+ */
+typedef struct TResourcePort_64{
+	uint8_t found;
+	uint64_t value;
+}TResourcePort_64;
+
+/**
  * Type for managing GPU buffers
  *
  * Data type used for managing GPU DMAs
@@ -295,10 +305,12 @@ typedef struct irioDrv_t
 	TResourcePort *enumDigitalOutput;	//!< Ports for DigitalOutputs
 	uint16_t max_digitalsoutputs;		//!< Maximum number of digital outputs to be instantiated
 
-	TResourcePort *enumauxAI;			//!< Ports for auxAI
+	TResourcePort *enumauxAI;			//!< Ports for auxAI, 32 bits
+	TResourcePort_64 *enumauxAI_64;		//!< Ports for auxAI, 64 bits
 	uint16_t max_auxanaloginputs;		//!< Maximum number of auxiliary analog inputs to be instantiated
 
-	TResourcePort *enumauxAO;			//!< Ports for auxAO
+	TResourcePort *enumauxAO;			//!< Ports for auxAO, 32 bits
+	TResourcePort_64 *enumauxAO_64;		//!< Ports for auxAO, 64 bits
 	uint16_t max_auxanalogoutputs;		//!< Maximum number of auxiliary analog outputs to be instantiated
 
 	TResourcePort *enumauxDI;			//!< Ports for auxDI

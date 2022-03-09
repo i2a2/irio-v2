@@ -161,7 +161,11 @@ int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const c
 	//Init file for resource search
 		//First build the header path
 	char* headerPath=NULL;
-	asprintf(&headerPath,"%s%s%s%s",headerDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,".h");
+
+	if (headerDir[strlen(headerDir)-1] != '/')
+		asprintf(&headerPath,"%s/%s%s%s",headerDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,".h");
+	else
+		asprintf(&headerPath,"%s%s%s%s",headerDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,".h");
 
 	//Call for file init
 	local_status |= irio_initFileSearch(p_DrvPvt,headerPath,(void**)&p_DrvPvt->headerFile,status);
@@ -175,7 +179,11 @@ int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const c
 
 	//Build bitfilePath
 	char* bitFilePath=NULL;
-	asprintf(&bitFilePath,"%s%s%s%s",bitfileDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,STRINGNAME_BITFILEEXT);
+
+	if (bitfileDir[strlen(headerDir)-1] != '/')
+		asprintf(&bitFilePath,"%s/%s%s%s",bitfileDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,STRINGNAME_BITFILEEXT);
+	else
+		asprintf(&bitFilePath,"%s%s%s%s",bitfileDir,STRINGNAME_PREFIX,p_DrvPvt->projectName,STRINGNAME_BITFILEEXT);
 
 	//Configure target and dowload bitfile
 	if(local_status<IRIO_error){
@@ -363,11 +371,13 @@ int allocFlexRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status){
 	p_DrvPvt->enumAnalogInput = calloc(p_DrvPvt->max_analoginputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanaloginputs = FLEXRIO_MAX_AUXA_IN;
 	p_DrvPvt->enumauxAI = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAI_64 = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort_64));
 	p_DrvPvt->max_analogoutputs = FLEXRIO_MAX_ANALOGS_OUT;
 	p_DrvPvt->enumAnalogOutput= calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->enumAOEnable = calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanalogoutputs = FLEXRIO_MAX_AUXA_OUT;
 	p_DrvPvt->enumauxAO = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAO_64 = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort_64));
 
 	//Digital Limits
 	p_DrvPvt->max_digitalsinputs = FLEXRIO_MAX_DIGITALS;
@@ -945,8 +955,9 @@ int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status){
 int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* status)
 {
 	int32_t moduleID;
-	int32_t statuscode;
+
 	if (p_DrvPvt->platform == IRIO_FlexRIO){
+		int32_t statuscode;
 		statuscode=NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
 		printf("Module ID found=%x\n", moduleID);
 		switch (moduleID)			{
@@ -961,7 +972,6 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 							//If using signal generator in this design we assume that this is internally connected in the FPGA
 							p_DrvPvt->maxAnalogOut=1;
 							p_DrvPvt->minAnalogOut=-1;
-
 						break;
 
 						case IRIO_coupling_DC: // DC coupling
@@ -970,7 +980,6 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 							p_DrvPvt->CVDAC=(8191.0/0.635);
 							p_DrvPvt->maxAnalogOut=0.635;
 							p_DrvPvt->minAnalogOut=-0.635;
-
 						break;
 
 						default:
@@ -988,7 +997,6 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 		}
 	}
 	//else REVIEW: What happens in cRIO?. This applies only to NI9205 analog input module. This module is only DC
-
 	return IRIO_success;
 }
 
@@ -1012,7 +1020,6 @@ int irio_setFPGAStart(irioDrv_t* p_DrvPvt,int32_t value,TStatus* status){
 		irio_mergeStatus(status,FPGAAlreadyRunning_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA status can not be changed after started \n",__func__,__LINE__,p_DrvPvt->appCallID);
 		return IRIO_warning;
 	}else if(value==1){
-
 		NiFpga_Status fpgaStatus=NiFpga_Status_Success;
 		p_DrvPvt->initDone=0;
 
@@ -1030,7 +1037,6 @@ int irio_setFPGAStart(irioDrv_t* p_DrvPvt,int32_t value,TStatus* status){
 			printf("[%s,%d]-(%s) TRACE Waiting for %s up to 5 seconds.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_INITDONE);
 		}
 		do{
-
 			usleep(500000);
 			NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadBool(p_DrvPvt->session,p_DrvPvt->enumInitDone.value,&p_DrvPvt->initDone));
 			timeouterror++;
@@ -1053,7 +1059,6 @@ int irio_setFPGAStart(irioDrv_t* p_DrvPvt,int32_t value,TStatus* status){
 		switch (p_DrvPvt->platform)
 		{
 		case IRIO_FlexRIO:
-
 			//Read IOModuleID and RIOAdapterCorrect
 			NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadU32(p_DrvPvt->session,p_DrvPvt->enumInsertedIoModuleID.value,&p_DrvPvt->moduleValue));
 			if(NiFpga_IsNotError(fpgaStatus)){
@@ -1069,13 +1074,13 @@ int irio_setFPGAStart(irioDrv_t* p_DrvPvt,int32_t value,TStatus* status){
 				local_status |= IRIO_error;
 			}
 			break;
+
 		case IRIO_cRIO:
 			//Read InsertedModulesID and cRIOModulesOk
 			NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadArrayU16(p_DrvPvt->session,p_DrvPvt->enumInsertedModulesID.value,p_DrvPvt->InsertedModulesID,16));
 			if(NiFpga_IsNotError(fpgaStatus) ){
 				NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadBool(p_DrvPvt->session,p_DrvPvt->enumcRIOModulesOk.value,&p_DrvPvt->cRIOModulesOK));
 			}
-
 			//There is no check of the inserted modules. Bitfile developer must determine whether or not activate cRIOModulesOk
 			if(NiFpga_IsError(fpgaStatus)){
 				irio_mergeStatus(status,NIRIO_API_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Reading %s or %s. Error Code:%d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_INSERTEDIOMODULESID,STRINGNAME_CRIOMODULESOK,fpgaStatus);
@@ -1086,7 +1091,6 @@ int irio_setFPGAStart(irioDrv_t* p_DrvPvt,int32_t value,TStatus* status){
 				local_status |= IRIO_error;
 			}
 			break;
-
 		}
 
 		//Stop DAQ

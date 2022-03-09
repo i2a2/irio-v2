@@ -91,6 +91,20 @@ int irio_findAnalogInputs(irioDrv_t* p_DrvPvt,TStatus* status);
 int irio_findAuxAnalogInputs(irioDrv_t* p_DrvPvt,TStatus* status);
 
 /**
+ * Search and map 64 bits auxiliary analog inputs ports
+ *
+ * Searches for auxiliary analog input ports implemented for the current target.
+ * Maps ports found in irioDrv_t::enumauxAI_64.
+ * No error will be prompted for missing auxiliary analog input ports.
+ *
+ * @param[in,out] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_findAuxAnalogInputs_64(irioDrv_t* p_DrvPvt,TStatus* status);
+
+
+/**
  * Search and map analog output ports
  *
  * Searches for auxiliary analog input ports implemented for the current target.
@@ -116,6 +130,19 @@ int irio_findAnalogOutputs(irioDrv_t* p_DrvPvt,TStatus* status);
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_findAuxAnalogOutputs(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Search and map 64 bits auxiliary analog output ports
+ *
+ * Searches for auxiliary analog output ports implemented for the current target.
+ * Maps ports found in irioDrv_t::enumauxAO_64.
+ * No error will be prompted for missing auxiliary analog output ports.
+ *
+ * @param[in,out] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_findAuxAnalogOutputs_64(irioDrv_t* p_DrvPvt,TStatus* status);
 
 /**
  * Read an analog input
@@ -144,6 +171,20 @@ int irio_getAI(irioDrv_t* p_DrvPvt,int n,int32_t* value,TStatus* status);
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_getAuxAI(irioDrv_t* p_DrvPvt,int n,int32_t* value,TStatus* status);
+
+/**
+ * Read a 64 bits auxiliary analog input
+ *
+ * Reads the value from a 64 bits auxiliary analog input port.
+ * Errors may occur if the port was not found or while reading from the port.
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] n Number of the auxiliary analog input to read (AIn)
+ * @param[out] value  Current value of the auxiliary analog input
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getAuxAI_64(irioDrv_t* p_DrvPvt,int n,int64_t* value,TStatus* status);
 
 /**
  * Read an analog output
@@ -216,6 +257,20 @@ int irio_setAOEnable(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status);
 int irio_getAuxAO(irioDrv_t* p_DrvPvt,int n,int32_t* value,TStatus* status);
 
 /**
+ * Read a 64 bits auxiliary analog output
+ *
+ * Reads the value from a 64 bits auxiliary analog output port.
+ * Errors may occur if the port was not found or while reading from the port
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] n Number of the auxiliary analog output to read (auxAOn)
+ * @param[out] value  Current value of the auxiliary analog output
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getAuxAO_64(irioDrv_t* p_DrvPvt,int n,int64_t* value,TStatus* status);
+
+/**
  * Write an auxiliary analog output
  *
  * Writes the given value in an auxiliary analog output port.
@@ -228,6 +283,20 @@ int irio_getAuxAO(irioDrv_t* p_DrvPvt,int n,int32_t* value,TStatus* status);
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_setAuxAO(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status);
+
+/**
+ * Write a 64 bits auxiliary analog output
+ *
+ * Writes the given value in a 64 bits auxiliary analog output port.
+ * Errors may occur if the port was not found or while writing to the port.
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] n Number of the auxiliary analog output to write (auxAOn)
+ * @param[in] value Value to write
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_setAuxAO_64(irioDrv_t* p_DrvPvt,int n,int64_t value,TStatus* status);
 
 #ifdef __cplusplus
 }

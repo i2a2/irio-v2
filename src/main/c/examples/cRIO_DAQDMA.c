@@ -93,7 +93,7 @@ void usage(char *name) {
         		"\t<block length>: Number of samples to be read from data acquisition device. Minimun: blocksize\n"
                 "\n"
                 "Usage: %s <s/n> <cRIO model> <debug_mode> <voltage NI9264 CH0 voltage value> <voltage NI9264 CH1 voltage value> <samples_to_read> <acquisition_mode> <N_blocks>\n"
-                "Example: %s 0234CBAC 9159 +5.0 -5.0 128 0 128\n", name, name);
+                "Example: %s 0x0234CBAC 9159 +5.0 -5.0 128 0 128\n", name, name);
 }
 
 

@@ -81,7 +81,7 @@ void usage(char *name) {
                 "Use lsrio.py to identify the RIO devices included in the fast controller\n"
         		"\n"
                 "Usage: ./%s <SERIAL_NUMBER> <cRIO MODEL> \n"
-                "Example: %s 01666C59 9159\n", name, name);
+                "Example: %s 0x01666C59 9159\n", name, name);
 }
 
 int main (int argc, char **argv)
@@ -99,8 +99,6 @@ int main (int argc, char **argv)
 	char *bitFilePath=NULL;
 	int verbosity=1;
 
-
-
 	int i=0; //iterator variable
 
 	if (argc!=3)
@@ -112,16 +110,13 @@ int main (int argc, char **argv)
 	asprintf(&bitfileName,"cRIOIO_%s",argv[2]);
 	asprintf(&NIcriomodel,"NI %s",argv[2]);
 	asprintf(&bitFilePath,"%s/resourceTest/%s/",get_current_dir_name(),argv[2]);
-
 	printf ("Pwd: %s \n", bitFilePath);
 
 	msgtest(0,irio_initDriver);
-
 	st=irio_initDriver("test",argv[1],NIcriomodel,bitfileName,"V1.1",verbosity,bitFilePath,bitFilePath,&p_DrvPvt,&status );
 	free(bitfileName);
 	free(NIcriomodel);
 	free(bitFilePath);
-
 	msgerr(st,0,"irio_initDriver",&status,verbosity,1);
 
 	msgtest(1,irio_getVersion);
@@ -168,7 +163,7 @@ int main (int argc, char **argv)
 	msgtest(8,irio_setSamplingRate irio_getSamplingRate);
 	st=irio_setSamplingRate(&p_DrvPvt,0,aivalue,&status);
 	printf("[irio_setSamplingRate function] Sampling Rate wrote %d .  \n", aivalue*p_DrvPvt.Fref);
-	st=irio_getSamplingRate(&p_DrvPvt,0,&aivalue,&status);
+	st|=irio_getSamplingRate(&p_DrvPvt,0,&aivalue,&status);
 	printf("[irio_getSamplingRate function] Sampling Rate read %d .  \n", aivalue*p_DrvPvt.Fref);
 	msgerr(st,8,"irio_setSamplingRate irio_getSamplingRate",&status,verbosity,0);
 
@@ -183,11 +178,11 @@ int main (int argc, char **argv)
 	/**
 	 * AO0, AO1 & AO2 ARE GOING TO BE SET TO 0V
 	 */
-
 	printf("[irio_setAO function] AO0, AO1 & AO2 are configured with 0.00V.\n");
 	st|=irio_setAO(&p_DrvPvt,0,(int)(0.0*p_DrvPvt.CVDAC),&status); // AO0 is set to 0V.
 	st|=irio_setAO(&p_DrvPvt,1,(int)(0.0*p_DrvPvt.CVDAC),&status); // AO1 is set to 0V.
 	st|=irio_setAO(&p_DrvPvt,2,(int)(0.0*p_DrvPvt.CVDAC),&status); // AO2 is set to 0V.
+
 	st|=irio_getAO(&p_DrvPvt,0,&aivalue,&status); //AO0 is set to 0V
 	printf("[irio_getAO function] value read from AO0 is: %.2fV \n", aivalue/p_DrvPvt.CVDAC);
 	st|=irio_getAO(&p_DrvPvt,1,&aivalue,&status); //AO0 is set to 0V
@@ -221,7 +216,6 @@ int main (int argc, char **argv)
 	/**
 	 * TEST 10 CONFIGURE ANALOG OUTPUTS WITH DIFFERENT VALUES. THESE ONES MUST BE READ FROM ANALOG INPUTS
 	 */
-
 	msgtest(10,irio_setDebugMode irio_getDebugMode irio_setAOEnable irio_getAOEnable irio_setAO irio_getAO irio_getAI);
 	printf("IRIO Test 5 configure analog outputs with determined volt values, and read them from analog Inputs.\n");
 	printf("Analog Inputs and analog outputs should be interconnected externally.\n\n");
@@ -247,7 +241,6 @@ int main (int argc, char **argv)
 
 	st|=irio_getAI(&p_DrvPvt,0, &aivalue, &status);
 	printf("[irio_getAI function] AI0 reads %fV from analog input 0\n\n",aivalue*p_DrvPvt.CVADC);
-
 
 	printf("[irio_setAOEnable function] AOEnable1 is set to:%d (Enable) \n",NiFpga_True);
 	st|=irio_setAOEnable(&p_DrvPvt,1,NiFpga_True, &status);
@@ -292,7 +285,6 @@ int main (int argc, char **argv)
 	 *TEST 12 CHECKS DIGITAL I/O WRITTING AND READING
 	 */
 	msgtest(11,irio_setDO irio_getDO irio_getDI);
-
 	st=IRIO_success;
 	//digital I/O performance with cRIO-NI9401 module
 	for(i=0;i<2;i++)

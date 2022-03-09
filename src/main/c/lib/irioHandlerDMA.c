@@ -364,7 +364,7 @@ int irio_cleanDMAsTtoHost(irioDrv_t* p_DrvPvt, TStatus* status){
 
 int irio_cleanDMATtoHost(irioDrv_t* p_DrvPvt, int n,uint64_t* cleanbuffer, size_t buffersize, TStatus* status){
 	
-	int toRead=0;
+	int toRead;
 	if(!p_DrvPvt->enumDMATtoHOST[n].found){
 		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Can not close DMA%d. DMA was not found. .\n",__func__,__LINE__,p_DrvPvt->appCallID,n);
 		return IRIO_warning;
@@ -549,7 +549,7 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
 	TIRIOStatusCode local_status = IRIO_success;
 	if(n>=0 && n<p_DrvPvt->DMATtoHOSTNo.value && p_DrvPvt->enumDMATtoHOST[n].found){
 		NiFpga_Status fpgaStatus = NiFpga_Status_Success;
-		size_t elementsToRead=0;
+		size_t elementsToRead;
 
 		//If irioasyn driver is used iriolib:
 		//From DMATtoHOSTFrameType=0 to DMATtoHOSTFrameType=127 data conversion factor used is: I/O Module conversion factor.
