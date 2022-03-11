@@ -26,6 +26,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * \endcond
  *****************************************************************************/
+#define _GNU_SOURCE //include asprintf, get_current_dir_name
 
 #include "irioResourceFinder.h"
 #include "irioDataTypes.h"
