@@ -276,6 +276,14 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t *data, int* elementsRead, TStatus* status);
+
+/**
+ * Reads Fref field from IRIO data structure
+ * TODO: Document
+ */
+int irio_getFref(irioDrv_t* p_DrvPvt, uint32_t *Fref, TStatus* status);
+
+
 #ifdef __cplusplus
 }
 #endif
