@@ -33,7 +33,8 @@ OBJECT_DIR = $(SOURCE_DIR)/.obj
 
 EXECUTABLE=$(BINARY_DIR)/$(PROGNAME)
 INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
-LDLIBS=-L$(CODAC_ROOT)/lib -L$(EPICS_BASE)/lib/$(EPICS_HOST_ARCH) $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
+#LDLIBS=-L$(CODAC_ROOT)/lib  $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
+LDLIBS= $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
 SOURCES=$(wildcard $(SOURCE_DIR)/*.cpp)
 # to build executable from all sources in the program directory:
 #SOURCES=$(wildcard $(SOURCE_DIR)/*.cpp $(SOURCE_DIR)/*.c)
