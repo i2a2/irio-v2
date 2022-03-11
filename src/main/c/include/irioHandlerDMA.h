@@ -279,9 +279,12 @@ int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t 
 
 /**
  * Reads Fref field from IRIO data structure
- * TODO: Document
+ *
+ * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] Fref         FPGA clock reference
+ * @return void
  */
-int irio_getFref(irioDrv_t* p_DrvPvt, uint32_t *Fref, TStatus* status);
+void irio_getFref(irioDrv_t* p_DrvPvt, uint32_t *Fref);
 
 
 #ifdef __cplusplus
