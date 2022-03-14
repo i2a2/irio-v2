@@ -1,12 +1,7 @@
 #ifndef TESTUTILS_H_
 #define TESTUTILS_H_
 
-#include <fstream>
-#include <stdio.h>
 #include <gtest/gtest.h>
-#include <type_traits>
-#include <functional>
-#include <algorithm>
 
 #define FWHT   "\x1b[37m"	//Foreground color, White
 #define BBLA   "\x1b[40m"	//Background color, Black
@@ -32,6 +27,13 @@ public:
 		}
 
 		return shellVarValue;
+	}
+
+	static void getErrors(const TStatus& status) {
+		char* detailStr = nullptr;
+		irio_getErrorString(status.detailCode, &detailStr);
+		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
+		free(detailStr);
 	}
 };
 
