@@ -1,11 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <ctime>
 #include <cstdlib>
-#include <stdexcept>
-
-#include <boost/version.hpp>
-#include <boost/regex.hpp>
 
 // IRIO Library
 extern "C" {
@@ -31,7 +26,7 @@ static int verbosity = 1;
  * PXIE7965R
  * PXIE7966R
  * The execution of this test requires to have an environment variable indicating the
- * serial number of the RIO board to be used. Execute in a command shell the lsrio.py command
+ * serial number of the RIO board to be used. Execute in a command shell the lsrio command
  * execute export RIOSerial=0x..........
  * execute export RIODevice=xxxx, where xxxx = 7965, 7966
  */
@@ -83,11 +78,8 @@ TEST(TP_noModule, functional) {
 	// Critical failure and closing driver if something fail
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cerr << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -98,10 +90,7 @@ TEST(TP_noModule, functional) {
 
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -119,20 +108,14 @@ TEST(TP_noModule, functional) {
 		std::cout << "[irio_setAuxAO function] value " << analogValue << " is set in auxAO" << i << std::endl;
 		myStatus=irio_setAuxAO(&p_DrvPvt,i,analogValue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 
 		EXPECT_NE(status.detailCode, IRIO_error);
 
 		myStatus=irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxAO function] value read from auxAO" << i << "is: " << aivalue << std::endl;
@@ -141,10 +124,7 @@ TEST(TP_noModule, functional) {
 
 		myStatus=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxAI function] value read from auxAI" << i << "is: " << aivalue << std::endl << std::endl;
@@ -158,20 +138,14 @@ TEST(TP_noModule, functional) {
 		std::cout << "[irio_setAuxAO function] value " << analogValue << " is set in auxAO" << i << std::endl;
 		myStatus=irio_setAuxAO(&p_DrvPvt,i,analogValue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 
 		EXPECT_NE(status.detailCode, IRIO_error);
 
 		myStatus=irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxAO function] value read from auxAO" << i << "is: " << aivalue << std::endl;
@@ -180,10 +154,7 @@ TEST(TP_noModule, functional) {
 
 		myStatus=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxAI function] value read from auxAI" << i << "is: " << aivalue << std::endl << std::endl;
@@ -204,28 +175,19 @@ TEST(TP_noModule, functional) {
 		std::cout << "[irio_setAuxDO function] value " << digitalvalue << " is set in auxDO" << i << std::endl;
 		myStatus=irio_setAuxDO(&p_DrvPvt,i,digitalvalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 
 		myStatus=irio_getAuxDO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxDO function] value read from auxDO" << i << "is: " << aivalue << std::endl;
 
 		myStatus=irio_getAuxDI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxDI function] value read from auxDI" << i << "is: " << aivalue << std::endl << std::endl;
@@ -238,28 +200,19 @@ TEST(TP_noModule, functional) {
 		std::cout << "[irio_setAuxDO function] value " << digitalvalue << " is set in auxDO" << i << std::endl;
 		myStatus=irio_setAuxDO(&p_DrvPvt,i,digitalvalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 
 		myStatus=irio_getAuxDO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxDO function] value read from auxDO" << i << "is: " << aivalue << std::endl;
 
 		myStatus=irio_getAuxDI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
-			char* detailStr = nullptr;
-			irio_getErrorString(status.detailCode, &detailStr);
-			std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-			free(detailStr);
+			TestUtilsIRIO::getErrors(status);
 		}
 		else
 			std::cout << "[irio_getAuxDI function] value read from auxDI" << i << "is: " << aivalue << std::endl << std::endl;
@@ -280,10 +233,7 @@ TEST(TP_noModule, functional) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
 
@@ -330,11 +280,8 @@ TEST(TP_noModule, setFPGATwice) {
 							   &status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cerr << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -344,10 +291,7 @@ TEST(TP_noModule, setFPGATwice) {
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -358,20 +302,14 @@ TEST(TP_noModule, setFPGATwice) {
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_NE(status.detailCode, IRIO_success);
 
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
 
@@ -426,10 +364,7 @@ TEST(TP_noModule, setFPGAInitErrorSessionClose) {
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_NE(status.detailCode, IRIO_success);
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
@@ -440,10 +375,7 @@ TEST(TP_noModule, setFPGAInitErrorSessionClose) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_NE(status.detailCode, IRIO_success);
 }
@@ -499,10 +431,7 @@ TEST(TP_noModule, setFPGAInitErrorSessionOpen) {
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_success);
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
@@ -514,19 +443,10 @@ TEST(TP_noModule, setFPGAInitErrorSessionOpen) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_NE(status.detailCode, IRIO_success);
 }
-
-//TODO: El problema de este test es que depende cuando se ejecute el parámetro a tener en cuenta,
-//      p_DrvPvt->fpgaStarted está a 1 o a 0 dependiendo de qué funciones se han ejecutado antes
-//      Para hacerlo independiente, sin tener que llamar a init_driver() que es la función que
-//      hace p_DrvPvt->fpgaStarted = 0 al principio, habría que ejecutar esa sentencia
-//      dentro del test
 
 TEST(TP_noModule, setFPGANoInitDriver) {
 	std::string testName = "TP_noModule: Start FPGA before the driver's initialization.";
@@ -551,10 +471,7 @@ TEST(TP_noModule, setFPGANoInitDriver) {
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_NE(status.detailCode, IRIO_success);
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
@@ -606,11 +523,8 @@ TEST(TP_noModule, setAuxAO6) {
 							   &status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cout << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -621,10 +535,7 @@ TEST(TP_noModule, setAuxAO6) {
 
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -640,10 +551,7 @@ TEST(TP_noModule, setAuxAO6) {
 	std::cout << "[irio_setAuxAO function] value " << analogValue << " is set in unimplemented auxAO6. Error/warning expected" << std::endl;
 	myStatus=irio_setAuxAO(&p_DrvPvt,6,analogValue,&status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 
 	EXPECT_NE(status.detailCode, IRIO_success);
@@ -651,10 +559,7 @@ TEST(TP_noModule, setAuxAO6) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
 
@@ -699,11 +604,8 @@ TEST(TP_noModule, getAuxAO6) {
 							   &status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cout << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -714,10 +616,7 @@ TEST(TP_noModule, getAuxAO6) {
 
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -731,10 +630,7 @@ TEST(TP_noModule, getAuxAO6) {
 
 	myStatus=irio_getAuxAO(&p_DrvPvt,6,&aivalue,&status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	else
 		std::cout << "[irio_getAuxAO function] value read from auxAO6 is: " << aivalue << std::endl;
@@ -744,10 +640,7 @@ TEST(TP_noModule, getAuxAO6) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
 
@@ -792,11 +685,8 @@ TEST(TP_noModule, getAuxAI10) {
 							   &status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cerr << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -807,10 +697,7 @@ TEST(TP_noModule, getAuxAI10) {
 
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -824,10 +711,7 @@ TEST(TP_noModule, getAuxAI10) {
 
 	myStatus=irio_getAuxAI(&p_DrvPvt,10,&aivalue,&status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	else
 		std::cout << "[irio_getAuxAI function] value read from auxAI10 is: " << aivalue << std::endl;
@@ -837,10 +721,7 @@ TEST(TP_noModule, getAuxAI10) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
 
@@ -885,11 +766,8 @@ TEST(TP_noModule, setAuxDO6) {
 							   &status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cerr << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -900,10 +778,7 @@ TEST(TP_noModule, setAuxDO6) {
 
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -919,10 +794,7 @@ TEST(TP_noModule, setAuxDO6) {
 	std::cout << "[irio_setAuxDO function] value " << digitalValue << " is set in unimplemented auxDO6. Error/warning expected" << std::endl;
 	myStatus=irio_setAuxDO(&p_DrvPvt,6,digitalValue,&status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 
 	EXPECT_NE(status.detailCode, IRIO_success);
@@ -930,10 +802,7 @@ TEST(TP_noModule, setAuxDO6) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
 
@@ -978,11 +847,8 @@ TEST(TP_noModule, getAuxDO6) {
 							   &status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cerr << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -993,10 +859,7 @@ TEST(TP_noModule, getAuxDO6) {
 
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -1010,10 +873,7 @@ TEST(TP_noModule, getAuxDO6) {
 
 	myStatus=irio_getAuxDO(&p_DrvPvt,6,&aivalue,&status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	else
 		std::cout << "[irio_getAuxDO function] value read from auxDO6 is: " << aivalue << std::endl;
@@ -1023,10 +883,7 @@ TEST(TP_noModule, getAuxDO6) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
 
@@ -1071,11 +928,8 @@ TEST(TP_noModule, getAuxDI6) {
 							   &status);
 
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
-		std::cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << std::endl;
+		TestUtilsIRIO::getErrors(status);
+		std::cerr << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << std::endl;
 		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	}
 	ASSERT_EQ(status.detailCode, IRIO_success);
@@ -1086,10 +940,7 @@ TEST(TP_noModule, getAuxDI6) {
 
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(status.detailCode, IRIO_error);
 
@@ -1103,10 +954,7 @@ TEST(TP_noModule, getAuxDI6) {
 
 	myStatus=irio_getAuxDI(&p_DrvPvt,6,&aivalue,&status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 	else
 		std::cout << "[irio_getAuxDI function] value read from auxDI6 is: " << aivalue << std::endl;
@@ -1116,11 +964,6 @@ TEST(TP_noModule, getAuxDI6) {
 	std::cout << "Closing driver..." << std::endl;
 	myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		TestUtilsIRIO::getErrors(status);
 	}
 }
-
-
