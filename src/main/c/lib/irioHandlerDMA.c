@@ -662,7 +662,39 @@ int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t 
 
 }
 
-void irio_getFref(irioDrv_t* p_DrvPvt, uint32_t *Fref){
-	*Fref=p_DrvPvt->Fref;
+int irio_getFref(irioDrv_t* p_DrvPvt, int32_t *Fref, TStatus* status){
+	*Fref= (int32_t) p_DrvPvt->Fref;
+	return IRIO_success;
 }
+
+int irio_getDMATtoHOSTBlockNWords(irioDrv_t* p_DrvPvt, uint16_t* NWords, TStatus* status){
+	*NWords = p_DrvPvt->DMATtoHOSTBlockNWords[0];
+	return IRIO_success;
+}
+
+int irio_getDMATtoHOSTNCh(irioDrv_t* p_DrvPvt, uint16_t* NCh, TStatus* status){
+	*NCh = p_DrvPvt->DMATtoHOSTNCh[0];
+	return IRIO_success;
+}
+
+int irio_getSGFref(irioDrv_t* p_DrvPvt, uint32_t* SGFref, TStatus* status) {
+	*SGFref=p_DrvPvt->SGfref[0];
+	return IRIO_success;
+}
+
+int irio_getSGCVDAC(irioDrv_t* p_DrvPvt, double* SGCVDAC, TStatus* status) {
+	*SGCVDAC=p_DrvPvt->CVDAC;
+	return IRIO_success;
+}
+
+int irio_getSGCVADC(irioDrv_t* p_DrvPvt, double* SGCVADC, TStatus* status) {
+	*SGCVADC=p_DrvPvt->CVADC;
+	return IRIO_success;
+}
+
+
+
+
+
+
 
