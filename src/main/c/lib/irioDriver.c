@@ -850,15 +850,13 @@ int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status){
 	double auxADC=1;
 	double auxDAC=1;
 	int32_t moduleID;
-	int32_t statuscode;
 	switch (p_DrvPvt->platform)
 	{
 	case IRIO_FlexRIO:
 		//we are not verifying the module in use..
 		//Two options, read using IRIO library the InsetedIOModule (this only can be called if FPGA is running!!!) or using flexRIO functions
 		//Using FlexRIO library here because FPGA is not running
-
-		statuscode=NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
+		NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
 		printf("Module ID found=%x\n", moduleID);
 		//Modules ID for Analog or Digital
 		// NI5761: 0x109374C6, supported by ITER in AC version not DC, 4 analog inputs
@@ -958,8 +956,7 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 	int32_t moduleID;
 
 	if (p_DrvPvt->platform == IRIO_FlexRIO){
-		int32_t statuscode;
-		statuscode=NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
+		NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
 		printf("Module ID found=%x\n", moduleID);
 		switch (moduleID)			{
 			case FlexRIO_Module_IO_NI5761: //only for NI5761
@@ -1009,6 +1006,7 @@ int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* st
 
 int irio_getVersion(char *version,TStatus* status)
 {
+	//TODO: Mejorar, más robustez
 	sprintf(version,"%s",IRIOVERSION);
 	return IRIO_success;
 }
