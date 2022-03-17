@@ -1000,13 +1000,16 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 
 int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status)
 {
-	*value=p_DrvPvt->couplingMode;
-	return IRIO_success;
+	if (p_DrvPvt->couplingMode != NULL){
+		*value=p_DrvPvt->couplingMode;
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
 }
 
 int irio_getVersion(char *version,TStatus* status)
 {
-	//TODO: Mejorar, más robustez
 	sprintf(version,"%s",IRIOVERSION);
 	return IRIO_success;
 }

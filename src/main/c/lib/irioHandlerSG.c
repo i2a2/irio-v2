@@ -371,3 +371,30 @@ int irio_setSGUpdateRate(irioDrv_t* p_DrvPvt,int n,int32_t value, TStatus* statu
 		return IRIO_error;
 	}
 }
+
+int irio_getSGFref(irioDrv_t* p_DrvPvt, uint32_t* SGFref, TStatus* status) {
+	if (p_DrvPvt->SGfref != NULL) {
+		*SGFref=p_DrvPvt->SGfref[0];
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
+}
+
+int irio_getSGCVDAC(irioDrv_t* p_DrvPvt, double* SGCVDAC, TStatus* status) {
+	if (p_DrvPvt->CVDAC != 0) {
+		*SGCVDAC=p_DrvPvt->CVDAC;
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
+}
+
+int irio_getSGCVADC(irioDrv_t* p_DrvPvt, double* SGCVADC, TStatus* status) {
+	if (p_DrvPvt->CVADC != 0) {
+		*SGCVADC=p_DrvPvt->CVADC;
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
+}

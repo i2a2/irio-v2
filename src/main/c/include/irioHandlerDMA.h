@@ -308,37 +308,6 @@ int irio_getDMATtoHOSTBlockNWords(irioDrv_t* p_DrvPvt, uint16_t* Nwords, TStatus
  */
 int irio_getDMATtoHOSTNCh(irioDrv_t* p_DrvPvt, uint16_t* NCh, TStatus* status);
 
-/**
- * Read the frequency from the internal signal generator
- *
- * @param[in]  p_DrvPvt 	Pointer to the driver session structure
- * @param[out] SGFref       Signal generator frequency
- * @param[out] status Warning and error messages produced during the execution of this call will be added here.
- * @return \ref TIRIOStatusCode result of the execution of this call.
- */
-int irio_getSGFref(irioDrv_t* p_DrvPvt, uint32_t* SGFref, TStatus* status);
-
-/**
- * Reads the value after conversion from Volts for analog outputs
- *
- * @param[in]  p_DrvPvt 	Pointer to the driver session structure
- * @param[out] SGCVDAC      Conversion from Volts for analog outputs
- * @param[out] status Warning and error messages produced during the execution of this call will be added here.
- * @return \ref TIRIOStatusCode result of the execution of this call.
- */
-int irio_getSGCVDAC(irioDrv_t* p_DrvPvt, double* SGCVDAC, TStatus* status);
-
-/**
- * Reads the value after conversion to Volts of analog inputs
- *
- * @param[in]  p_DrvPvt 	Pointer to the driver session structure
- * @param[out] SGCVADC      Conversion to Volts of analog inputs
- * @param[out] status Warning and error messages produced during the execution of this call will be added here.
- * @return \ref TIRIOStatusCode result of the execution of this call.
- */
-int irio_getSGCVADC(irioDrv_t* p_DrvPvt, double* SGCVADC, TStatus* status);
-
-
 #ifdef __cplusplus
 }
 #endif
