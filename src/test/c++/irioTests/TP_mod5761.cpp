@@ -25,8 +25,7 @@ static int verbosity = 1;
  * generator is needed because the example uses the internal signal generator implemented in the FPGA
  * This test is related to the following requirements:
  *
- * PXIE7965R
- * PXIE7966R
+ * PXIE7966R. 7966R device can not be sustituted by any other model
  *
  * NI5761 adapter module
  *
@@ -35,7 +34,7 @@ static int verbosity = 1;
  * The execution of this test requires to have an environment variable indicating the
  * serial number of the RIO board to be used. Execute in a command shell the lsrio command
  * execute export RIOSerial=0x..........
- * execute export RIODevice=xxxx, where xxxx = 7965,7966
+ * execute export RIODevice=7966
  * execute export Coupling=0 (Coupling mode supported by ITER)
  */
 
@@ -56,7 +55,7 @@ TEST(TP_mod5761, functional) {
 	std::string Coupling  = TestUtilsIRIO::getEnvVar("Coupling");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User doesn't have to know what FPGA Version is used
 	std::string FPGAversion = "V1.1";
@@ -627,9 +626,7 @@ TEST(TP_mod5761, functional) {
 	}
 }
 
-// Tests to check warnings and errors
-// TODO: Todos los mensajes de error de IRIO devuelven -13 como detailCode, revisar si
-//       no habría que modificar algo ahí
+// Test to check errors
 
 TEST(TP_mod5761, failInitDriver) {
 	std::string testName = "TP_mod5761: Configuring FPGA when there is a failure on driver initialization";
@@ -1105,7 +1102,3 @@ TEST(TP_mod5761, failInitDriver) {
 		TestUtilsIRIO::getErrors(status);
 	}
 }
-
-// TODO: Forzar p_DrvPvt.session = 0 para mejorar cobertura de código
-
-
