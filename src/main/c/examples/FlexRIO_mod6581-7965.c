@@ -58,7 +58,7 @@ void msgerr(TIRIOStatusCode code, int nTest, const char* testName, TStatus* stat
 		}else{
 			printf("\n\tCheck previous messages for more detailed information of the error\n");
 		}
-		free(detailStr);
+		free(detailStr); detailStr = NULL;
 		fflush(stdout);
 		irio_resetStatus(status);
 
@@ -84,14 +84,10 @@ int main (int argc, char** argv)
 	irioDrv_t p_DrvPvt;
 	TStatus status;
 	irio_initStatus(&status);
-//	int myStatus=0;
-	TIRIOStatusCode myStatus=IRIO_success;
-	int i=0;
-	int FPGATemp;
-	int valueI32;
+	int myStatus=0;
+
 	int verbosity=1;
 
-	int valueReadI32=0;
 	char *filePath=NULL;
 	char *bitfileName=NULL;
 	char *NIriomodel=NULL;
@@ -101,7 +97,6 @@ int main (int argc, char** argv)
 		usage(argv[0]);
 		return 1;
 	}
-
 
 	/**
 	 * PATH BUILDING FOR THE BITFILE AND HEADER FILE
@@ -126,8 +121,11 @@ int main (int argc, char** argv)
 	usleep(100);
 
 	// In this example PORT2 has been configured as output and PORT0 and 1 as inputs.
-
+	int valueReadI32=0;
 	msgtest(2,irio_setAuxDO irio_getAuxDO);
+
+	// When auxDO6 is true, PORT 2 is updated with the value written in terminals DO0, DO1-- DO7. (see labview implementation)
+	// This digital values are expected in the port 1.
 	printf("[irio_setAuxDO function] write '1' value into auxDO6\n");
 	myStatus=irio_setAuxDO(&p_DrvPvt,6,1,&status);
 	myStatus|=irio_getAuxDO(&p_DrvPvt, 6, &valueReadI32, &status);
@@ -135,17 +133,16 @@ int main (int argc, char** argv)
 	printf("auxDO6 configured to 1, means that DO[7-0] are connected to port 2 in Connector A\n");
 	msgerr(myStatus,2,"irio_setAuxDO irio_getAuxDO",&status,verbosity,0);
 	usleep(10);
-	// When auxDO6 is true, PORT 2 is updated with the value written in terminals DO0, DO1-- DO7. (see labview implementation)
-	// This digital values are expected in the port 1.
 
 	/**
 	 * WRITING AND READING DIGITAL I/O, BOTH VALUES: 0 AND 1.
 	 */
+	int valueI32 = 0;
 	msgtest(3,irio_setDO irio_getDO irio_getDI);
 	printf("\nIRIO test 3: This test write 0 and 1, into every digital output, and it is read from DO register.\n");fflush(stdout);
 	printf("Hardware digital I/O [7-0] are interconnected physically, then the value written in DO must be read in the DI too.\n");fflush(stdout);
 	printf("Although all values written and read are showed, in case of reading an unexpected value, Error message will be shown\n\n");fflush(stdout);
-	for(i=0;i<8;i++)
+	for(int i=0;i<8;i++)
 	{
 		printf("[irio_setDO function]IRIO test 3: Write 0 value in DO%d\n",i);fflush(stdout);
 		myStatus|=irio_setDO(&p_DrvPvt, i, 0, &status);
@@ -189,7 +186,7 @@ int main (int argc, char** argv)
 	/**
 	* READING FPGA TEMPERATURE
 	*/
-	FPGATemp=-1;
+	int FPGATemp=-1;
 	msgtest(4,irio_getDevTemp);
 	myStatus=irio_getDevTemp(&p_DrvPvt,&FPGATemp,&status);
 	printf("[irio_getDevTemp function] Temperature value read from FPGA is %.2fºC\n",(float)((float)FPGATemp*0.25));

@@ -38,7 +38,7 @@ EXAMPLES := cRIO_IO.c cRIO_DAQDMA.c
 
 EXAMPLES += FlexRIO_noModule.c	  
 EXAMPLES += FlexRIO_mod5761-7966.c FlexRIO_onlyResources.c
-EXAMPLES += FlexRIO_mod5761-7966-perf.c  FlexRIO_mod6581-7961.c FlexRIO_mod1483-7966-Imaq.c FlexRIO_mod1483-7966-uart.c
+EXAMPLES += FlexRIO_mod5761-7966-perf.c  FlexRIO_mod6581-7965.c FlexRIO_mod1483-7966-Imaq.c FlexRIO_mod1483-7966-uart.c
 EXAMPLES += FlexRIO_mod5734-7966.c
 LIBRARIES := m rt irioCore
 

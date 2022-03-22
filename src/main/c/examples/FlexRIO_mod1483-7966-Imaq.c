@@ -62,7 +62,7 @@ void msgerr(TIRIOStatusCode code, int nTest, const char* testName, TStatus* stat
 		}else{
 			printf("\n\tCheck previous messages for more detailed information of the error\n");
 		}
-		free(detailStr);
+		free(detailStr); detailStr = NULL;
 		fflush(stdout);
 		irio_resetStatus(status);
 
@@ -112,9 +112,9 @@ int main (int argc, char **argv)
 	//******** Download bitfile
 	msgtest(0,irio_initDriver);
 	myStatus=irio_initDriver("testCPUDAQ",argv[1],NIriomodel,bitfileName,"V1.1",1,filePath,filePath,&p_DrvPvt,&status);
-	free(filePath);
-	free(NIriomodel);
-	free(bitfileName);
+	free(filePath); filePath = NULL;
+	free(NIriomodel); NIriomodel = NULL;
+	free(bitfileName); bitfileName = NULL;
 	msgerr(myStatus,0,"irio_initDriver",&status,verbosity,1);
 
 
