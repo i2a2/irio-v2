@@ -81,9 +81,7 @@ int irio_mergeStatus(TStatus* status,TErrorDetailCode code, int printMsg, const 
 		}
 	}
 
-	if(status->detailCode==Success || (code<0 && code<status->detailCode)){
-		status->detailCode=code;
-	}
+	status->detailCode=code;
 
 	if(status->detailCode<0){
 		status->code=IRIO_error;
