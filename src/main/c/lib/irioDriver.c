@@ -998,9 +998,19 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 	return IRIO_success;
 }
 
+// TODO: Hay que hacer modificaciones sobre esta funcion.
+//       p_DrvPvt->couplingMode siempre se inicializa independientemente
+//           de si el driver si ha inicializado bien o mal, por lo que siempre
+//           va a devolver Success
+//       Añadir otra restriccion a esta funcion o cambiar cuando y bajo que
+//           circunstancias se inicializa p_DrvPvt->couplingMode
+
+// TODO: Revisar. Puesto así porque p_DrvPvt->session es parametro critico
+//           que indica si el driver esta inicializado bien o mal
 int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status)
 {
-	if (p_DrvPvt->couplingMode != NULL){
+	if ((p_DrvPvt->couplingMode != (TIRIOCouplingMode) IRIO_coupling_NULL)
+		&& p_DrvPvt->session != 0){
 		*value=p_DrvPvt->couplingMode;
 		return IRIO_success;
 	}
