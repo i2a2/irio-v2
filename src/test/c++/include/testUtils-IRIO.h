@@ -8,19 +8,22 @@
 #define RST    "\x1B[0m"	//Foreground color, Reset
 #define FCYN   "\x1b[36m"	//Foreground color, Cyan
 
+using std::cout; using std::endl;
+using std::string; using std::cerr;
+
 class TestUtilsIRIO
 {
 public:
-	static void displayTitle(const std::string& msg, const std::string& forecolor=FWHT, const std::string& backcolor=BBLA) {
-		std::cout<<forecolor<<backcolor<<"+-----------------------------------------------------------------------------"<<std::endl;
-		std::cout<<msg<<std::endl;
-		std::cout<<"+-----------------------------------------------------------------------------"<<std::endl<<RST<<std::endl;
+	static void displayTitle(const string& msg, const string& forecolor=FWHT, const string& backcolor=BBLA) {
+		cout<<forecolor<<backcolor<<"+-----------------------------------------------------------------------------"<<endl;
+		cout<<msg<<endl;
+		cout<<"+-----------------------------------------------------------------------------"<<endl<<RST<<endl;
 	}
 
-	static std::string getEnvVar(const std::string& shellVarName) {
-		std::string shellVarValue;
+	static string getEnvVar(const string& shellVarName) {
+		string shellVarValue;
 		try {
-			shellVarValue=std::string(std::getenv(shellVarName.c_str()));
+			shellVarValue=string(std::getenv(shellVarName.c_str()));
 		}
 		catch(...) {
 			throw std::logic_error("Shell variables not defined. Please define "+shellVarName+" variable before run this test.");
@@ -32,8 +35,8 @@ public:
 	static void getErrors(const TStatus& status) {
 		char* detailStr = nullptr;
 		irio_getErrorString(status.detailCode, &detailStr);
-		std::cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << std::endl ;
-		free(detailStr);
+		cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << endl << endl;
+		free(detailStr); detailStr = nullptr;
 	}
 };
 
