@@ -21,10 +21,24 @@
 #-======================================================================
 
 LIBNAME=irioCore
+CC=gcc
+CFLAGS=-c -Wall -fPIC
+LDFLAGS= -shared
 
 LIBRARIES=NiFpga niflexrio
-LIBRARY_DIRS=$(CODAC_ROOT)/lib
-INCLUDE_DIRS=$(CODAC_ROOT)/include ../include
+ifdef CODAC_ROOT
+	LIBRARY_DIRS=$(CODAC_ROOT)/lib
+	INCLUDE_DIRS=$(CODAC_ROOT)/include ../include
+else
+    NIRIO=
+	LIBRARY_DIRS=$(NIRIO)/lib
+	INCLUDE_DIRS=$(NIRIO)/include ../include
+endif
+
+ifeq ($(COVERAGE),true)
+	CFLAGS+= -O0 -g --coverage
+	LDFLAGS+= --coverage
+endif
 
 TARGET=../../../../target
 LIBRARY_DIR=$(TARGET)/lib
@@ -34,38 +48,30 @@ OBJECT_DIR = $(SOURCE_DIR)/.obj
 SHAREDLIBRARY=$(LIBRARY_DIR)/lib$(LIBNAME).so
 STATICLIBRARY=$(LIBRARY_DIR)/lib$(LIBNAME).a
 INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
-LDLIBS=-L$(CODAC_ROOT)/lib -L$(EPICS_BASE)/lib/$(EPICS_HOST_ARCH) $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
+LDLIBS=-L$(LIBRARY_DIRS) $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
 SOURCES=$(wildcard $(SOURCE_DIR)/*.c)
 OBJECTS=$(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(notdir $(SOURCES))))
-HFILES=$(wildcard *.h)
-HTARGETS=$(addprefix $(TARGET)/include/, $(HFILES))
+#HFILES=$(wildcard *.h)
+#HTARGETS=$(addprefix $(TARGET)/include/, $(HFILES))
 
-C=gcc
-CFLAGS=-c -Wall -fPIC
-LDFLAGS= -shared
-
-ifeq ($(COVERAGE),true)
-	CFLAGS+= -O0 -g --coverage
-	LDFLAGS+= --coverage
-endif
 
 .PHONY: all clean run 
 
-all: $(HTARGETS) $(SOURCES) $(SHAREDLIBRARY) $(STATICLIBRARY)
-
+#all: $(HTARGETS) $(SOURCES) $(SHAREDLIBRARY) $(STATICLIBRARY)
+all:  $(SOURCES) $(SHAREDLIBRARY) $(STATICLIBRARY)
 $(TARGET)/include/%.h: %.h
 	@mkdir -p $(TARGET)/include
 	cp $< $@
 
 clean:
-	rm -rf "$(SHAREDLIBRARY)" "$(STATICLIBRARY)" "$(OBJECT_DIR)" "$(HTARGETS)"
+	rm -rf "$(SHAREDLIBRARY)" "$(STATICLIBRARY)" "$(OBJECT_DIR)" 
 
-run: $(SOURCES) $(SHAREDLIBRARY)
-	$(SHAREDLIBRARY)
+#run: $(SOURCES) $(SHAREDLIBRARY)
+#	$(SHAREDLIBRARY)
 
 $(SHAREDLIBRARY): $(OBJECTS)
 	mkdir -p $(LIBRARY_DIR)
-	$(C) $(LDFLAGS) $(LDLIBS) $(OBJECTS) -o $(SHAREDLIBRARY) 
+	$(CC) $(LDFLAGS) $(LDLIBS) $(OBJECTS) -o $(SHAREDLIBRARY) 
 
 $(STATICLIBRARY): $(OBJECTS)
 	mkdir -p $(LIBRARY_DIR)
@@ -73,4 +79,4 @@ $(STATICLIBRARY): $(OBJECTS)
 	
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c
 	mkdir -p $(OBJECT_DIR)
-	$(C) $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
