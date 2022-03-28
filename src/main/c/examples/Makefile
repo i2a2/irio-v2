@@ -55,7 +55,7 @@ endif
 
 
 IRIOCORE_DIR := $(realpath ../../../../target/lib)
-CUDA_DIR := /usr/local/cuda-6.5
+
  
 
 # ======================================================================
@@ -66,35 +66,47 @@ CUDA_DIR := /usr/local/cuda-6.5
 INCLUDE_DIRS := $(CODAC_ROOT)/include $(CUDA_DIR)/include
 
 ifndef CODAC_ROOT
-INCLUDE_DIRS += ../support
-CFLAGS += -DCLOSE_VERSION_NIRIO
+#INCLUDE_DIRS += ../support
+CFLAGS += -DCLOSE_VERSION_NIRIO -fPIC -Wall -O3
+LDFLAGS += -Wall -Wl,-rpath=$(IRIOCORE_DIR)
+LIBRARY_DIRS =  $(NIRIO)/lib $(IRIOCORE_DIR)
 else
-CFLAGS += -DOPEN_VERSION_NIRIO
+CFLAGS += -DOPEN_VERSION_NIRIO -fPIC -Wall -O3
+LDFLAGS += -Wall -Wl,-rpath=$(IRIOCORE_DIR) 
+LIBRARY_DIRS =  $(CODAC_ROOT)/lib $(IRIOCORE_DIR)
+endif
+
+ifeq ($(COVERAGE),true)
+	CFLAGS+= -O0 -g --coverage -fPIC -Wall -ggdb -DDEBUG
+	LDFLAGS+= --coverage -Wall -g  -Wl,-rpath=$(IRIOCORE_DIR) 
 endif
 
 ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
 INCLUDE_DIRS += $(CODAC_ROOT)/include/iriocuda
+LDFLAGS_RELEASE += -Wl,-rpath=$(CUDA_DIR)/lib64 
+LDFLAGS_DEBUG += -Wl,-rpath=$(CUDA_DIR)/lib64 
+CUDA_DIR := /usr/local/cuda-6.5
 endif
 # Additional library directories
-LIBRARY_DIRS = $(IRIOCORE_DIR) $(CODAC_ROOT)/lib 
+
 
 # ======================================================================
 # UNIT SPECIFIC COMPILER AND LINKER FLAGS
 # ======================================================================
 
 # Optimized release builds (default)
-CFLAGS_RELEASE := -fPIC -Wall -O3
-LDFLAGS_RELEASE := -Wall -Wl,-rpath=$(IRIOCORE_DIR) 
+#CFLAGS_RELEASE := -fPIC -Wall -O3
+#LDFLAGS_RELEASE := -Wall -Wl,-rpath=$(IRIOCORE_DIR) 
 
 # Debug builds (make debug)
-CFLAGS_DEBUG := -fPIC -Wall -O0 -g -ggdb -DDEBUG 
-LDFLAGS_DEBUG := -Wall -g  -Wl,-rpath=$(IRIOCORE_DIR) 
+#CFLAGS_DEBUG := -fPIC -Wall -O0 -g -ggdb -DDEBUG 
+#LDFLAGS_DEBUG := -Wall -g  -Wl,-rpath=$(IRIOCORE_DIR) 
 
 
-ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
-LDFLAGS_RELEASE += -Wl,-rpath=$(CUDA_DIR)/lib64 
-LDFLAGS_DEBUG += -Wl,-rpath=$(CUDA_DIR)/lib64 
-endif
+#ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
+#LDFLAGS_RELEASE += -Wl,-rpath=$(CUDA_DIR)/lib64 
+#LDFLAGS_DEBUG += -Wl,-rpath=$(CUDA_DIR)/lib64 
+#endif
 # Uncomment the following lines to use GCov
 #CFLAGS_DEBUG += -fprofile-arcs -ftest-coverage
 #LDFLAGS_DEBUG += -fprofile-arcs -ftest-coverage -lgcov
@@ -128,14 +140,14 @@ NC=\e[0m
 # Rules
 .PHONY: .depend all release debug clean
 
-all: debug
+all:  release
 
-release: CFLAGS += $(CFLAGS_RELEASE)
-release: LDFLAGS += $(LDFLAGS_RELEASE)
+#release: CFLAGS += $(CFLAGS_RELEASE)
+#release: LDFLAGS += $(LDFLAGS_RELEASE)
 release: .depend $(alltargets)
 
-debug: CFLAGS += $(CFLAGS_DEBUG)
-debug: LDFLAGS += $(LDFLAGS_DEBUG)
+#debug: CFLAGS += $(CFLAGS_DEBUG)
+#debug: LDFLAGS += $(LDFLAGS_DEBUG)
 debug: .depend $(alltargets)
 
 clean:

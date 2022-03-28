@@ -51,13 +51,10 @@ INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 LDLIBS=-L$(LIBRARY_DIRS) $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
 SOURCES=$(wildcard $(SOURCE_DIR)/*.c)
 OBJECTS=$(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(notdir $(SOURCES))))
-#HFILES=$(wildcard *.h)
-#HTARGETS=$(addprefix $(TARGET)/include/, $(HFILES))
-
 
 .PHONY: all clean run 
 
-#all: $(HTARGETS) $(SOURCES) $(SHAREDLIBRARY) $(STATICLIBRARY)
+
 all:  $(SOURCES) $(SHAREDLIBRARY) $(STATICLIBRARY)
 $(TARGET)/include/%.h: %.h
 	@mkdir -p $(TARGET)/include
@@ -66,8 +63,7 @@ $(TARGET)/include/%.h: %.h
 clean:
 	rm -rf "$(SHAREDLIBRARY)" "$(STATICLIBRARY)" "$(OBJECT_DIR)" 
 
-#run: $(SOURCES) $(SHAREDLIBRARY)
-#	$(SHAREDLIBRARY)
+
 
 $(SHAREDLIBRARY): $(OBJECTS)
 	mkdir -p $(LIBRARY_DIR)
