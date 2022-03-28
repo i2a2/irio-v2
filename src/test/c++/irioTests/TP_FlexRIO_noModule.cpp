@@ -37,8 +37,8 @@ using std::string; using std::cerr;
  * execute export RIODevice=xxxx, where xxxx = 7965, 7966
  */
 
-TEST(TP_noModule, functional) {
-	string testName = "TP_noModule: Functional test of bitfile noModule";
+TEST(TP_FlexRIO_noModule, functional) {
+	string testName = "TP_FlexRIO_noModule: Functional test of bitfile noModule";
 	string testDescription = "Test verifies driver’s ability to check the "
 			"correct communication and interconnection between auxiliary I/O analog/digital FPGA registers";
 
@@ -74,14 +74,13 @@ TEST(TP_noModule, functional) {
 							   &p_DrvPvt,
 							   &status);
 
-	// In TP_onlyResources test all parameters of irio_initDriver has been tested, so
+	// In TP_FlexRIO_onlyResources test all parameters of irio_initDriver has been tested, so
 	// in this test they are suppose that are not going to be incorrect.
 	// Critical failure and closing driver if something fail
 
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -324,8 +323,8 @@ TEST(TP_noModule, functional) {
 
 // Tests to catch errors
 
-TEST(TP_noModule, setFPGATwice) {
-	string testName = "TP_noModule: Set FPGA twice test";
+TEST(TP_FlexRIO_noModule, setFPGATwice) {
+	string testName = "TP_FlexRIO_noModule: Set FPGA twice test";
 	string testDescription = "Test verifies driver’s ability to check that the "
 			                 "FPGA is started twice in a row";
 
@@ -363,8 +362,7 @@ TEST(TP_noModule, setFPGATwice) {
 
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -398,8 +396,8 @@ TEST(TP_noModule, setFPGATwice) {
 	EXPECT_EQ(myStatus, IRIO_success);
 }
 
-TEST(TP_noModule, setFPGAInitErrorSessionClose) {
-	string testName = "TP_noModule: Start FPGA after a failure on the driver's initialization. Condition: there has to be the driver's session close";
+TEST(TP_FlexRIO_noModule, setFPGAInitErrorSessionClose) {
+	string testName = "TP_FlexRIO_noModule: Start FPGA after a failure on the driver's initialization. Condition: there has to be the driver's session close";
 	string testDescription = "Test verifies driver’s ability to *************************************";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -462,8 +460,8 @@ TEST(TP_noModule, setFPGAInitErrorSessionClose) {
 	EXPECT_NE(myStatus, IRIO_success);
 }
 
-TEST(TP_noModule, setFPGAInitErrorSessionOpen) {
-	string testName = "TP_noModule: Start FPGA after a failure on the driver's initialization. Condition: there has to be the driver's session open";
+TEST(TP_FlexRIO_noModule, setFPGAInitErrorSessionOpen) {
+	string testName = "TP_FlexRIO_noModule: Start FPGA after a failure on the driver's initialization. Condition: there has to be the driver's session open";
 	string testDescription = "Test verifies driver’s ability to **********************************";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -532,8 +530,8 @@ TEST(TP_noModule, setFPGAInitErrorSessionOpen) {
 	EXPECT_EQ(myStatus, IRIO_success);
 }
 
-TEST(TP_noModule, manageNonImplementedPorts) {
-	string testName = "TP_noModule: writing on non implemented auxiliary analog/digital I/O ports.";
+TEST(TP_FlexRIO_noModule, manageNonImplementedPorts) {
+	string testName = "TP_FlexRIO_noModule: writing on non implemented auxiliary analog/digital I/O ports.";
 	string testDescription = "Test verifies driver’s ability to check the error if user tries to write on "
 			"a port that is not implemented in the FPGA";
 
@@ -573,8 +571,7 @@ TEST(TP_noModule, manageNonImplementedPorts) {
 
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "FPGA must not be started if driver is not initialized correctly. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 

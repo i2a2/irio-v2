@@ -41,8 +41,8 @@ using std::string; using std::cerr;
  * execute export Coupling=X, X=0 (Coupling mode supported by ITER), 1 (Not supported by ITER)
  */
 
-TEST(TP_mod5761, functional) {
-	string testName = "TP_mod5761: Functional test of bitfile FlexRIOMod5761";
+TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
+	string testName = "TP_FlexRIO_FlexRIO_mod5761: Functional test of bitfile FlexRIOMod5761";
 	string testDescription = "Test verifies the data acquisition profile in the FlexRIO device";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
@@ -81,14 +81,13 @@ TEST(TP_mod5761, functional) {
 							   &p_DrvPvt,
 							   &status);
 
-	// In TP_onlyResources test all parameters of irio_initDriver has been tested, so
+	// In TP_FlexRIO_onlyResources test all parameters of irio_initDriver has been tested, so
 	// in all these tests it is suppose that they are not going to be incorrect.
 	// Critical failure and closing driver if something fail
 
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -242,8 +241,7 @@ TEST(TP_mod5761, functional) {
 	myStatus=irio_setUpDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on setting up the DMA. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "Test can not continue if there is a failure on setting up the DMA." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -262,6 +260,11 @@ TEST(TP_mod5761, functional) {
 	cout << endl << "TEST 9: Testing DMAs sampling rate configuration." << endl << endl;
 
 	myStatus = irio_getFref(&p_DrvPvt, &Fref, &status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+		cout << "Test can not continue if value of FPGA clock reference for "
+				 "signal generation is 0 because of core dumped exception excepted." << endl;
+	}
 	EXPECT_NE(Fref, 0);
 	if (Fref != 0) {
 		cout << "FPGA Clock reference (Fref value) is: " << Fref << " Hz" << endl;
@@ -282,11 +285,6 @@ TEST(TP_mod5761, functional) {
 		cout << "[irio_getDMATtoHostSamplingRate function] Sampling rate for DMA0 read: "
 				  << Fref/valueReadI32 << " Samples/s" << endl;
 		EXPECT_EQ(myStatus, IRIO_success);
-	}
-	else {
-		cout << "Test can not continue if value of FPGA clock reference for "
-				     "signal generation is 0 because of core dumped exception excepted. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 
 	/*
@@ -322,16 +320,14 @@ TEST(TP_mod5761, functional) {
 	myStatus=irio_setDMATtoHostEnable(&p_DrvPvt,0,1,&status); //DMA data transfer to Host is activated
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on setting up the DMA. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "Test can not continue if there is a failure on setting up the DMA." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	myStatus=irio_getDMATtoHostEnable(&p_DrvPvt,0,&valueReadI32,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on setting up the DMA. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "Test can not continue if there is a failure on setting up the DMA." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getDMATtoHostEnable function] DMATtoHostEnable0 read: " << valueReadI32 << endl;
@@ -347,8 +343,7 @@ TEST(TP_mod5761, functional) {
 	myStatus=irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on setting up the DAQ. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -381,8 +376,7 @@ TEST(TP_mod5761, functional) {
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on getting blocks of "
-				     "data from the DMA. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+				     "data from the DMA." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -430,8 +424,7 @@ TEST(TP_mod5761, functional) {
 	myStatus=irio_setDAQStartStop(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on stopping the DAQ. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "Test can not continue if there is a failure on stopping the DAQ." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -439,8 +432,7 @@ TEST(TP_mod5761, functional) {
 	myStatus=irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on cleaning the DMA. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "Test can not continue if there is a failure on cleaning the DMA." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -517,6 +509,10 @@ TEST(TP_mod5761, functional) {
 	int32_t amplitude = 4096;
 	double CVDAC = 0.0;
 	myStatus = irio_getSGCVDAC(&p_DrvPvt, &CVDAC, &status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_setSGAmp function] SGAmp0 set to " << amplitude << ", meaning " << amplitude/CVDAC << " V" << endl;
 	myStatus=irio_setSGAmp(&p_DrvPvt, 0, amplitude, &status); // y(t)=4096sin(2*pi*10000*t) signal configured
 	if (myStatus > IRIO_success) {
@@ -540,6 +536,10 @@ TEST(TP_mod5761, functional) {
 	cout << endl << "TEST 17: Set Signal Generator type" << endl << endl;
 	cout << "[irio_setSGSignalType function] SGSignalType0 set to 1 (SINE) " << endl;
 	myStatus=irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO is disabled
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_EQ(myStatus, IRIO_success);
 	usleep(100);
 	myStatus=irio_setSGSignalType(&p_DrvPvt, 0, 1, &status);
 	if (myStatus > IRIO_success) {
@@ -573,8 +573,7 @@ TEST(TP_mod5761, functional) {
 	myStatus=irio_setDAQStartStop(&p_DrvPvt,1,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on setting up the DAQ. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -584,8 +583,7 @@ TEST(TP_mod5761, functional) {
 		myStatus=irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer,&elementsRead,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
-			cout << "Test can not continue if there is a failure on getting data from the DMA. Closing driver..." << endl;
-			myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+			cout << "Test can not continue if there is a failure on getting data from the DMA." << endl;
 		}
 		ASSERT_EQ(myStatus, IRIO_success);
 
@@ -596,6 +594,10 @@ TEST(TP_mod5761, functional) {
 			sampleCounter++;
 			double CVADC = 0.0;
 			myStatus=irio_getSGCVADC(&p_DrvPvt, &CVADC, &status);
+			if (myStatus > IRIO_success) {
+				TestUtilsIRIO::getErrors(status);
+			}
+			EXPECT_EQ(myStatus, IRIO_success);
 			for (int i=0;i<numOfSamplesToShow;i++){ //only one part of the block is displayed to simplify the output
 				cout << "Sample["<< std::setw(2) << std::setfill('0') << i
 				     << "]=" << auxDataBuffer[(i*DMATtoHOSTNCh)+2]*CVADC << endl;
@@ -622,8 +624,8 @@ TEST(TP_mod5761, functional) {
 
 // Test to check errors
 
-TEST(TP_mod5761, failInitDriver) {
-	string testName = "TP_mod5761: Configuring FPGA when there is a failure on driver initialization";
+TEST(TP_FlexRIO_mod5761, failInitDriver) {
+	string testName = "TP_FlexRIO_mod5761: Configuring FPGA when there is a failure on driver initialization";
 	string testDescription = "Test verifies several warnings and errors if "
 			                      "user tries to configure the FPGA when there is a failure on driver initialization";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -787,6 +789,9 @@ TEST(TP_mod5761, failInitDriver) {
 	cout << endl << "TEST 8: Testing DMAs sampling rate configuration after failure on initializing the driver." << endl << endl;
 
 	myStatus = irio_getFref(&p_DrvPvt, &Fref, &status);
+	if (myStatus > IRIO_success) {
+		cout << "IRIO can not take the Clock reference of the FPGA for signal generation" << endl;
+	}
 	EXPECT_EQ(Fref, 0);
 	cout << "FPGA Clock reference (Fref value) is: " << Fref << " Hz" << endl;
 	cout << "[irio_setDMATtoHostSamplingRate function] Sampling rate for DMA0 set to: "
@@ -994,6 +999,10 @@ TEST(TP_mod5761, failInitDriver) {
 
 	cout << "[irio_getSGCVDAC function] Trying to read SGCVDAC..." << endl << endl;
 	myStatus = irio_getSGCVDAC(&p_DrvPvt, &CVDAC, &status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
 	// TODO: Ver cómo poner esto para evitar core dumped
 //	cout << "[irio_setSGAmp function] SGAmp0 set to " << amplitude << ", meaning " << amplitude/CVDAC << " V" << endl;
 	cout << "[irio_setSGAmp function] SGAmp0 set to 0.517563 V" << endl;

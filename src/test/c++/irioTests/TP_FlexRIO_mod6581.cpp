@@ -40,8 +40,8 @@ using std::string; using std::cerr;
  * execute export RIODevice=xxxx, where xxxx = 7965,7966
  */
 
-TEST(TP_mod6581, functional) {
-	string testName = "TP_mod6581: Functional test of bitfile FlexRIOMod6581";
+TEST(TP_FlexRIO_mod6581, functional) {
+	string testName = "TP_FlexRIO_mod6581: Functional test of bitfile FlexRIOMod6581";
 	string testDescription = "Test verifies the data acquisition profile in the FlexRIO device";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
@@ -79,14 +79,13 @@ TEST(TP_mod6581, functional) {
 							   &p_DrvPvt,
 							   &status);
 
-	// In TP_onlyResources test all parameters of irio_initDriver has been tested, so
+	// In TP_FlexRIO_onlyResources test all parameters of irio_initDriver has been tested, so
 	// in this test they are suppose that are not going to be incorrect.
 	// Critical failure and closing driver if something fail
 
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
-		cout << "FPGA must not be started if driver is not initiated correctly. Closing driver..." << endl;
-		myStatus=irio_closeDriver(&p_DrvPvt,0, &status);
+		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
@@ -231,8 +230,8 @@ TEST(TP_mod6581, functional) {
 
 // Tests to check errors
 
-TEST(TP_mod6581, failInitDriver) {
-	string testName = "TP_mod6581: Configuring FPGA when there is a failure on driver initialization";
+TEST(TP_FlexRIO_mod6581, failInitDriver) {
+	string testName = "TP_FlexRIO_mod6581: Configuring FPGA when there is a failure on driver initialization";
 	string testDescription = "Test verifies several warnings and errors if "
                                   "user tries to configure the FPGA when there is a failure on driver initialization";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);

@@ -37,9 +37,9 @@ using std::string;
  */
 
 // CPUDAQ bitfile
-TEST(TP_onlyResources, CPUDAQ)
+TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 {
-	string testName = "TP_onlyResources: Functional test of bitfile CPUDAQ";
+	string testName = "TP_FlexRIO_onlyResources: Functional test of bitfile CPUDAQ";
 	string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -102,9 +102,9 @@ TEST(TP_onlyResources, CPUDAQ)
 }
 
 // CPUIMAQ bitfile
-TEST(TP_onlyResources, CPUIMAQ)
+TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 {
-	string testName = "TP_onlyResources: Functional test of bitfile CPUIMAQ";
+	string testName = "TP_FlexRIO_onlyResources: Functional test of bitfile CPUIMAQ";
 	string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -166,9 +166,9 @@ TEST(TP_onlyResources, CPUIMAQ)
 }
 
 // Hereafter onlyResources bitfile
-TEST(TP_onlyResources, onlyResources)
+TEST(TP_FlexRIO_onlyResources, onlyResources)
 {
-	string testName = "TP_onlyResources: Functional test of bitfile onlyResources";
+	string testName = "TP_FlexRIO_onlyResources: Functional test of bitfile onlyResources";
 	string testDescription = "Test verifies driver’s ability to read and testing resources in the FPGA.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -231,9 +231,9 @@ TEST(TP_onlyResources, onlyResources)
 	EXPECT_EQ(myStatus, IRIO_success);
 }
 
-TEST(TP_onlyResources, wrongFPGAVersion)
+TEST(TP_FlexRIO_onlyResources, wrongFPGAVersion)
 {
-	string testName = "TP_onlyResources: Wrong FPGA version test";
+	string testName = "TP_FlexRIO_onlyResources: Wrong FPGA version test";
 	string testDescription = "Test verifies driver’s ability to detect that FPGA version is not correct";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -283,9 +283,9 @@ TEST(TP_onlyResources, wrongFPGAVersion)
 	EXPECT_EQ(myStatus, IRIO_success);
 }
 
-TEST(TP_onlyResources, wrongFilePath)
+TEST(TP_FlexRIO_onlyResources, wrongFilePath)
 {
-	string testName = "TP_onlyResources: Wrong file path test";
+	string testName = "TP_FlexRIO_onlyResources: Wrong file path test";
 	string testDescription = "Test verifies driver’s ability to detect that path where bitfiles are located is not correct";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -336,9 +336,9 @@ TEST(TP_onlyResources, wrongFilePath)
 	EXPECT_NE(myStatus, IRIO_success);
 }
 
-TEST(TP_onlyResources, wrongBitfileName)
+TEST(TP_FlexRIO_onlyResources, wrongBitfileName)
 {
-	string testName = "TP_onlyResources: Wrong bitfile name test";
+	string testName = "TP_FlexRIO_onlyResources: Wrong bitfile name test";
 	string testDescription = "Test verifies driver’s ability to detect that bitfile name is not correct";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -388,9 +388,9 @@ TEST(TP_onlyResources, wrongBitfileName)
 	EXPECT_NE(myStatus, IRIO_success);
 }
 
-TEST(TP_onlyResources, wrongRIOSerial)
+TEST(TP_FlexRIO_onlyResources, wrongRIOSerial)
 {
-	string testName = "TP_onlyResources: Wrong RIO serial number test";
+	string testName = "TP_FlexRIO_onlyResources: Wrong RIO serial number test";
 	string testDescription = "Test verifies driver’s ability to detect that FlexRIO device's serial number is not correct.";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -440,9 +440,9 @@ TEST(TP_onlyResources, wrongRIOSerial)
 	EXPECT_NE(myStatus, IRIO_success);
 }
 
-TEST(TP_onlyResources, wrongRIODevice)
+TEST(TP_FlexRIO_onlyResources, wrongRIODevice)
 {
-	string testName = "TP_onlyResources: Wrong RIO device test";
+	string testName = "TP_FlexRIO_onlyResources: Wrong RIO device test";
 	string testDescription = "Test verifies driver’s ability to detect that FlexRIO device is not correct";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
@@ -493,9 +493,9 @@ TEST(TP_onlyResources, wrongRIODevice)
 }
 
 // This test is supossed to fail if not a 7966 device model is passed as environment variable
-TEST(TP_onlyResources, differentModel_Serial)
+TEST(TP_FlexRIO_onlyResources, differentModel_Serial)
 {
-	string testName = "TP_onlyResources: RIO device model does not match its serial number";
+	string testName = "TP_FlexRIO_onlyResources: RIO device model does not match its serial number";
 	string testDescription = "Test verifies driver’s ability to detect that RIO device model does not match its serial number";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -555,9 +555,9 @@ TEST(TP_onlyResources, differentModel_Serial)
 
 // Bitfile used in this test does not have auxiliary 64bits analog I/O ports implemented
 // It is the original bitfile also used in C examples
-TEST(TP_onlyResources, wrongBitfileResources)
+TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 {
-	string testName = "TP_onlyResources: Wrong bitfile resources";
+	string testName = "TP_FlexRIO_onlyResources: Wrong bitfile resources";
 	string testDescription = "Test verifies driver’s ability to detect that all "
 			                 "expected resources are not implemented in the bitfile";
 
