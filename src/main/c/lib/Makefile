@@ -22,7 +22,7 @@
 
 LIBNAME=irioCore
 CC=gcc
-CFLAGS=-c -Wall -fPIC
+CFLAGS=-c -Wall -fPIC -D_GNU_SOURCE
 LDFLAGS= -shared
 
 LIBRARIES=NiFpga niflexrio
@@ -38,6 +38,8 @@ endif
 ifeq ($(COVERAGE),true)
 	CFLAGS+= -O0 -g --coverage
 	LDFLAGS+= --coverage
+else
+	CFLAGS+= -O3
 endif
 
 TARGET=../../../../target

@@ -38,7 +38,7 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include <niflexrio.h> //located in /opt/codac/include
+#include <niflexrio.h>
 #ifdef IRIO_GPU
 #include "irioHandlerDMAGPU.h"
 #endif

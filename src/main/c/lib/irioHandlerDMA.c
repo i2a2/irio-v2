@@ -32,7 +32,7 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include "NiFpga.h"
+
 
 #include <stdint.h>
 #include <stdio.h>
