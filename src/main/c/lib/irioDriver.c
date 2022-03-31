@@ -26,6 +26,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * \endcond
  *****************************************************************************/
+#define _GNU_SOURCE //include asprintf, get_current_dir_name
 
 #include "irioDriver.h"
 #include "irioDataTypes.h"
@@ -37,7 +38,7 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include <niflexrio.h> //located in /opt/codac/include
+#include <niflexrio.h>
 #ifdef IRIO_GPU
 #include "irioHandlerDMAGPU.h"
 #endif
@@ -849,15 +850,13 @@ int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status){
 	double auxADC=1;
 	double auxDAC=1;
 	int32_t moduleID;
-	int32_t statuscode;
 	switch (p_DrvPvt->platform)
 	{
 	case IRIO_FlexRIO:
 		//we are not verifying the module in use..
 		//Two options, read using IRIO library the InsetedIOModule (this only can be called if FPGA is running!!!) or using flexRIO functions
 		//Using FlexRIO library here because FPGA is not running
-
-		statuscode=NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
+		NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
 		printf("Module ID found=%x\n", moduleID);
 		//Modules ID for Analog or Digital
 		// NI5761: 0x109374C6, supported by ITER in AC version not DC, 4 analog inputs
@@ -957,8 +956,7 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 	int32_t moduleID;
 
 	if (p_DrvPvt->platform == IRIO_FlexRIO){
-		int32_t statuscode;
-		statuscode=NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
+		NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
 		printf("Module ID found=%x\n", moduleID);
 		switch (moduleID)			{
 			case FlexRIO_Module_IO_NI5761: //only for NI5761
@@ -1000,10 +998,24 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 	return IRIO_success;
 }
 
+// TODO: Hay que hacer modificaciones sobre esta funcion.
+//       p_DrvPvt->couplingMode siempre se inicializa independientemente
+//           de si el driver si ha inicializado bien o mal, por lo que siempre
+//           va a devolver Success
+//       Añadir otra restriccion a esta funcion o cambiar cuando y bajo que
+//           circunstancias se inicializa p_DrvPvt->couplingMode
+
+// TODO: Revisar. Puesto así porque p_DrvPvt->session es parametro critico
+//           que indica si el driver esta inicializado bien o mal
 int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status)
 {
-	*value=p_DrvPvt->couplingMode;
-	return IRIO_success;
+	if ((p_DrvPvt->couplingMode != (TIRIOCouplingMode) IRIO_coupling_NULL)
+		&& p_DrvPvt->session != 0){
+		*value=p_DrvPvt->couplingMode;
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
 }
 
 int irio_getVersion(char *version,TStatus* status)

@@ -32,7 +32,7 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include "NiFpga.h"
+
 
 #include <stdint.h>
 #include <stdio.h>
@@ -660,5 +660,32 @@ int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t 
 		return IRIO_error;
 	}
 
+}
+
+int irio_getFref(irioDrv_t* p_DrvPvt, int32_t *Fref, TStatus* status){
+	if (p_DrvPvt->Fref != 0) {
+		*Fref= (int32_t) p_DrvPvt->Fref;
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
+}
+
+int irio_getDMATtoHOSTBlockNWords(irioDrv_t* p_DrvPvt, uint16_t* NWords, TStatus* status){
+	if (p_DrvPvt->DMATtoHOSTBlockNWords != NULL) {
+		*NWords = p_DrvPvt->DMATtoHOSTBlockNWords[0];
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
+}
+
+int irio_getDMATtoHOSTNCh(irioDrv_t* p_DrvPvt, uint16_t* NCh, TStatus* status){
+	if (p_DrvPvt->DMATtoHOSTNCh != NULL) {
+		*NCh = p_DrvPvt->DMATtoHOSTNCh[0];
+		return IRIO_success;
+	}
+	else
+		return IRIO_error;
 }
 

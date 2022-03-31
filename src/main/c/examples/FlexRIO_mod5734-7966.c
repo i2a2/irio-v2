@@ -242,11 +242,6 @@ int main (int argc, char **argv)
 //	printf("[irio_getAICoupling function] AICoupling read %d\n",coupling);
 //	msgerr(myStatus,10,"irio_setAICoupling & irio_getAICoupling",&status,verbosity,0);
 
-
-	//TODO: Esto está aislado de lo demás, pertenece al test 10 comentado o al
-	//      test 11? Hay que comprobar que esos setters son correctos.
-	//      No puedo arreglar error cppCheck con esto así
-
 	// setting DC mode directly.
 		coupling=atoi(argv[3]);
     // This part is setting the DC coupling for channel 0 only

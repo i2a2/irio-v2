@@ -62,7 +62,7 @@ void msgerr(TIRIOStatusCode code, int nTest, const char* testName, TStatus* stat
 		}else{
 			printf("\n\tCheck previous messages for more detailed information of the error\n");
 		}
-		free(detailStr);
+		free(detailStr); detailStr = NULL;
 		fflush(stdout);
 		irio_resetStatus(status);
 
@@ -88,7 +88,7 @@ int main (int argc, char **argv)
 	irioDrv_t p_DrvPvt;
 	TStatus status;
 	irio_initStatus(&status);
-	int myStatus;
+	int myStatus=0;
 	int verbosity=1;
 
 	char *filePath=NULL;
@@ -182,7 +182,7 @@ int main (int argc, char **argv)
 	}else{
 		printf("MSG not received\n");
 	}
-	free(msg);
+	free(msg); msg = NULL;
 	msgerr(myStatus,6,"irio_getCLuart",&status,verbosity,0);
 
 

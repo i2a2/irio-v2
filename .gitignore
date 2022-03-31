@@ -1,0 +1,6 @@
+.project
+.settings/
+.cproject
+target/
+.pydevproject
+ErrorFile

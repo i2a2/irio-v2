@@ -276,6 +276,38 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t *data, int* elementsRead, TStatus* status);
+
+/**
+ * Reads Fref field from IRIO data structure
+ *
+ * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] Fref         FPGA clock reference
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getFref(irioDrv_t* p_DrvPvt, int32_t *Fref, TStatus* status);
+
+/**
+ *
+ * Reads a specified number of data blocks from the DMA
+ *
+ * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] Nwords       Numbers of blocks readed
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getDMATtoHOSTBlockNWords(irioDrv_t* p_DrvPvt, uint16_t* Nwords, TStatus* status);
+
+/**
+ * Reads a specified FPGA Channel from the DMA
+ *
+ * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] Nch          Channel of the FPGA where user wants to read
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getDMATtoHOSTNCh(irioDrv_t* p_DrvPvt, uint16_t* NCh, TStatus* status);
+
 #ifdef __cplusplus
 }
 #endif
