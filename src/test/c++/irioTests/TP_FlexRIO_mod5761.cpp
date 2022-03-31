@@ -41,7 +41,7 @@ using std::string; using std::cerr;
  * execute export Coupling=X, X=0 (Coupling mode supported by ITER), 1 (Not supported by ITER)
  */
 
-TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
+TEST(TP_FlexRIO_mod5761, functional) {
 	string testName = "TP_FlexRIO_FlexRIO_mod5761: Functional test of bitfile FlexRIOMod5761";
 	string testDescription = "Test verifies the data acquisition profile in the FlexRIO device";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
@@ -177,11 +177,11 @@ TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
 
 	/**
 	 * TEST 5
-	 * AO0_ENABLE IS ACTIVATED
+	 * AO0_ENABLE
 	 */
 	usleep(100);
 	cout << endl << "TEST 5: Configuring the Analog output enable on port 0" << endl << endl;
-	cout << "[irio_setAO enable] AOEnable0 set to 1 (ON)" << endl;
+	cout << "[irio_setAOEnable function] AOEnable0 set to 1 (ENABLE)" << endl;
 
 	myStatus=irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
 	if (myStatus > IRIO_success) {
@@ -221,7 +221,8 @@ TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
 	 * DMA CLEANING
 	 */
 	usleep(100);
-	cout << endl << "TEST 7: Testing DMAs cleaning. No output if DMAs have been cleaned successfully" << endl;
+	cout << endl << "TEST 7: Testing DMAs' cleaning." << endl << endl;
+	cout << "[irio_cleanDMAsTtoHost function] No output if DMAs have been cleaned successfully" << endl;
 
 	myStatus=irio_cleanDMAsTtoHost(&p_DrvPvt,&status); // DMA FIFOs are cleaned
 	if (myStatus > IRIO_success) {
@@ -234,7 +235,8 @@ TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
 	 * DMA CONFIGURATION
 	 */
 	usleep(100);
-	cout << endl << "TEST 8: Testing configurations of DMAs. No output if DMAs have been configured successfully" << endl;
+	cout << endl << "TEST 8: Testing DMAs' set up configuration." << endl;
+	cout << "[irio_setUpDMAsTtoHost function] No output if DMAs have been configured successfully" << endl;
 
 	// All DMAs are configured. In this case there is only one DMA implemented in the FPGA
 	// with four channels (every channel has a digital value of 16 bits)
@@ -257,7 +259,7 @@ TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
 	//		 - SamplingRate is the sampling rate desired to be configured
 	//		 - decimationFactor, is the value configured in the FPGA to obtain the sampling rate desired
 	// E.g., If you want 10000 Samples/s then configure (p_DrvPvt.Fref/10000) in third parameter of irio_setDMATtoHostSamplingRate
-	cout << endl << "TEST 9: Testing DMAs sampling rate configuration." << endl << endl;
+	cout << endl << "TEST 9: Testing DMAs' sampling rate configuration." << endl << endl;
 
 	myStatus = irio_getFref(&p_DrvPvt, &Fref, &status);
 	if (myStatus > IRIO_success) {
@@ -314,7 +316,7 @@ TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
 	 * DMA ENABLE
 	 */
 	usleep(100);
-	cout << endl << "TEST 11: Testing DMA Enable" << endl << endl;
+	cout << endl << "TEST 11: Testing DMAs' Enable" << endl << endl;
 
 	cout << "[irio_setDMATtoHostEnable function] DMATtoHostEnable0 set to 1 (ON)" << endl;
 	myStatus=irio_setDMATtoHostEnable(&p_DrvPvt,0,1,&status); //DMA data transfer to Host is activated
@@ -485,8 +487,9 @@ TEST(TP_FlexRIO_FlexRIO_mod5761, functional) {
 	// We want program signal generator with 10kHz periodic signal
 	// Equation to apply to obtain freq_desired is:
 	//       SGFreq = Freq_desired*((2to32)/(SGFref/(Samples/s)))
-	int accIncr=10000*(UINT_MAX/(10000000));
-	cout << "[irio_setSGFreq function] SGFreq0 set to " << accIncr << " meaning " << 10000 << " Hz" << endl;
+	uint32_t freqDesired = 10000;
+	int accIncr=freqDesired*(UINT_MAX/samplingRate);
+	cout << "[irio_setSGFreq function] SGFreq0 set to " << accIncr << ", meaning " << freqDesired << " Hz" << endl;
 	myStatus=irio_setSGFreq(&p_DrvPvt, 0, accIncr, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -730,7 +733,7 @@ TEST(TP_FlexRIO_mod5761, failInitDriver) {
 
 	usleep(100);
 	cout << endl << "TEST 4: Configuring the Analog output enable on port 0 after failure on initializing the driver" << endl << endl;
-	cout << "[irio_setAO enable] AOEnable0 set to 1 (ON)" << endl;
+	cout << "[irio_setAOEnable] AOEnable0 set to 1 (ENABLE)" << endl;
 
 	myStatus=irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
 	if (myStatus > IRIO_success) {
@@ -977,9 +980,12 @@ TEST(TP_FlexRIO_mod5761, failInitDriver) {
 
 
 	cout << endl << "TEST 15: Set Signal Generator frequency" << endl << endl;
-
-	int accIncr=10000*(UINT_MAX/(10000000));
-	cout << "[irio_setSGFreq function] SGFreq0 set to " << accIncr << " meaning " << 10000 << " Hz" << endl;
+	// We want program signal generator with 10kHz periodic signal
+	// Equation to apply to obtain freq_desired is:
+	//       SGFreq = Freq_desired*((2to32)/(SGFref/(Samples/s)))
+	uint32_t freqDesired = 100000;
+	int accIncr=freqDesired*(UINT_MAX/(10000000));
+	cout << "[irio_setSGFreq function] SGFreq0 set to " << accIncr << ", meaning " << freqDesired << " Hz" << endl;
 	myStatus=irio_setSGFreq(&p_DrvPvt, 0, accIncr, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -1021,7 +1027,7 @@ TEST(TP_FlexRIO_mod5761, failInitDriver) {
 
 	cout << endl << "TEST 17: Set Signal Generator type" << endl;
 	cout << "First is necessary to disable Analog output 0" << endl << endl;
-	cout << "[irio_setAOEnable function] AO0 enable set to 0 (OFF) " << endl;
+	cout << "[irio_setAOEnable function] AO0 enable set to 0 (DISABLE) " << endl;
 	myStatus=irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO is disabled
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);

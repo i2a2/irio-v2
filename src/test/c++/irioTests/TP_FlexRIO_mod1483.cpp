@@ -88,8 +88,6 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
-		EXPECT_EQ(myStatus, IRIO_success);
-		exit(-1);
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
