@@ -35,4 +35,21 @@ using std::string;
 
 TEST(TP_cRIO_PBP, functional) {
 
+
+	// TODO: Usar ejemplo ya diseñado pero cambiando el bitfile, a ver qué hace
+
+	// TODO: Cuando se tire del cable en el chasis cRIO habria que ver que hace
+	//       la libreria de NI con el driver, especialmente con la sesion
+	//       Mantiene la misma sesion, la cierra, la cierra y abre otra nueva...?
+
+
+
+
+
+
+
+
+
+
+
 }

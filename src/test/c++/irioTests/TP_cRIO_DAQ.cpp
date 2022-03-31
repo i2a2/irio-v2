@@ -34,5 +34,52 @@ using std::string;
  */
 
 TEST(TP_cRIO_DAQ, functional) {
+	string testName = "TP_cRIO_DAQ: Functional test of bitfile cRIO_DAQ";
+	string testDescription = "Test verifies driver’s ability to check cRIO DAQ profile.";
+
+	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
+	TestUtilsIRIO::displayTitle(testDescription);
+
+	// Environment variables
+	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+
+	// TODO: confParams se va a diseñar como un array
+	//       Acceso a un valor del array en el bash: ${confParams[X]}, X = 0,1,2,...
+	//       Acceso a todo el array en el bash: ${confParams[@]}
+	string confParams = TestUtilsIRIO::getEnvVar("confParams");
+
+	// Makes no sense to execute IRIO Library if rioDevice is not correct
+	ASSERT_TRUE(RIODevice=="9159") << "Use the correct model of your cRIO chassis";
+
+	// User don't have to know what FPGA Version is used
+	string FPGAversion = "V1.1";
+	string NIRIOmodel = "PXIe-"+RIODevice+"R";
+	string filePath = "../resources/"+RIODevice+"/";
+	string bitfileName = "FlexRIO_CPUDAQ_"+RIODevice;
+
+	int myStatus = 0;
+	irioDrv_t p_DrvPvt;
+	TStatus status;
+	irio_initStatus(&status);
+
+
+
+	// TODO: Usar ejemplo ya diseñado pero cambiando el bitfile, a ver qué hace
+
+	// TODO: Cuando se tire del cable en el chasis cRIO habria que ver que hace
+	//       la libreria de NI con el driver, especialmente con la sesion
+	//       Mantiene la misma sesion, la cierra, la cierra y abre otra nueva...?
+
+
+
+
+
+
+
+
+
+
+
 
 }
