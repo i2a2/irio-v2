@@ -42,7 +42,7 @@ using std::string; using std::cerr;
  */
 
 TEST(TP_FlexRIO_mod5761, functional) {
-	string testName = "TP_FlexRIO_FlexRIO_mod5761: Functional test of bitfile FlexRIOMod5761";
+	string testName = "TP_FlexRIO_mod5761: Functional test of bitfile FlexRIOMod5761";
 	string testDescription = "Test verifies the data acquisition profile in the FlexRIO device";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);

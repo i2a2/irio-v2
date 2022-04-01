@@ -16,6 +16,7 @@ extern "C" {
 }
 
 #include "testUtils-IRIO.h"
+#include <thread>
 
 // Always max verbosity
 static int verbosity = 1;
@@ -23,11 +24,44 @@ static int verbosity = 1;
 using std::cout; using std::endl;
 using std::string; using std::cerr;
 
+// Data structure to storage data read on each performance test
+// TODO: Use prefix typedef? Other syntax in C++?
+typedef struct{
+	irioDrv_t *p_Drv;
+	int flagToFinish;
+	long int blocksRead;
+	uint64_t *DBuffer;
+}threadData_t;
+
+void DMAthread(threadData_t* data, TStatus* status) {
+	int myStatus = 0;
+	int elementsRead = 0;
+	int numBlocks = 10;
+	int DMAFrameType = 0;
+
+	do{
+		myStatus=irio_getDMATtoHostData(data->p_Drv,numBlocks,DMAFrameType,
+				                        data->DBuffer,&elementsRead,status);
+		if(myStatus==IRIO_success){
+			if (elementsRead==10){
+				data->blocksRead = data->blocksRead+elementsRead;
+			}
+			else {
+				usleep(10);
+			}
+		}
+		else{
+			TestUtilsIRIO::getErrors(*status);
+			cout << "DEBUG: Error on irio_getDMATtoHostData " << endl;
+		}
+	}while(data->flagToFinish==0);
+}
+
 /**
  * Test verifies the performance of the FlexRIO device
  * This test is related to the following requirements:
  *
- * PXIE7966R. 7966R device can not be sustituted by any other model
+ * PXIE7966R. 7966R device can not be substituted by any other model
  *
  * NI5761 adapter module
  *
@@ -37,18 +71,16 @@ using std::string; using std::cerr;
  * serial number of the RIO board to be used. Execute in a command shell the lsrio command
  * execute export RIOSerial=0x..........
  * execute export RIODevice=7966
- * execute export Coupling=X, X=0 (Coupling mode supported by ITER), 1 (Not supported by ITER)
  */
 
 TEST(TP_FlexRIO_mod5761_perf, functional) {
-	string testName = "TP_FlexRIO_FlexRIO_mod5761_perf: Functional test of bitfile FlexRIO_perf";
+	string testName = "TP_FlexRIO_mod5761_perf: Functional test of bitfile FlexRIO_perf";
 	string testDescription = "Test verifies the performance of the FlexRIO device connected to NI5761 module";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-	string Coupling  = TestUtilsIRIO::getEnvVar("Coupling");
 
 	// Makes no sense to execute IRIO Library if rioDevice is not correct
 	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
@@ -139,7 +171,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	 * DMA CONFIGURATION
 	 */
 	usleep(100);
-	cout << endl << "TEST 8: Testing DMAs' set up configuration" << endl;
+	cout << endl << "TEST 4: Testing DMAs' set up configuration" << endl << endl;
 	cout << "[irio_setUpDMAsTtoHost function] No output if DMAs have been configured successfully" << endl;
 	// All DMAs are configured. In this case there is only one DMA implemented in the FPGA
 	// with four channels (every channel has a digital value of 16 bits)
@@ -296,13 +328,28 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	/*
+	 * PERFORMANCE TESTS
+	 */
+	cout << endl << "***  PERFORMANCE TESTS ***" << endl;
+	cout << "This test pretends to show that the IRIO library is able to overcome "
+			"the throughput of 750MB/s" << endl;
+
+	/*
+	 * THREAD NEEDED TO RUN PERFORMANCE TESTS
+	 */
+	usleep(100);
+	threadData_t data;
+	data.p_Drv=&p_DrvPvt;
+	data.DBuffer = new uint64_t;
+	std::thread t (DMAthread,&data,&status);
+
+	/*
 	 * TEST 12
 	 * PERFORMANCE TEST 1
 	 */
-	usleep(100);
 	cout << endl << "TEST 12: Performance test 1" << endl << endl;
-	cout << "This test pretends to show that the IRIO library is able to "
-			"overcome the throughput of 750MB/s" << endl;
+	cout << "This test pretends to show that IRIO library is able to "
+			"overcome the throughput of 800kB/s" << endl;
 	cout << "IRIO Performance Test 1. Bandwidth tested: 800kB/s during 5 seconds" << endl;
 	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
 	myStatus=irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
@@ -312,10 +359,114 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
+	cout << "Thread acquiring data" << endl;
+	t.join();
+
+	cout << "Sleep 5 seconds..." << endl;
+	sleep(5); // 5 Seconds to wait while the thread acquires data.
+
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 0 (OFF)" << endl;
+	myStatus=irio_setDAQStartStop(&p_DrvPvt,0,&status); // Data acquisition is stopped
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_EQ(myStatus, IRIO_success);
+
+	int DMAsOverflow = 0;
+	myStatus=irio_getDMATtoHostOverflow(&p_DrvPvt, &DMAsOverflow , &status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	ASSERT_EQ(myStatus, IRIO_success);
+
+	if (DMAsOverflow==0)	{
+		cout << "IRIO performance Test 1. 800kB/s during 5 seconds, 4MB of data "
+				"reception are expected" << endl;
+		cout << "IRIO performance Test 1. Bandwidth tested: 800kB/s [OK]. Data "
+				"transfered: " << std::setprecision(2) << data.blocksRead*4096.0*8/1000000
+				<< "MB" << endl << endl;
+	}
+	else{
+		irio_mergeStatus(&status,Generic_Error,verbosity,"IRIO performance Test 1. Bandwidth tested: 800kB/s [ERROR]. DMA Overflow with data loss\n");
+	}
+
+	/*
+	 * TEST 13
+	 * PERFORMANCE TEST 2
+	 */
+//	cout << endl << "TEST 13: Performance test 2" << endl << endl;
+//	cout << "This test pretends to show that IRIO library is able to "
+//			"overcome the throughput of 8MB/s" << endl;
+//	cout << "IRIO Performance Test 2. Bandwidth tested: 8MB/s during 10 seconds" << endl;
+//
+//	cout << "[irio_cleanDMAsTtoHost function] No output if DMAs have been cleaned successfully" << endl;
+//	myStatus=irio_cleanDMAsTtoHost(&p_DrvPvt,&status); // DMA FIFOs are cleaned
+//	if (myStatus > IRIO_success) {
+//		TestUtilsIRIO::getErrors(status);
+//	}
+//	EXPECT_EQ(myStatus, IRIO_success);
+//	usleep(100);
+//
+//	cout << "FPGA Clock reference (Fref value) is: " << Fref << " Hz" << endl;
+//	cout << "[irio_setDMATtoHostSamplingRate function] Sampling rate for DMA0 set to: "
+//			  << samplingRate << " Samples/s"<< endl;
+//
+//	int32_t decimationFactor = Fref/samplingRate;
+//	myStatus=irio_setDMATtoHostSamplingRate(&p_DrvPvt,0,decimationFactor,&status);
+//	if (myStatus > IRIO_success) {
+//		TestUtilsIRIO::getErrors(status);
+//	}
+//	EXPECT_EQ(myStatus, IRIO_success);
+//
+//	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
+//	myStatus=irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
+//	if (myStatus > IRIO_success) {
+//		TestUtilsIRIO::getErrors(status);
+//		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
+//	}
+//	ASSERT_EQ(myStatus, IRIO_success);
+//
+//	// TODO: Ver si el segundo thread permite hacer otro join() o hay que crear uno nuevo
+//	cout << "Thread acquiring data" << endl;
+//	t.join();
+//
+//	cout << "Sleep 5 seconds..." << endl;
+//	sleep(5); // 5 Seconds to wait while the thread acquires data.
+//
+//	cout << "[irio_setDAQStartStop function] DAQStartStop set to 0 (OFF)" << endl;
+//	myStatus=irio_setDAQStartStop(&p_DrvPvt,0,&status); // Data acquisition is stopped
+//	if (myStatus > IRIO_success) {
+//		TestUtilsIRIO::getErrors(status);
+//	}
+//	EXPECT_EQ(myStatus, IRIO_success);
+//
+//	int DMAsOverflow = 0;
+//	myStatus=irio_getDMATtoHostOverflow(&p_DrvPvt, &DMAsOverflow , &status);
+//	if (myStatus > IRIO_success) {
+//		TestUtilsIRIO::getErrors(status);
+//	}
+//	ASSERT_EQ(myStatus, IRIO_success);
+//
+//	if (DMAsOverflow==0)	{
+//		cout << "IRIO performance Test 1. 800kB/s during 5 seconds, 4MB of data "
+//				"reception are expected" << endl;
+//		cout << "IRIO performance Test 1. Bandwidth tested: 800kB/s [OK]. Data "
+//				"transfered: " << std::setprecision(2) << data.blocksRead*4096.0*8/1000000
+//				<< "MB" << endl << endl;
+//	}
+//	else{
+//		irio_mergeStatus(&status,Generic_Error,verbosity,"IRIO performance Test 1. Bandwidth tested: 800kB/s [ERROR]. DMA Overflow with data loss\n");
+//	}
 
 
 
-
+	cout << endl << "TEST XXX: Closing IRIO DRIVER" << endl << endl;
+	cout << "Closing driver..." << endl;
+	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_EQ(myStatus, IRIO_success);
 
 
 
