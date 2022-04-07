@@ -549,10 +549,6 @@ TEST(TP_FlexRIO_onlyResources, differentModel_Serial)
 	EXPECT_NE(myStatus, IRIO_success);
 }
 
-// TODO: Revisar este ultimo test.
-//       Por qué no hay warning cuando no encuentra las auxAnalog de 64 bits
-//       pero sí cuando faltan el resto de recursos?
-
 // Bitfile used in this test does not have auxiliary 64bits analog I/O ports implemented
 // It is the original bitfile also used in C examples
 TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)

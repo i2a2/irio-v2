@@ -277,7 +277,8 @@ TEST(TP_FlexRIO_mod1483, failInitDriverUART) {
 	// Expect warnings or error so use this verification when check error tests to allow moving forward to next tests
 	EXPECT_NE(myStatus, IRIO_success);
 
-	// TODO: Core dumped when configure after failure initializing the driver
+	// Core dumped when configure after failure initializing the driver
+	// Don't make sente to use this function on this test
 	int32_t value;
 //	cout << "TEST 1: Configuring CameraLink adapter module" << endl << endl;
 //	cout << "[irio_configCL function] Configuring cameraLink adapter module" << endl;
@@ -339,7 +340,8 @@ TEST(TP_FlexRIO_mod1483, failInitDriverUART) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	// TODO: Core dumped when sending data after failure initializing the driver
+	// Core dumped when sending data after failure initializing the driver
+	// Don't make sente to use this function on this test
 //	cout << endl << "TEST 5: Sending data to CameraLink" << endl << endl;
 //	cout << "[irio_sendCLuart function]" << endl;
 //	cout << "Introduce 4 characters and pulse intro, to send data to the camera" << endl;
@@ -355,7 +357,8 @@ TEST(TP_FlexRIO_mod1483, failInitDriverUART) {
 //	}
 //	EXPECT_NE(myStatus, IRIO_success);
 
-	// TODO: Core dumped when receiving data after failure initializing the driver
+	// Core dumped when receiving data after failure initializing the driver
+	// Don't make sente to use this function on this test
 //	cout << endl << "TEST 6: Receiving data from CameraLink" << endl << endl;
 //	int len = 0;
 //	// TODO: Ver cuánta memoria almaceno en esta variable
@@ -580,7 +583,8 @@ TEST(TP_FlexRIO_mod1483, failInitDriverIMAQ) {
 	// Expect warnings or error so use this verification when check error tests to allow moving forward to next tests
 	EXPECT_NE(myStatus, IRIO_success);
 
-//	// TODO: Core dumped when configure
+    // Core dumped when configure after failure initializing the driver
+	// Don't make sente to use this function on this test
 //	cout << endl << "TEST 1: Configuring CameraLink adapter module" << endl << endl;
 //	cout << "[irio_configCL function] Configuring cameraLink adapter module" << endl;
 //	myStatus=irio_configCL(&p_DrvPvt,1,1,1,1,1,0,CL_STANDARD,CL_FULL, &status);

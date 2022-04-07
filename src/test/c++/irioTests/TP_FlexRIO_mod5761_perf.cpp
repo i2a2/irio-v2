@@ -332,7 +332,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 		cout << "Test can not continue if value of FPGA clock reference for "
 				 "signal generation is 0 because of core dumped exception excepted." << endl;
 	}
-	EXPECT_NE(Fref, 0);
+	EXPECT_EQ(myStatus, IRIO_success);
 	if (Fref != 0) {
 		cout << "FPGA Clock reference, Fref: " << Fref << " Hz" << endl;
 		cout << "[irio_setDMATtoHostSamplingRate function] Sampling rate for DMA0 set to: "
@@ -352,8 +352,6 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
-//		cout << "[irio_getDMATtoHostSamplingRate function] Sampling rate for DMA0 read: "
-//				  << Fref/valueReadI32 << " Samples/s" << endl;
 		cout << "[irio_getDMATtoHostSamplingRate function] Sampling rate for DMA0 read: "
 				  << valueReadI32 << " Samples/s" << endl;
 		EXPECT_EQ(myStatus, IRIO_success);
@@ -628,6 +626,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 
 	data.flagToFinish=1;
 	t.join();
+	delete [] data.DBuffer;
 
 	cout << endl << "TEST 16: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
@@ -841,7 +840,7 @@ TEST (TP_FlexRIO_mod5761_perf, failInitDriver) {
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
-	EXPECT_EQ(Fref, 0);
+	EXPECT_NE(myStatus, IRIO_success);
 	cout << "FPGA Clock reference, Fref: " << Fref << " Hz" << endl;
 	cout << "[irio_setDMATtoHostSamplingRate function] Sampling rate for DMA0 set to: "
 			  << samplingRate << " Samples/s"<< endl;
