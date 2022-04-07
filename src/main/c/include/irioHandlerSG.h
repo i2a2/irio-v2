@@ -212,11 +212,12 @@ int irio_setSGUpdateRate(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status
  * Read the frequency from the internal signal generator
  *
  * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[in]  n            Signal Generator channel
  * @param[out] SGFref       Signal generator frequency
  * @param[out] status Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
-int irio_getSGFref(irioDrv_t* p_DrvPvt, uint32_t* SGFref, TStatus* status);
+int irio_getSGFref(irioDrv_t* p_DrvPvt, int n, uint32_t* SGFref, TStatus* status);
 
 /**
  * Reads the value after conversion from Volts for analog outputs

@@ -50,6 +50,7 @@
 #define STRINGNAME_SGSIGNALTYPE "_ControlU8_SGSignalType"
 #define STRINGNAME_SGUPDATERATE "_ControlU32_SGUpdateRate"
 #define STRINGNAME_SGFREF "_IndicatorU32_SGFref"
+#define STRINGNAME_FREQREF "_IndicatorU32_Fref"
 ///@}
 
 int irio_findSGs(irioDrv_t* p_DrvPvt, TStatus* status){
@@ -372,13 +373,36 @@ int irio_setSGUpdateRate(irioDrv_t* p_DrvPvt,int n,int32_t value, TStatus* statu
 	}
 }
 
-int irio_getSGFref(irioDrv_t* p_DrvPvt, uint32_t* SGFref, TStatus* status) {
-	if (p_DrvPvt->SGfref != NULL) {
-		*SGFref=p_DrvPvt->SGfref[0];
-		return IRIO_success;
+int irio_getFref(irioDrv_t* p_DrvPvt,int32_t* value, TStatus* status){
+	TIRIOStatusCode local_status = IRIO_success;
+	if(p_DrvPvt->enumFref.found){
+		*value = (int32_t) p_DrvPvt->Fref;
+	}else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_FREQREF);
+		local_status |= IRIO_warning;
 	}
-	else
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
 		return IRIO_error;
+	}
+}
+
+int irio_getSGFref(irioDrv_t* p_DrvPvt, int n, uint32_t* value, TStatus* status) {
+	TIRIOStatusCode local_status = IRIO_success;
+	if(p_DrvPvt->enumSGFref!= NULL && p_DrvPvt->enumSGFref[n].found) {
+		*value = (int32_t) p_DrvPvt->SGfref[n];
+	}else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_SGFREF);
+		local_status |= IRIO_warning;
+	}
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
 }
 
 int irio_getSGCVDAC(irioDrv_t* p_DrvPvt, double* SGCVDAC, TStatus* status) {
