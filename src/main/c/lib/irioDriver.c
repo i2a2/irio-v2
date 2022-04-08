@@ -434,11 +434,13 @@ int allocCRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	p_DrvPvt->enumAnalogInput = calloc(p_DrvPvt->max_analoginputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanaloginputs = CRIO_MAX_AUXA_IN;
 	p_DrvPvt->enumauxAI = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAI_64 = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort_64));
 	p_DrvPvt->max_analogoutputs = CRIO_MAX_ANALOGS_OUT;
 	p_DrvPvt->enumAnalogOutput= calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->enumAOEnable = calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanalogoutputs = CRIO_MAX_AUXA_OUT;
 	p_DrvPvt->enumauxAO = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAO_64 = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort_64));
 
 	//Digital Limits
 	p_DrvPvt->max_digitalsinputs = CRIO_MAX_DIGITALS;
@@ -482,9 +484,11 @@ int freeXRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	//Analog Limits
 	free(p_DrvPvt->enumAnalogInput);
 	free(p_DrvPvt->enumauxAI);
+	free(p_DrvPvt->enumauxAI_64);
 	free(p_DrvPvt->enumAnalogOutput);
 	free(p_DrvPvt->enumAOEnable);
 	free(p_DrvPvt->enumauxAO);
+	free(p_DrvPvt->enumauxAO_64);
 
 	//Digital Limits
 	free(p_DrvPvt->enumDigitalInput);
