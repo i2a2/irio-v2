@@ -35,11 +35,6 @@ using std::cin;
  * NI1483 adapter module
  *
  * This test must be executed with a PXIE7966R
- *
- * The execution of this test requires to have an environment variable indicating the
- * serial number of the RIO board to be used. Execute in a command shell the lsrio command
- * execute export RIOSerial=0x..........
- * execute export RIODevice=7966
  */
 
 TEST(TP_FlexRIO_mod1483, functionalUART){
@@ -48,11 +43,8 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+	string RIODevice = "7966";
+	string RIOSerial = "0x01A34CC7";
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
@@ -242,11 +234,8 @@ TEST(TP_FlexRIO_mod1483, failInitDriverUART) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+	string RIODevice = "7966";
+	string RIOSerial = "0x01A34CC7";
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
@@ -396,11 +385,8 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+	string RIODevice = "7966";
+	string RIOSerial = "0x01A34CC7";
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
@@ -548,11 +534,8 @@ TEST(TP_FlexRIO_mod1483, failInitDriverIMAQ) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+	string RIODevice = "7966";
+	string RIOSerial = "0x01A34CC7";
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";

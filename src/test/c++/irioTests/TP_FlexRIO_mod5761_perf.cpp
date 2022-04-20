@@ -77,11 +77,8 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+	string RIODevice = "7966";
+	string RIOSerial = "0x0177A2AD";
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
@@ -647,11 +644,8 @@ TEST (TP_FlexRIO_mod5761_perf, failInitDriver) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7966") << "Use the correct model of your FlexRIO device";
+	string RIODevice = "7966";
+	string RIOSerial = "0x0177A2AD";
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";

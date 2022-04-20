@@ -110,7 +110,6 @@ int main (int argc, char **argv)
 	asprintf(&bitfileName,"cRIOIO_%s",argv[2]);
 	asprintf(&NIcriomodel,"NI %s",argv[2]);
 	asprintf(&bitFilePath,"%s/resourceTest/%s/",get_current_dir_name(),argv[2]);
-	printf ("Pwd: %s \n", bitFilePath);
 
 	msgtest(0,irio_initDriver);
 	st=irio_initDriver("test",argv[1],NIcriomodel,bitfileName,"V1.1",verbosity,bitFilePath,bitFilePath,&p_DrvPvt,&status );
