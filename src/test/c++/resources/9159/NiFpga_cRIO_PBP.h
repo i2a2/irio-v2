@@ -1,13 +1,13 @@
 /*
- * Generated with the FPGA Interface C API Generator 13.0.0
- * for NI-RIO 13.0.0 or later.
+ * Generated with the FPGA Interface C API Generator 17.0.0
+ * for NI-RIO 17.0.0 or later.
  */
 
 #ifndef __NiFpga_cRIO_PBP_h__
 #define __NiFpga_cRIO_PBP_h__
 
 #ifndef NiFpga_Version
-   #define NiFpga_Version 1300
+   #define NiFpga_Version 1700
 #endif
 
 #include "NiFpga.h"
@@ -24,29 +24,29 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_cRIO_PBP_Signature = "BFBF5A5E59019BC28F055185094F7F88";
+static const char* const NiFpga_cRIO_PBP_Signature = "D56E611870F0AC228D375713AB3BD7F1";
 
 typedef enum
 {
    NiFpga_cRIO_PBP_IndicatorBool_DI0 = 0x8152,
    NiFpga_cRIO_PBP_IndicatorBool_DI1 = 0x814E,
-   NiFpga_cRIO_PBP_IndicatorBool_InitDone = 0x81B6,
+   NiFpga_cRIO_PBP_IndicatorBool_InitDone = 0x81B2,
    NiFpga_cRIO_PBP_IndicatorBool_auxDI0 = 0x814A,
    NiFpga_cRIO_PBP_IndicatorBool_auxDI1 = 0x8146,
-   NiFpga_cRIO_PBP_IndicatorBool_cRIOModulesOK = 0x81AE,
+   NiFpga_cRIO_PBP_IndicatorBool_cRIOModulesOK = 0x81AA,
 } NiFpga_cRIO_PBP_IndicatorBool;
 
 typedef enum
 {
    NiFpga_cRIO_PBP_IndicatorU8_DevProfile = 0x819E,
-   NiFpga_cRIO_PBP_IndicatorU8_DevQualityStatus = 0x81A6,
-   NiFpga_cRIO_PBP_IndicatorU8_Platform = 0x810E,
+   NiFpga_cRIO_PBP_IndicatorU8_DevQualityStatus = 0x81A2,
+   NiFpga_cRIO_PBP_IndicatorU8_Platform = 0x81BA,
    NiFpga_cRIO_PBP_IndicatorU8_SGNo = 0x8142,
 } NiFpga_cRIO_PBP_IndicatorU8;
 
 typedef enum
 {
-   NiFpga_cRIO_PBP_IndicatorI16_DevTemp = 0x81A2,
+   NiFpga_cRIO_PBP_IndicatorI16_DevTemp = 0x810E,
 } NiFpga_cRIO_PBP_IndicatorI16;
 
 typedef enum
@@ -59,7 +59,7 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_cRIO_PBP_IndicatorU32_Fref = 0x81A8,
+   NiFpga_cRIO_PBP_IndicatorU32_Fref = 0x81A4,
    NiFpga_cRIO_PBP_IndicatorU32_SGFref0 = 0x8128,
    NiFpga_cRIO_PBP_IndicatorU32_SGFref1 = 0x8110,
 } NiFpga_cRIO_PBP_IndicatorU32;
@@ -110,7 +110,7 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_cRIO_PBP_IndicatorArrayU8_FPGAVIversion = 0x81BA,
+   NiFpga_cRIO_PBP_IndicatorArrayU8_FPGAVIversion = 0x81B6,
 } NiFpga_cRIO_PBP_IndicatorArrayU8;
 
 typedef enum
@@ -120,7 +120,7 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_cRIO_PBP_IndicatorArrayU16_InsertedIOModulesID = 0x81B0,
+   NiFpga_cRIO_PBP_IndicatorArrayU16_InsertedIOModulesID = 0x81AC,
 } NiFpga_cRIO_PBP_IndicatorArrayU16;
 
 typedef enum
