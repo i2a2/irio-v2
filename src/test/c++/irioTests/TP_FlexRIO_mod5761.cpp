@@ -256,7 +256,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	// E.g., If you want 10000 Samples/s then configure (p_DrvPvt.Fref/10000) in third parameter of irio_setDMATtoHostSamplingRate
 	cout << endl << "TEST 9: Testing DMAs' sampling rate configuration." << endl << endl;
 
-	myStatus = irio_getFref(&p_DrvPvt, &Fref, &status);
+	myStatus = irio_getFref(&p_DrvPvt,&Fref,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if value of FPGA clock reference for "
@@ -386,7 +386,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	do{
-		myStatus=irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer, &elementsRead,&status); //1 block of 4096 64 bit words are expected to be acquired
+		myStatus=irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer,&elementsRead,&status); //1 block of 4096 64 bit words are expected to be acquired
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -492,7 +492,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	 myStatus=irio_getSGFreq(&p_DrvPvt, 0, &valueReadI32, &status);
+	 myStatus=irio_getSGFreq(&p_DrvPvt,0,&valueReadI32,&status);
 	 cout << "[irio_getSGFreq function] SGFreq0 read " << valueReadI32 << ", meaning " <<
 			      valueReadI32/(UINT_MAX/(10000000)) << " Hz" << endl;
 	if (myStatus > IRIO_success) {
@@ -519,7 +519,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	 myStatus=irio_getSGAmp(&p_DrvPvt, 0, &valueReadI32, &status);
+	 myStatus=irio_getSGAmp(&p_DrvPvt,0,&valueReadI32,&status);
 	 cout << "[irio_getSGAmp function] SGAmp0 read " << valueReadI32 << ", meaning " <<
 			      valueReadI32/CVDAC << " V" << endl;
 	if (myStatus > IRIO_success) {
@@ -540,13 +540,13 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	usleep(100);
-	myStatus=irio_setSGSignalType(&p_DrvPvt, 0, 1, &status);
+	myStatus=irio_setSGSignalType(&p_DrvPvt,0,1,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	myStatus=irio_getSGSignalType(&p_DrvPvt,0, &valueReadI32,&status);
+	myStatus=irio_getSGSignalType(&p_DrvPvt,0,&valueReadI32,&status);
 	cout << "[irio_getSGSGSignalType function] SGSignalType0 read " << valueReadI32 << endl;
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -608,11 +608,25 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	while (sampleCounter<1);
 
 	delete [] dataBuffer;
+
 	/**
 	 * TEST 19
+	 * CLOSING DMAS
+	 */
+	// Once data acquisition has finished DMAs have to be closed
+	cout << endl << "TEST 19: Closing DMAS" << endl << endl;
+	cout << "[irio_closeDMAsTtoHost function] No output if DMAs have been closed successfully" << endl;
+	myStatus = irio_closeDMAsTtoHost(&p_DrvPvt,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_EQ(myStatus, IRIO_success);
+
+	/**
+	 * TEST 20
 	 * IRIO CLOSE DRIVER
 	 */
-	cout << endl << "TEST 19: Closing IRIO DRIVER" << endl << endl;
+	cout << endl << "TEST 20: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
@@ -881,7 +895,7 @@ TEST(TP_FlexRIO_mod5761, failInitDriver) {
 	EXPECT_NE(myStatus, IRIO_success);
 
 	cout << "[irio_getDMATtoHOSTNCh function] Trying to read DMATtoHOSTNCh..." << endl << endl;
-	myStatus = irio_getDMATtoHOSTNCh(&p_DrvPvt, &DMATtoHOSTNCh, &status);
+	myStatus = irio_getDMATtoHOSTNCh(&p_DrvPvt,&DMATtoHOSTNCh,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -1090,7 +1104,17 @@ TEST(TP_FlexRIO_mod5761, failInitDriver) {
 
 	delete [] dataBuffer;
 
-	cout << endl << "TEST 19: Closing IRIO DRIVER" << endl << endl;
+	// Once data acquisition has finished DMAs have to be closed
+	cout << endl << "TEST 19: Closing DMAS" << endl << endl;
+	cout << "[irio_closeDMAsTtoHost function] No output if DMAs have been closed successfully" << endl;
+	myStatus = irio_closeDMAsTtoHost(&p_DrvPvt,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+
+	cout << endl << "TEST 20: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
