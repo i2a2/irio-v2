@@ -199,7 +199,7 @@ int irio_configCL(irioDrv_t* p_DrvPvt,int32_t fvalHigh, int32_t lvalHigh, int32_
 		!p_DrvPvt->enumControlEnable.found || !p_DrvPvt->enumSignalMapping.found||
 		!p_DrvPvt->enumConfiguration.found){
 
-		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"%s[%s,%d]-(%s) WARNING Some of CameraLink mandatory configuration resources were not found. Configuration will be incomplete.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Some of CameraLink mandatory configuration resources were not found. Configuration will be incomplete.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		local_status |= IRIO_warning;
 	}
 
@@ -325,7 +325,7 @@ int irio_sendCLuart(irioDrv_t* p_DrvPvt, const char *msg, int msg_size,TStatus* 
 	NiFpga_Status fpgaStatus;
 
 	if(!p_DrvPvt->enumuartTxReady.found || !p_DrvPvt->enumuartTxByte.found || !p_DrvPvt->enumuartTransmit.found){
-		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"%s[%s,%d]-(%s) WARNING Some of UART mandatory resources for sending messages were not found. Can not send UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Some of UART mandatory resources for sending messages were not found. Can not send UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		return IRIO_warning;
 	}
 
@@ -378,7 +378,7 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 	int numbytes=0;
 
 	if(!p_DrvPvt->enumuartRxReady.found || !p_DrvPvt->enumuartRxByte.found || !p_DrvPvt->enumuartReceive.found){
-		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"%s[%s,%d]-(%s) WARNING Some of UART mandatory resources for receiving messages were not found. Can not receive UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Some of UART mandatory resources for receiving messages were not found. Can not receive UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		return IRIO_warning;
 	}
 
