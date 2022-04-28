@@ -76,10 +76,6 @@ TEST(TP_FlexRIO_mod5761, functional) {
 							   &p_DrvPvt,
 							   &status);
 
-	// In TP_FlexRIO_onlyResources test all parameters of irio_initDriver has been tested, so
-	// in all these tests it is suppose that they are not going to be incorrect.
-	// Critical failure and closing driver if something fail
-
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
@@ -90,7 +86,8 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	 * TEST 1
 	 * FPGA START
 	 */
-	cout << endl << "TEST 1: Start the execution of the FPGA" << endl << endl;
+	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
+	cout << "[irio_setFPGAStart function] Setting up the FPGA" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning after starting the FPGA, not error
@@ -99,9 +96,16 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	}
 	ASSERT_NE(myStatus, IRIO_error);
 
+	// This function does not modify status neither myStatus, it is not necessary to check that variables
+	int aivalue=0;
+	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
+	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
+		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+
+	usleep(100);
 	/**
 	 * TEST 2
-	 * DEBUG MODE CONFIGURATION: OFF MODE
+	 * DEBUG MODE CONFIGURATION
 	 */
 	int valueReadI32 = 0;
 	usleep(100);
@@ -130,7 +134,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 
 	/**
 	 * TEST 3
-	 * SIGNALTYPE FOR WG 0 CONFIGURATION: DC TYPE
+	 * SIGNALTYPE FOR WG 0 CONFIGURATION
 	 */
 	usleep(100);
 	cout << endl << "TEST 3: Configuring Signal Generator Signal type" << endl << endl;
@@ -172,7 +176,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 
 	/**
 	 * TEST 5
-	 * AO0_ENABLE
+	 * AO0 ENABLE
 	 */
 	usleep(100);
 	cout << endl << "TEST 5: Configuring the Analog output enable on port 0" << endl << endl;
@@ -288,18 +292,18 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	 * TEST 10
 	 * Coupling configuration for NI5761
 	 */
-	int coupling = std::stoi(Coupling); // std::stoi(str) convert std::string str to integer
+	int coupling = std::stoi(Coupling);
 	usleep(100);
 	cout << endl << "TEST 10: Testing coupling configuration for NI5761 adapter module" << endl << endl;
 
 	cout << "[irio_setAICoupling function] AICoupling (AC = 0, DC = 1) set to : " << coupling << endl;
-	myStatus=irio_setAICoupling(&p_DrvPvt, (TIRIOCouplingMode) coupling, &status);
+	myStatus=irio_setAICoupling(&p_DrvPvt,(TIRIOCouplingMode) coupling,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	myStatus=irio_getAICoupling(&p_DrvPvt, (TIRIOCouplingMode*) &coupling, &status);
+	myStatus=irio_getAICoupling(&p_DrvPvt,(TIRIOCouplingMode*) &coupling, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -369,7 +373,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	 */
 	cout << endl << "TEST 13: Get 1 block from DMA" << endl << endl;
 
-    myStatus = irio_getDMATtoHOSTBlockNWords(&p_DrvPvt, &DMATtoHOSTBlockNWords, &status);
+    myStatus = irio_getDMATtoHOSTBlockNWords(&p_DrvPvt,&DMATtoHOSTBlockNWords,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on getting blocks of "
@@ -377,7 +381,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	myStatus = irio_getDMATtoHOSTNCh(&p_DrvPvt, &DMATtoHOSTNCh, &status);
+	myStatus = irio_getDMATtoHOSTNCh(&p_DrvPvt,&DMATtoHOSTNCh,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on getting blocks of "
@@ -386,7 +390,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	do{
-		myStatus=irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer,&elementsRead,&status); //1 block of 4096 64 bit words are expected to be acquired
+		myStatus = irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer,&elementsRead,&status); //1 block of 4096 64 bit words are expected to be acquired
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -418,7 +422,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 			     "read: " << negativeTest << endl << endl;
 
 	usleep(100000); // This sleep time is to ensure that FIFO is full of data. FIFO will be cleaned below
-	myStatus=irio_setDAQStartStop(&p_DrvPvt,0,&status);
+	myStatus = irio_setDAQStartStop(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on stopping the DAQ." << endl;
@@ -426,7 +430,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	usleep(100);
-	myStatus=irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
+	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on cleaning the DMA." << endl;
@@ -451,7 +455,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	 * SG Update rate
 	 * */
 	cout << endl << "TEST 14: Set Signal Generator update rate" << endl << endl;
-	myStatus=irio_getSGFref(&p_DrvPvt,SGChannel,&SGFref,&status);
+	myStatus = irio_getSGFref(&p_DrvPvt,SGChannel,&SGFref,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -461,13 +465,13 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	// At this version, user has to apply this calculus
 	cout << "[irio_setSGUpdateRate function] SGUpdateRate0 set to " << SGFref/samplingRate <<
 			     " MSamples/s " << endl;
-	myStatus=irio_setSGUpdateRate(&p_DrvPvt,0,SGFref/samplingRate,&status);
+	myStatus = irio_setSGUpdateRate(&p_DrvPvt,0,SGFref/samplingRate,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	myStatus=irio_getSGUpdateRate(&p_DrvPvt,0,&valueReadI32,&status);
+	myStatus = irio_getSGUpdateRate(&p_DrvPvt,0,&valueReadI32,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -484,15 +488,15 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	// Equation to apply to obtain freq_desired is:
 	//       SGFreq = Freq_desired*((2to32)/(SGFref/(Samples/s)))
 	uint32_t freqDesired = 10000;
-	int accIncr=freqDesired*(UINT_MAX/samplingRate);
+	int accIncr = freqDesired*(UINT_MAX/samplingRate);
 	cout << "[irio_setSGFreq function] SGFreq0 set to " << accIncr << ", meaning " << freqDesired << " Hz" << endl;
-	myStatus=irio_setSGFreq(&p_DrvPvt, 0, accIncr, &status);
+	myStatus = irio_setSGFreq(&p_DrvPvt,0,accIncr,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	 myStatus=irio_getSGFreq(&p_DrvPvt,0,&valueReadI32,&status);
+	 myStatus = irio_getSGFreq(&p_DrvPvt,0,&valueReadI32,&status);
 	 cout << "[irio_getSGFreq function] SGFreq0 read " << valueReadI32 << ", meaning " <<
 			      valueReadI32/(UINT_MAX/(10000000)) << " Hz" << endl;
 	if (myStatus > IRIO_success) {
@@ -513,13 +517,13 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_setSGAmp function] SGAmp0 set to " << amplitude << ", meaning " << amplitude/CVDAC << " V" << endl;
-	myStatus=irio_setSGAmp(&p_DrvPvt,0,amplitude,&status); // y(t)=4096sin(2*pi*10000*t) signal configured
+	myStatus = irio_setSGAmp(&p_DrvPvt,0,amplitude,&status); // y(t)=4096sin(2*pi*10000*t) signal configured
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	 myStatus=irio_getSGAmp(&p_DrvPvt,0,&valueReadI32,&status);
+	 myStatus = irio_getSGAmp(&p_DrvPvt,0,&valueReadI32,&status);
 	 cout << "[irio_getSGAmp function] SGAmp0 read " << valueReadI32 << ", meaning " <<
 			      valueReadI32/CVDAC << " V" << endl;
 	if (myStatus > IRIO_success) {
@@ -528,25 +532,24 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	/**
-	 *
 	 * TEST 17
 	 * SG Type
 	 */
 	cout << endl << "TEST 17: Set Signal Generator type" << endl << endl;
 	cout << "[irio_setSGSignalType function] SGSignalType0 set to 1 (SINE) " << endl;
-	myStatus=irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO is disabled
+	myStatus = irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO is disabled
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	usleep(100);
-	myStatus=irio_setSGSignalType(&p_DrvPvt,0,1,&status);
+	myStatus = irio_setSGSignalType(&p_DrvPvt,0,1,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	myStatus=irio_getSGSignalType(&p_DrvPvt,0,&valueReadI32,&status);
+	myStatus = irio_getSGSignalType(&p_DrvPvt,0,&valueReadI32,&status);
 	cout << "[irio_getSGSGSignalType function] SGSignalType0 read " << valueReadI32 << endl;
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -554,7 +557,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	usleep(100000);
-	myStatus=irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
+	myStatus = irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -569,7 +572,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 			     "that represent one sine cycle with a maximum and minimum of +-" <<
 				 amplitude/CVDAC << " raw_value +-4096" << endl;
 
-	myStatus=irio_setDAQStartStop(&p_DrvPvt,1,&status);
+	myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
@@ -579,7 +582,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	elementsRead = 0;
 	sampleCounter = 0;
 	do {
-		myStatus=irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer,&elementsRead,&status);
+		myStatus = irio_getDMATtoHostData(&p_DrvPvt,1,0,dataBuffer,&elementsRead,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 			cout << "Test can not continue if there is a failure on getting data from the DMA." << endl;
@@ -624,7 +627,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 
 	/**
 	 * TEST 20
-	 * IRIO CLOSE DRIVER
+	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 20: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;

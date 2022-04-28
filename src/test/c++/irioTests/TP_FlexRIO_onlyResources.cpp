@@ -63,6 +63,10 @@ TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 	TStatus status;
 	irio_initStatus(&status);
 
+	/*
+	 * TEST 0
+	 * IRIO DRIVER INITIALIZATION
+	 */
 	cout << "TEST 0: Testing driver initialization and resources" << endl << endl;
 	cout << "Resources user should found:" << endl;
 	cout << "2 DMAs" << endl;
@@ -92,6 +96,10 @@ TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	/**
+	 * TEST 1
+	 * IRIO DRIVER CLOSING
+	 */
 	cout << endl << "TEST 1: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
@@ -120,7 +128,7 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	// User don't have to know what FPGA Version is used
 	string FPGAversion = "V1.0";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
+	string filePath = "../resources/"+RIODevice;
 	string bitfileName = "FlexRIO_CPUIMAQ_"+RIODevice;
 
 	int myStatus = 0;
@@ -128,6 +136,10 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	TStatus status;
 	irio_initStatus(&status);
 
+	/*
+	 * TEST 0
+	 * IRIO DRIVER INITIALIZATION
+	 */
 	cout << "TEST 0: Testing driver initialization and resources" << endl << endl;
 	cout << "Resources user should found:" << endl;
 	cout << "1 IMAQ DMAs" << endl;
@@ -156,6 +168,10 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	/**
+	 * TEST 1
+	 * IRIO DRIVER CLOSING
+	 */
 	cout << endl << "TEST 1: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
@@ -192,6 +208,10 @@ TEST(TP_FlexRIO_onlyResources, onlyResources)
 	TStatus status;
 	irio_initStatus(&status);
 
+	/*
+	 * TEST 0
+	 * IRIO DRIVER INITIALIZATION
+	 */
 	cout << "TEST 0: Testing driver initialization and resources" << endl << endl;
 	cout << "Resources user should found:" << endl;
 	cout << "1 DMA" << endl;
@@ -222,6 +242,10 @@ TEST(TP_FlexRIO_onlyResources, onlyResources)
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	/**
+	 * TEST 1
+	 * IRIO DRIVER CLOSING
+	 */
 	cout << endl << "TEST 1: Closing IRIO driver" << endl << endl;
 	cout << "Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
@@ -261,6 +285,10 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	TStatus status;
 	irio_initStatus(&status);
 
+	/*
+	 * TEST 0
+	 * IRIO DRIVER INITIALIZATION
+	 */
 	cout << "TEST 0: Testing driver initialization and resources when there are "
 			"missing resources on the bitfile" << endl << endl;
 	cout << "Resources user should found:" << endl;
@@ -291,6 +319,10 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	EXPECT_TRUE((myStatus!=IRIO_success) &&
 				((status.detailCode==ResourceNotFound_Error) || (status.detailCode==ResourceNotFound_Warning)));
 
+	/**
+	 * TEST 1
+	 * IRIO DRIVER CLOSING
+	 */
 	cout << endl << "TEST 1: Closing IRIO driver" << endl << endl;
 	cout << "Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);

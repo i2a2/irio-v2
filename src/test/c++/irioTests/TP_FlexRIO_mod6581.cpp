@@ -72,10 +72,6 @@ TEST(TP_FlexRIO_mod6581, functional) {
 							   &p_DrvPvt,
 							   &status);
 
-	// In TP_FlexRIO_onlyResources test all parameters of irio_initDriver has been tested, so
-	// in this test they are suppose that are not going to be incorrect.
-	// Critical failure and closing driver if something fail
-
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
@@ -86,7 +82,8 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	 * TEST 1
 	 * FPGA START
 	 */
-	cout << endl << "TEST 1: Start the execution of the FPGA" << endl << endl;
+	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
+	cout << "[irio_setFPGAStart function] Setting up the FPGA" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning after starting the FPGA, not error
@@ -95,12 +92,19 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	}
 	ASSERT_NE(myStatus, IRIO_error);
 
+	// This function does not modify status neither myStatus, it is not necessary to check that variables
+	int aivalue=0;
+	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
+	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
+		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+
+	usleep(100);
 	/*
 	 * TEST 2
 	 * SETTING AND GETTING FROM AUX DIGITAL OUTPUT
 	 */
 	cout << endl << "TEST 2: Testing auxiliary digital output port 6. "
-				              "It allows to write on whole digital output port 2" << endl << endl;
+				    "It allows to write on whole digital output port 2" << endl << endl;
 
 	int32_t valueReadI32 = 0;
 	cout << "[irio_setAuxDO function] write '1' value into auxDO6" << endl;
@@ -127,9 +131,9 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	cout << endl << "IRIO test 3: This test write 0 and 1, into every digital output, "
 			        "and it is read from DO register." << endl << endl;
 	cout << "Hardware digital I/O [7-0] are interconnected physically, "
-			     "then the value written in DO must be read in the DI too" << endl;
+			"then the value written in DO must be read in the DI too" << endl;
 	cout << "Although all values written and read are showed, in case "
-			     "of reading an unexpected value, Error message will be shown" << endl << endl;
+			"of reading an unexpected value, Error message will be shown" << endl << endl;
 
 	for (int i = 0; i < 8; i++) {
 		cout << "[irio_setDO function] Write 0 value in DO" << i << endl;
@@ -145,8 +149,10 @@ TEST(TP_FlexRIO_mod6581, functional) {
 		}
 		cout << "[irio_getDO function] DO" << i << " value read: " << valueReadI32 << endl;
 
-		if (valueReadI32 != 0)
+		if (valueReadI32 != 0){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"Expected value in D0%d is 0, but value read is:%d [ERROR]\n",i,valueReadI32);
+			TestUtilsIRIO::getErrors(status);
+		}
 
 		EXPECT_EQ(myStatus, IRIO_success);
 
@@ -157,8 +163,10 @@ TEST(TP_FlexRIO_mod6581, functional) {
 		}
 		cout << "[irio_getDI function] DI" << i << " value read: " << valueReadI32 << endl << endl;
 
-		if (valueReadI32 != 0)
+		if (valueReadI32 != 0){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"Expected value in DI%d is 0, but value read is:%d [ERROR]\n",i,valueReadI32);
+			TestUtilsIRIO::getErrors(status);
+		}
 
 		EXPECT_EQ(myStatus, IRIO_success);
 
@@ -175,8 +183,10 @@ TEST(TP_FlexRIO_mod6581, functional) {
 		}
 		cout << "[irio_getDO function] DO" << i << " value read: " << valueReadI32 << endl;
 
-		if (valueReadI32 != 1)
+		if (valueReadI32 != 1){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"Expected value in D0%d is 1, but value read is:%d [ERROR]\n",i,valueReadI32);
+			TestUtilsIRIO::getErrors(status);
+		}
 
 		EXPECT_EQ(myStatus, IRIO_success);
 
@@ -187,15 +197,17 @@ TEST(TP_FlexRIO_mod6581, functional) {
 		}
 		cout << "[irio_getDI function] DI" << i << " value read: " << valueReadI32 << endl << endl;
 
-		if (valueReadI32 != 1)
+		if (valueReadI32 != 1){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"Expected value in DI%d is 1, but value read is:%d [ERROR]\n",i,valueReadI32);
+			TestUtilsIRIO::getErrors(status);
+		}
 
 		EXPECT_EQ(myStatus, IRIO_success);
 	}
 
 	/*
 	 * TEST 4
-	 * READING FPGA TEMPERATURE
+	 * FPGA TEMPERATURE
 	 */
 	int FPGATemp = -1;
 
@@ -210,7 +222,7 @@ TEST(TP_FlexRIO_mod6581, functional) {
 
 	/**
 	 * TEST 5
-	 * IRIO CLOSE DRIVER
+	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 5: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;

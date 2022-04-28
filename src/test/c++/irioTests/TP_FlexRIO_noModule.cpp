@@ -62,6 +62,10 @@ TEST(TP_FlexRIO_noModule, functional) {
 	TStatus status;
 	irio_initStatus(&status);
 
+	/*
+	 * TEST 0
+	 * IRIO DRIVER INITIALIZATION
+	 */
 	cout << "TEST 0: Testing driver initialization" << endl << endl;
 	myStatus = irio_initDriver("functionalNoModuleTest",
 							   RIOSerial.c_str(),
@@ -80,8 +84,12 @@ TEST(TP_FlexRIO_noModule, functional) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
+	/**
+	 * TEST 1
+	 * FPGA START
+	 */
 	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
-	cout << "FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
+	cout << "[irio_setFPGAStart function] Setting up the FPGA" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning after starting the FPGA, not error
@@ -92,25 +100,30 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 	// This function does not modify status neither myStatus, it is not necessary to check that variables
 	int aivalue=0;
-	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
-	cout << "FPGA State is: " << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
+	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
+		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
 
 	usleep(100);
 
+	/*
+	 * TEST 2
+	 * AUXILIARY 32 BITS ANALOG I/O PORTS
+	 */
 	cout << endl << "TEST 2: Testing auxiliary 32 bits analog I/O ports" << endl << endl;
 	// It is known prior to the execution of the test that there are ten auxiliary analog input ports
 	// but only six auxiliary analog output ports instantiated
 	for(int i=0;i<6;i++){
 		int analogValue = 0;
 		cout << "[irio_setAuxAO function] Value " << analogValue << " is set in auxAO" << i << endl;
-		myStatus=irio_setAuxAO(&p_DrvPvt,i,analogValue,&status);
+		myStatus = irio_setAuxAO(&p_DrvPvt,i,analogValue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -119,7 +132,7 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -128,19 +141,21 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		if(aivalue!=analogValue)
+		if(aivalue!=analogValue){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"AuxAI%d expected value 0, read value: %d [ERROR]\n",i,aivalue);
+			TestUtilsIRIO::getErrors(status);
+		}
 
 		analogValue = 100;
 		cout << "[irio_setAuxAO function] Value " << analogValue << " is set in auxAO" << i << endl;
-		myStatus=irio_setAuxAO(&p_DrvPvt,i,analogValue,&status);
+		myStatus = irio_setAuxAO(&p_DrvPvt,i,analogValue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxAO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -149,7 +164,7 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxAI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -160,56 +175,28 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		if(aivalue!=analogValue)
 			irio_mergeStatus(&status,Generic_Error,verbosity,"AuxAI%d expected value 1,read value: %d [ERROR]\n",i,aivalue);
+		TestUtilsIRIO::getErrors(status);
 	}
 
-
-// TODO: Commented until noModule bitfile is designed with auxiliary 64 bits analog I/O ports
-
-	cout << endl << "TEST ***: Testing auxiliary 64 bits analog I/O ports" << endl << endl;
+	/*
+	 * TEST 3
+	 * AUXILIARY 64 BITS ANALOG I/O PORTS
+	 */
+	cout << endl << "TEST 3: Testing auxiliary 64 bits analog I/O ports" << endl << endl;
 	int64_t ai64value = 0;
 	// It is known prior to the execution of the test that there are ten auxiliary analog input ports
 	// but only six auxiliary analog output ports instantiated
 	for(int i=0;i<6;i++){
 		int analogValue = 0;
 		cout << "[irio_setAuxAO_64 function] value " << analogValue << " is set in aux64AO" << i << endl;
-		myStatus=irio_setAuxAO_64(&p_DrvPvt,i,analogValue,&status);
+		myStatus = irio_setAuxAO_64(&p_DrvPvt,i,analogValue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxAO_64(&p_DrvPvt,i,&ai64value,&status);
-		if (myStatus > IRIO_success) {
-			TestUtilsIRIO::getErrors(status);
-		}
-		else
-			cout << "[irio_getAuxAO_64 function] value read from aux64AO" << i << "is: " << aivalue << endl;
-
-		EXPECT_NE(myStatus, IRIO_error);
-
-		myStatus=irio_getAuxAI_64(&p_DrvPvt,i,&ai64value,&status);
-		if (myStatus > IRIO_success) {
-			TestUtilsIRIO::getErrors(status);
-		}
-		else
-			cout << "[irio_getAuxAI_64 function] value read from aux64AI" << i << "is: " << ai64value << endl << endl;
-
-		EXPECT_NE(myStatus, IRIO_error);
-
-		if(ai64value!=analogValue)
-			irio_mergeStatus(&status,Generic_Error,verbosity,"Aux64AI%d expected value 0, read value: %d [ERROR]\n",i,ai64value);
-
-		analogValue = 100;
-		cout << "[irio_setAuxAO_64 function] value " << analogValue << " is set in aux64AO" << i << endl;
-		myStatus=irio_setAuxAO_64(&p_DrvPvt,i,analogValue,&status);
-		if (myStatus > IRIO_success) {
-			TestUtilsIRIO::getErrors(status);
-		}
-
-		EXPECT_NE(myStatus, IRIO_error);
-
-		myStatus=irio_getAuxAO_64(&p_DrvPvt,i,&ai64value,&status);
+		myStatus = irio_getAuxAO_64(&p_DrvPvt,i,&ai64value,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -218,7 +205,7 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxAI_64(&p_DrvPvt,i,&ai64value,&status);
+		myStatus = irio_getAuxAI_64(&p_DrvPvt,i,&ai64value,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -227,10 +214,48 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		if(aivalue!=analogValue)
+		if(ai64value!=analogValue){
+			irio_mergeStatus(&status,Generic_Error,verbosity,"Aux64AI%d expected value 0, read value: %d [ERROR]\n",i,ai64value);
+			TestUtilsIRIO::getErrors(status);
+		}
+
+		analogValue = 100;
+		cout << "[irio_setAuxAO_64 function] value " << analogValue << " is set in aux64AO" << i << endl;
+		myStatus = irio_setAuxAO_64(&p_DrvPvt,i,analogValue,&status);
+		if (myStatus > IRIO_success) {
+			TestUtilsIRIO::getErrors(status);
+		}
+
+		EXPECT_NE(myStatus, IRIO_error);
+
+		myStatus = irio_getAuxAO_64(&p_DrvPvt,i,&ai64value,&status);
+		if (myStatus > IRIO_success) {
+			TestUtilsIRIO::getErrors(status);
+		}
+		else
+			cout << "[irio_getAuxAO_64 function] value read from aux64AO" << i << "is: " << ai64value << endl;
+
+		EXPECT_NE(myStatus, IRIO_error);
+
+		myStatus = irio_getAuxAI_64(&p_DrvPvt,i,&ai64value,&status);
+		if (myStatus > IRIO_success) {
+			TestUtilsIRIO::getErrors(status);
+		}
+		else
+			cout << "[irio_getAuxAI_64 function] value read from aux64AI" << i << "is: " << ai64value << endl << endl;
+
+		EXPECT_NE(myStatus, IRIO_error);
+
+		if(aivalue!=analogValue){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"Aux64AI%d expected value 1,read value: %d [ERROR]\n",i,ai64value);
+			TestUtilsIRIO::getErrors(status);
+		}
 	}
 
+	/*
+	 * TEST 3
+	 * AUXILIARY DIGITAL I/O PORTS
+	 */
 	cout << endl << "TEST 3: Testing auxiliary digital I/O ports" << endl << endl;
 	aivalue = 0;
 	// It is known prior to the execution of the test that there are only six auxiliary digital
@@ -239,14 +264,14 @@ TEST(TP_FlexRIO_noModule, functional) {
 		int digitalvalue = 0;
 
 		cout << "[irio_setAuxDO function] Value " << digitalvalue << " is set in auxDO" << i << endl;
-		myStatus=irio_setAuxDO(&p_DrvPvt,i,digitalvalue,&status);
+		myStatus = irio_setAuxDO(&p_DrvPvt,i,digitalvalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxDO(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxDO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -255,7 +280,7 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxDI(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxDI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -264,20 +289,22 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		if(aivalue!=digitalvalue)
+		if(aivalue!=digitalvalue){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"AuxDI%d expected value 0, value read:%d [ERROR]\n",i,aivalue);
+			TestUtilsIRIO::getErrors(status);
+		}
 
 		digitalvalue = 1;
 
 		cout << "[irio_setAuxDO function] Value " << digitalvalue << " is set in auxDO" << i << endl;
-		myStatus=irio_setAuxDO(&p_DrvPvt,i,digitalvalue,&status);
+		myStatus = irio_setAuxDO(&p_DrvPvt,i,digitalvalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxDO(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxDO(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -286,7 +313,7 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		myStatus=irio_getAuxDI(&p_DrvPvt,i,&aivalue,&status);
+		myStatus = irio_getAuxDI(&p_DrvPvt,i,&aivalue,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -295,17 +322,27 @@ TEST(TP_FlexRIO_noModule, functional) {
 
 		EXPECT_NE(myStatus, IRIO_error);
 
-		if(aivalue!=digitalvalue)
+		if(aivalue!=digitalvalue){
 			irio_mergeStatus(&status,Generic_Error,verbosity,"AuxDI%d expected value 1, value read:%d [ERROR]\n",i,aivalue);
+			TestUtilsIRIO::getErrors(status);
+		}
 	}
 
+	/*
+	 * TEST 4
+	 * FPGA TEMPERATURE
+	 */
 	cout << endl << "TEST 4: Reading FPGA temperature" << endl << endl;
 	int FPGATemp=0;
-	myStatus=irio_getDevTemp(&p_DrvPvt,&FPGATemp,&status);
+	myStatus = irio_getDevTemp(&p_DrvPvt,&FPGATemp,&status);
 	cout << "[irio_getDevTemp function] Temperature value read from FPGA: "
 	     << std::setprecision(4) << (float) FPGATemp*0.25 << "ºC" << endl << endl;
 	EXPECT_NE(myStatus, IRIO_error);
 
+	/**
+	 * TEST 5
+	 * IRIO DRIVER CLOSING
+	 */
 	cout << endl << "TEST 5: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);

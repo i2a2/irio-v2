@@ -24,6 +24,7 @@ static int verbosity = 1;
 using std::cout; using std::endl;
 using std::string; using std::cerr;
 
+// TODO: Comment this
 struct threadData_t{
 	irioDrv_t *p_Drv;
 	int flagToFinish;
@@ -109,10 +110,6 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 							   &p_DrvPvt,
 							   &status);
 
-	// In TP_FlexRIO_onlyResources test all parameters of irio_initDriver has been tested, so
-	// in all these tests it is suppose that they are not going to be incorrect.
-	// Critical failure and closing driver if something fail
-
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
@@ -133,7 +130,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 
 	/*
 	 * TEST 2
-	 * DEBUG MODE CONFIGURATION: ON MODE
+	 * DEBUG MODE CONFIGURATION
 	 */
 	usleep(100);
 	cout << endl << "TEST 2: Testing debug mode configuration, ON mode" << endl << endl;
@@ -154,7 +151,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 
 	/*
 	 * TEST 3
-	 * SIGNALTYPE FOR WG 0 CONFIGURATION: SINE TYPE
+	 * SIGNALTYPE FOR WG 0 CONFIGURATION
 	 */
 	usleep(100);
 	cout << endl << "TEST 3: Configuring Signal Generator Type" << endl << endl;
@@ -263,7 +260,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 
 	/*
 	 * TEST 7
-	 * AO0_ENABLE
+	 * AO0 ENABLE
 	 */
 	usleep(100);
 	cout << endl << "TEST 7: Configuring the Analog output enable on port 0" << endl << endl;
@@ -430,6 +427,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	else{
 		irio_mergeStatus(&status,Generic_Error,verbosity,"IRIO performance Test 1. "
 				         "Bandwidth tested: 800kB/s [ERROR]. DMA Overflow with data loss\n");
+		TestUtilsIRIO::getErrors(status);
 	}
 
 	/*
@@ -493,6 +491,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	else{
 		irio_mergeStatus(&status,Generic_Error,verbosity,"IRIO performance Test 2. "
 				         "Bandwidth tested: 80MB/s [ERROR]. DMA Overflow with data loss\n");
+		TestUtilsIRIO::getErrors(status);
 	}
 
 	/*
@@ -545,7 +544,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	if (DMAsOverflow==0)	{
+	if (DMAsOverflow==0){
 		cout << "80MB/s during 30 seconds, 2400MB of data "
 				"reception are expected" << endl;
 		cout << "Bandwidth tested: 80MB/s [OK]. Data "
@@ -553,9 +552,9 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 				<< " MB" << endl << endl;
 	}
 	else{
-		irio_mergeStatus(&status,Generic_Error,verbosity,"IRIO performance Test 4. "
-				"Bandwidth tested: 800MB/s [ERROR]. DMA Overflow with data loss. Througput: "
-				"%.2f MB/s \n\n",((8*(data.blocksRead)*4096.0)/60000000.0));
+		irio_mergeStatus(&status,Generic_Error,verbosity,"IRIO performance Test 3. "
+				"Bandwidth tested: 800MB/s [ERROR]. DMA Overflow with data loss.");
+		TestUtilsIRIO::getErrors(status);
 	}
 
 	/*
@@ -611,14 +610,15 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 	if (DMAsOverflow==0)	{
 		cout << "800MB/s during 60 seconds, Throughput expected> 750MB/s" << endl;
 		cout << "Bandwidth tested: 800MB/s [OK]. Throughput: "
-				<< std::setprecision(5) << data.blocksRead*4096.0*8.0/60000000.0
-				<< " MB" << endl << endl;
+			<< std::setprecision(5) << data.blocksRead*4096.0*8.0/60000000.0
+			<< " MB" << endl << endl;
 	}
 	else{
 		irio_mergeStatus(&status,Generic_Error,verbosity,"Bandwidth tested: 800MB/s [ERROR]. "
 				         "DMA Overflow with data loss.");
 		cout << "Throughput: " << std::setprecision(5) <<
 				data.blocksRead*4096.0*8.0/60000000.0 << " MB/s" << endl << endl;
+		TestUtilsIRIO::getErrors(status);
 	}
 
 	data.flagToFinish=1;
@@ -627,7 +627,7 @@ TEST(TP_FlexRIO_mod5761_perf, functional) {
 
 	/*
 	 * TEST 16
-	 * CLOSE IRIO DRIVER
+	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 16: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;

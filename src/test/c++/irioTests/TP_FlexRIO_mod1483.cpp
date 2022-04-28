@@ -73,10 +73,6 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 							   &p_DrvPvt,
 							   &status);
 
-	// In TP_onlyResources test all parameters of irio_initDriver has been tested, so
-	// in this test they are suppose that are not going to be incorrect.
-	// Critical failure and closing driver if something fail
-
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
@@ -85,12 +81,12 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 
 	/*
 	 * TEST 1
-	 * PRE FPGA START CONFIG
+	 * CAMERALINK CONFIGURATION
 	 */
-	int32_t value;
+	int32_t value = 0;
 	cout << endl << "TEST 1: Configuring CameraLink adapter module" << endl << endl;
 	cout << "[irio_configCL function] Configuring cameraLink adapter module" << endl;
-	myStatus = irio_configCL(&p_DrvPvt,1,1,1,1,1,0,CL_STANDARD,CL_FULL, &status);
+	myStatus = irio_configCL(&p_DrvPvt,1,1,1,1,1,0,CL_STANDARD,CL_FULL,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -139,7 +135,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	 * TEST 3
 	 * FPGA START
 	 */
-	cout << endl << "TEST 3: Starting FPGA" << endl;
+	cout << endl << "TEST 3: Starting FPGA" << endl << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
@@ -197,6 +193,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	// TODO: Supuestamente debería permitir almacenar solo 4 caracteres + '\0'
 	//       pero en el test se traga muchos más. Revisar
 	char* msg = new char[5];
+
 	cout << "Receiving UART message" << endl;
 	myStatus = irio_getCLuart(&p_DrvPvt,msg,&len,&status);
 	if (myStatus > IRIO_success) {
@@ -215,7 +212,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 
 	/**
 	 * TEST 7
-	 * IRIO CLOSE DRIVER
+	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 7: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
@@ -276,7 +273,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	 */
 	cout << endl << "TEST 1: Configuring CameraLink adapter module" << endl << endl;
 	cout << "[irio_configCL function] Configuring cameraLink adapter module" << endl;
-	myStatus = irio_configCL(&p_DrvPvt,1,1,1,1,1,0,CL_STANDARD,CL_FULL, &status);
+	myStatus = irio_configCL(&p_DrvPvt,1,1,1,1,1,0,CL_STANDARD,CL_FULL,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -286,13 +283,23 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	 * TEST 2
 	 * FPGA START
 	 */
-	cout << endl << "TEST 2: Starting FPGA" << endl << endl;
+	cout << endl << "TEST 2: Testing FPGA start mode" << endl << endl;
+	cout << "[irio_setFPGAStart function] Setting up the FPGA" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
+
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(myStatus, IRIO_error);
+
+	// This function does not modify status neither myStatus, it is not necessary to check that variables
+	int aivalue=0;
+	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
+	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
+		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+
+	usleep(100);
 
 	/*
 	 * TEST 3
@@ -328,7 +335,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 			     "start at any number but all the values must be consecutive" << endl;
 
 	while(myStatus==IRIO_success && i<1000){
-		myStatus = irio_getDMATtoHostImage(&p_DrvPvt, imageSize, 0, dataBuffer, &count, &status);
+		myStatus = irio_getDMATtoHostImage(&p_DrvPvt,imageSize,0,dataBuffer,&count,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
@@ -342,6 +349,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 				}else if((fc+1)%imageSize!=fc2[0]){
 					irio_mergeStatus(&status,Generic_Error,verbosity,
 							         "\nFrameCounter Error at Image fc[i]=%d, fc[i-1]=%d, img: %d\n",fc2[0],fc, i);
+					TestUtilsIRIO::getErrors(status);
 					myStatus=IRIO_error;
 					break;
 				}
@@ -363,18 +371,13 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 
 	/**
 	 * TEST 4
-	 * IRIO CLOSE DRIVER
+	 * IRIO DRIVER CLOSING
 	 */
-	cout << endl << "TEST 3: Closing IRIO DRIVER" << endl << endl;
+	cout << endl << "TEST 4: Closing IRIO DRIVER" << endl << endl;
 	cout << "Closing driver..." << endl;
-	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
+	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 }
-
-
-
-
-
