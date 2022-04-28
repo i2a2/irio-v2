@@ -278,16 +278,6 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
 int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t *data, int* elementsRead, TStatus* status);
 
 /**
- * Reads Fref field from IRIO data structure
- *
- * @param[in]  p_DrvPvt 	Pointer to the driver session structure
- * @param[out] Fref         FPGA clock reference
- * @param[out] status Warning and error messages produced during the execution of this call will be added here.
- * @return \ref TIRIOStatusCode result of the execution of this call.
- */
-int irio_getFref(irioDrv_t* p_DrvPvt, int32_t *Fref, TStatus* status);
-
-/**
  *
  * Reads a specified number of data blocks from the DMA
  *

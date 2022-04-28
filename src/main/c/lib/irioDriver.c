@@ -545,7 +545,7 @@ int searchMandatoryResourcesAllPlatforms( irioDrv_t* p_DrvPvt, TStatus* status){
 		asprintf(&auxVersion,"V%d.%d",p_DrvPvt->FPGAVIversion[0],p_DrvPvt->FPGAVIversion[1]);
 	}
 	if(NiFpga_IsError(fpgaStatus) || strcmp(auxVersion,p_DrvPvt->FPGAVIStringversion)!=0){
-		irio_mergeStatus(status,NIRIO_API_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR VI Version Check Failed. Expected:%s Read:%s .Error Code:%d\n",__func__,__LINE__,p_DrvPvt->appCallID,p_DrvPvt->FPGAVIStringversion,auxVersion,fpgaStatus);
+		irio_mergeStatus(status,NIRIO_API_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR VI Version Check Failed. Read: %s, Expected: %s. Error Code:%d\n",__func__,__LINE__,p_DrvPvt->appCallID,p_DrvPvt->FPGAVIStringversion,auxVersion,fpgaStatus);
 		local_status |= IRIO_error;
 		fpgaStatus=NiFpga_Status_Success;
 	}

@@ -220,6 +220,16 @@ int irio_setSGUpdateRate(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status
 int irio_getSGFref(irioDrv_t* p_DrvPvt, int n, uint32_t* SGFref, TStatus* status);
 
 /**
+ * Reads Fref field from IRIO data structure
+ *
+ * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] Fref         FPGA clock reference
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getFref(irioDrv_t* p_DrvPvt, int32_t *Fref, TStatus* status);
+
+/**
  * Reads the value after conversion from Volts for analog outputs
  *
  * @param[in]  p_DrvPvt 	Pointer to the driver session structure

@@ -366,7 +366,7 @@ int irio_cleanDMATtoHost(irioDrv_t* p_DrvPvt, int n,uint64_t* cleanbuffer, size_
 	
 	int toRead;
 	if(!p_DrvPvt->enumDMATtoHOST[n].found){
-		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Can not close DMA%d. DMA was not found. .\n",__func__,__LINE__,p_DrvPvt->appCallID,n);
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can not clean DMA%d. DMA was not found. .\n",__func__,__LINE__,p_DrvPvt->appCallID,n);
 		return IRIO_warning;
 	}
 	
