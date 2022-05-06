@@ -172,10 +172,12 @@ int main (int argc, char **argv)
 
 	//*********** Receive UART Message
 	msgtest(6,irio_getCLuart);
-	char* msg = malloc(40*sizeof(char));
 	int len=0;
+	int msg_len = 4;
+	char* msg = malloc(msg_len*sizeof(char));
+
 	printf("Receiving UART Message.\n");
-	myStatus= irio_getCLuart(&p_DrvPvt,msg,&len,&status);
+	myStatus= irio_getCLuart(&p_DrvPvt,msg_len,msg,&len,&status);
 
 	if (len>0){
 		printf("MSG received: %s\n",msg);

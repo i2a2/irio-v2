@@ -136,12 +136,19 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	 * FPGA START
 	 */
 	cout << endl << "TEST 3: Starting FPGA" << endl << endl;
+	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	ASSERT_NE(myStatus, IRIO_error);
+
+	// This function does not modify status neither myStatus, it is not necessary to check that variables
+	int aivalue=0;
+	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
+	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
+		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
 
 	/*
 	 * TEST 4
@@ -176,11 +183,11 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	cout << "Please check the message displayed in the EDTpdv terminal "
-				 "application. Press intro to continue" << endl;
+		    "application. Press intro to continue" << endl;
 	while(cin.get()!='\n');
 
 	cout << "Introduce 4 characters into the EDTpdv terminal application. "
-				 "After writing the 4 characters, press intro in this terminal." << endl;
+		    "After writing the 4 characters, press intro in this terminal." << endl;
 
 	getline(cin, message);
 
@@ -190,12 +197,11 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	 */
 	cout << endl << "TEST 6: Receiving data from CameraLink" << endl << endl;
 	int len = 0;
-	// TODO: Supuestamente debería permitir almacenar solo 4 caracteres + '\0'
-	//       pero en el test se traga muchos más. Revisar
-	char* msg = new char[5];
+	int msg_len = 4;
+	char* msg = new char[msg_len+1]; //+1 because of terminator character \0
 
 	cout << "Receiving UART message" << endl;
-	myStatus = irio_getCLuart(&p_DrvPvt,msg,&len,&status);
+	myStatus = irio_getCLuart(&p_DrvPvt,msg_len,msg,&len,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -215,7 +221,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 7: Closing IRIO DRIVER" << endl << endl;
-	cout << "Closing driver..." << endl;
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -284,7 +290,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	 * FPGA START
 	 */
 	cout << endl << "TEST 2: Testing FPGA start mode" << endl << endl;
-	cout << "[irio_setFPGAStart function] Setting up the FPGA" << endl;
+	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning after starting the FPGA, not error
@@ -331,8 +337,8 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	// The example is going to acquire 1000 images. This loop needs a variable
 	// time depending on the framerate programmed in the camera.
 	cout << "1000 frames are going to be acquired. The counter embedded in "
-			     "the frame will be recovered and printed. The counter value can "
-			     "start at any number but all the values must be consecutive" << endl;
+			"the frame will be recovered and printed. The counter value can "
+			"start at any number but all the values must be consecutive" << endl;
 
 	while(myStatus==IRIO_success && i<1000){
 		myStatus = irio_getDMATtoHostImage(&p_DrvPvt,imageSize,0,dataBuffer,&count,&status);
@@ -374,7 +380,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 4: Closing IRIO DRIVER" << endl << endl;
-	cout << "Closing driver..." << endl;
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);

@@ -368,7 +368,7 @@ int irio_sendCLuart(irioDrv_t* p_DrvPvt, const char *msg, int msg_size,TStatus* 
 	}
 }
 
-int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* status){
+int irio_getCLuart(irioDrv_t* p_DrvPvt, int data_size, char* data, int* msg_size,TStatus* status){
 	TIRIOStatusCode local_status = IRIO_success;
 	NiFpga_Status fpgaStatus;
 	NiFpga_Bool RxReady;
@@ -398,17 +398,15 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 			timeout++;
 		}
 
-		if (timeout==100)
-		{
+		if (timeout==100){
 			irio_mergeStatus(status,CLSLinetimeout_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) CameraLink Serial Line Timeout  . Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,CLSLinetimeout_Warning);
 			local_status |= IRIO_warning;
-
 		}
 
 	}while(local_status==IRIO_success && !RxReady && timeout<3000);
 
 	timeout=0;
-	while (RxReady && local_status==IRIO_success){
+	while (RxReady && local_status==IRIO_success && numbytes<data_size){
 		do{
 			fpgaStatus=NiFpga_ReadBool(p_DrvPvt->session,p_DrvPvt->enumuartRxReady.value, &RxReady);
 			if(NiFpga_IsError(fpgaStatus)){
@@ -418,11 +416,12 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 			if(!RxReady){
 				usleep(1000);
 				timeout++;
+				if (numbytes != 0)
+					data[numbytes] = '\0';
 			}
 		}while(!RxReady && timeout<1000);
 
-		if(RxReady && (local_status==IRIO_success))
-		{
+		if(RxReady && (local_status==IRIO_success)){
 			fpgaStatus= NiFpga_WriteBool(p_DrvPvt->session, p_DrvPvt->enumuartReceive.value, (NiFpga_Bool)1);
 			if(NiFpga_IsError(fpgaStatus)){
 				irio_mergeStatus(status,Write_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error writing %s. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_UARTRECEIVE,fpgaStatus);
@@ -445,10 +444,9 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 			data[numbytes]=aux;
 			numbytes++;
 		}
-
 	}
 
-	(*msg_size) =numbytes;
+	*msg_size=numbytes;
 
 	if(local_status<IRIO_error){
 		return local_status;
