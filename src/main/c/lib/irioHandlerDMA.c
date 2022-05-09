@@ -540,7 +540,6 @@ int irio_setDMATtoHostEnable(irioDrv_t* p_DrvPvt,int n,int32_t value, TStatus* s
 }
 
 int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, TStatus* status){
-
 	if(!p_DrvPvt->DMATtoHOSTNo.found){
 		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can not use DMAs. DMAs were not searched or found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		return IRIO_warning;
@@ -576,7 +575,6 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
 		*elementsRead=0;
 		NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadFifoU64(p_DrvPvt->session,p_DrvPvt->enumDMATtoHOST[n].value,data,0,0,&elementsRemaining));
 
-
 		if (elementsRemaining>=elementsToRead){
 			int attempts=0;
 			do{ //[BUG7807] elementRemaining indicates that samples greater than elementsToRead are in the buffer but next call can fail.
@@ -606,6 +604,60 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
 					}
 			}while (attempts<3);
 		  }
+	}else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_DMATTOHOST,n);
+		local_status |= IRIO_warning;
+	}
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_getDMATtoHostDataWT(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, uint32_t timeout, TStatus* status){
+	if(!p_DrvPvt->DMATtoHOSTNo.found){
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can not use DMAs. DMAs were not searched or found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		return IRIO_warning;
+	}
+
+	TIRIOStatusCode local_status = IRIO_success;
+	if(n>=0 && n<p_DrvPvt->DMATtoHOSTNo.value && p_DrvPvt->enumDMATtoHOST[n].found){
+		NiFpga_Status fpgaStatus = NiFpga_Status_Success;
+		size_t elementsToRead;
+
+		//If irioasyn driver is used iriolib:
+		//From DMATtoHOSTFrameType=0 to DMATtoHOSTFrameType=127 data conversion factor used is: I/O Module conversion factor.
+		//From DMATtoHOSTFrameType=128 to DMATtoHOSTFrameType=255 data conversion factor used is: user defined conversion factor.
+		switch(p_DrvPvt->DMATtoHOSTFrameType[n]){
+		case 0:
+			elementsToRead=NBlocks*p_DrvPvt->DMATtoHOSTBlockNWords[n];
+			break;
+		case 1:
+			elementsToRead=NBlocks*(p_DrvPvt->DMATtoHOSTBlockNWords[n]+2); //each DMA data block includes two extra U64 words to include timestamp
+			break;
+		case 128:
+			elementsToRead=NBlocks*(p_DrvPvt->DMATtoHOSTBlockNWords[n]);
+			break;
+		case 129:
+			elementsToRead=NBlocks*(p_DrvPvt->DMATtoHOSTBlockNWords[n]+2); //each DMA data block includes two extra U64 words to include timestamp
+			break;
+		default:
+			elementsToRead=NBlocks*(p_DrvPvt->DMATtoHOSTBlockNWords[n]);
+			break;
+		}
+
+		size_t elementsRemaining=0;
+		*elementsRead=0;
+		NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadFifoU64(p_DrvPvt->session,p_DrvPvt->enumDMATtoHOST[n].value,data,elementsToRead,timeout,NULL));
+		if(NiFpga_IsError(fpgaStatus)){
+			irio_mergeStatus(status,Read_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error reading %s%d. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_DMATTOHOST,n,fpgaStatus);
+			local_status |= IRIO_warning;
+		}
+		else {
+			*elementsRead=NBlocks;
+		}
 	}else{
 		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_DMATTOHOST,n);
 		local_status |= IRIO_warning;

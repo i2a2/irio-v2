@@ -257,6 +257,28 @@ int irio_setDMATtoHostEnable(irioDrv_t* p_DrvPvt, int n,int32_t value, TStatus* 
 int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, TStatus* status);
 
 /**
+ * Reads data from the DMA
+ *
+ * Reads data blocks from the specified data DMA if they are available. If there are less blocks
+ * than requested nothing is read. The size in DMA words of a data block depends on
+ * the frame type and block size given by the FPGA registers DMATtoHOSTFrameType and
+ * DMATtoHOSTBlockNWords respectively (read into irioDrv_t::DMATtoHOSTFrameType and
+ * irioDrv_t::DMATtoHOSTBlockNWords at irio_findDAQDMAs()).
+ * Errors may occur if one of the needed ports were not found or while reading from the ports.
+ *
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] NBlocks number of data blocks to read.
+ * @param[in] n Number of Number of the DMA where data should be read
+ * @param[in] timeout Time function waits until stop data acquisition
+ * @param[out] data Previously allocated buffer where data read will be stored
+ * @param[out elementsRead number of elements read. Can be 0 or NBlocks
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getDMATtoHostDataWT(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, uint32_t timeout, TStatus* status);
+
+/**
  * Reads image from the DMA
  *
  * Reads one image from the specified image DMA if it is available.If there is not
