@@ -123,11 +123,11 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 		while(!found){//Search while the device has not been found and still no errors
 			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT))!=NULL){//Still devices to search
 				int aux;
-				char * auxLength;
+				// It is supposed that RIO device name is never going to be larger than 40 characters
+				char auxLength[40];
 				sscanf(deviceInfo+3, "%d", &aux);
-				auxLength = (char*) calloc (aux, sizeof(int));
 				sprintf(auxLength, "%d", aux);
-				// TODO: Damos por hecho que todos los dispositivos se llaman RIOX
+				// It is considered that all devices' name are going to be RIOX
 				snprintf(port, strlen(deviceInfo)+strlen(auxLength), "RIO%d", aux);
 			}else{
 				break;
@@ -332,7 +332,6 @@ int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int3
 	}else
 	//Read the port value
 	if(sscanf(aux,"%*s %*s %lX",&port->value)==0){//First, try to read an hexadecimal value
-		//TODO: Review if formats lX and ld support variable uint64_t
 		if (sscanf(aux,"%*s %*s %ld",&port->value)==0){//If failed, try to read a decimal value
 			irio_mergeStatus(status,ResourceValueNotValid_Error,printErrMsg,"[%s,%d]-(%s) ERROR Value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,completeName);
 			local_status = IRIO_error;
@@ -354,10 +353,9 @@ int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int3
 }
 
 int irio_findHeaderString(irioDrv_t *p_DrvPvt, char* fileContent, const char* toSearch, char** str,TStatus* status){
-	char* aux;
-	char *indexcoma1;
-	char *indexcoma2;
-	int length;
+	char* aux = NULL;
+	char* indexcoma1 = NULL;
+	char* indexcoma2 = NULL;
 
 	aux=fileContent;
 	if((aux=strstr(aux,toSearch))==NULL){
@@ -365,16 +363,22 @@ int irio_findHeaderString(irioDrv_t *p_DrvPvt, char* fileContent, const char* to
 		return IRIO_error;
 	}
 	indexcoma1=strstr(aux,"\"");
-	indexcoma2=strstr ((indexcoma1+1),"\"");
-	if(indexcoma1==NULL || indexcoma2==NULL){
+	if(indexcoma1==NULL){
 		irio_mergeStatus(status,ResourceValueNotValid_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR String value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
 		return IRIO_error;
+		}
+	else {
+		int length = 0;
+		indexcoma2=strstr((indexcoma1+1),"\"");
+		if(indexcoma2==NULL){
+			irio_mergeStatus(status,ResourceValueNotValid_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR String value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
+			return IRIO_error;
+		}
+		length=indexcoma2-indexcoma1-1;
+
+		*str=malloc(length+1);
+		strncpy(*str, (indexcoma1+1), length);
+		(*str)[length]='\0';
 	}
-	length=indexcoma2-indexcoma1-1;
-
-	*str=malloc(length+1);
-	strncpy(*str, (indexcoma1+1), length);
-	(*str)[length]='\0';
-
 	return IRIO_success;
 }
