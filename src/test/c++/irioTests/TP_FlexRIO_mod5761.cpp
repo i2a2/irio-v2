@@ -337,44 +337,13 @@ TEST(TP_FlexRIO_mod5761, functional) {
 
 	/**
 	 * TEST 12
-	 * DAQ START
+	 * DMA parameters
 	 */
-	usleep(100);
-	cout << endl << "TEST 12: Set DAQ Start" << endl << endl;
-
-	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
-	myStatus=irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
-	}
-	ASSERT_EQ(myStatus, IRIO_success);
-
-	myStatus = irio_getDAQStartStop(&p_DrvPvt,&valueReadI32,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "[irio_getDAQStartStop function] DAQStartStop read: " << valueReadI32 << endl;
-
-	/**
-	 * LOOP FOR ACQUIRING DMA BLOCKS
-	 */
-	usleep(100);
-	int sampleCounter = 0;
-	int elementsRead = 0;
-	int positiveTest = 0;
-	int negativeTest = 0;
-
 	uint16_t DMATtoHOSTBlockNWords = 0;
 	uint16_t DMATtoHOSTNCh = 0;
 
-	/**
-	 * TEST 13
-	 * GETTING DATA FROM DMA
-	 */
-	cout << endl << "TEST 13: Get 1 block from DMA" << endl << endl;
-    myStatus = irio_getDMATtoHOSTBlockNWords(&p_DrvPvt,&DMATtoHOSTBlockNWords,&status);
+	cout << endl << "TEST 12: Getting parameters needed to read data from DMA" << endl << endl;
+	myStatus = irio_getDMATtoHOSTBlockNWords(&p_DrvPvt,&DMATtoHOSTBlockNWords,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on getting number of "
@@ -394,10 +363,31 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	cout << "[irio_getDMATtoHOSTNCh function] Acquiring number of DMA channels. "
 			"DMATtoHOSTNCh: " << DMATtoHOSTNCh << endl;
 
+	/**
+	 * TEST 13
+	 * GETTING DATA FROM DMA
+	 */
+	cout << endl << "TEST 13: Getting several blocks from DMA" << endl << endl;
+
+	usleep(100);
+	int sampleCounter = 0;
+	int elementsRead = 0;
+	int positiveTest = 0;
+	int negativeTest = 0;
+
 	// User decides how many blocks wants to read
 	int blocksToRead = 1;
 	// Each block: 4096 words * 64 bits/word = 4096 words * 8 bytes/word
 	uint64_t* dataBuffer = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*8];
+
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl << endl;
+	myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
+	}
+	ASSERT_EQ(myStatus, IRIO_success);
+
 	do{
 		myStatus = irio_getDMATtoHostData(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,&status); // blocksToRead blocks of 4096 64 bit words are expected to be acquired
 		if (myStatus > IRIO_success) {
@@ -433,7 +423,6 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	cout << "Samples correctly read: "   << positiveTest << endl;
 	cout << "Samples incorrectly read: " << negativeTest << endl << endl;
 
-	usleep(100000); // This sleep time is to ensure that FIFO is full of data. FIFO will be cleaned below
 	cout << "[irio_setDAQStartStop function] Stop data acquisition" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
@@ -443,6 +432,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	usleep(100);
+	cout << "[irio_cleanDMAsTtoHost function] Cleaning DMAs" << endl;
 	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -474,7 +464,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "FPGA SignalGenerator Fref (SGFref) has the value: " << SGFref << " Hz" << endl;
+	cout << "[irio_getSGFref function] FPGA SignalGenerator Fref (SGFref) has the value: " << SGFref << " Hz" << endl;
 	// SGUpdateRate=(SGFref/(Samples/s)). In this case SG0 will generate 10 MS/s
 	// At this version, user has to apply this calculus
 	cout << "[irio_setSGUpdateRate function] SGUpdateRate0 set to " << SGFref/samplingRate <<
@@ -532,7 +522,9 @@ TEST(TP_FlexRIO_mod5761, functional) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "[irio_setSGAmp function] SGAmp0 set to " << amplitude << ", meaning " << amplitude/CVDAC << " V" << endl;
+	cout << "[irio_getSGCVDAC function] CVDAC (conversion from Volts for AO): "
+		 << std::fixed << CVDAC << endl;
+	cout << "[irio_setSGAmp function] SGAmp0 set to " << (double) amplitude << ", meaning " << amplitude/CVDAC << " V" << endl;
 	myStatus = irio_setSGAmp(&p_DrvPvt,0,amplitude,&status); // y(t) = amplitude*sin(2*pi*freqDesired*t) signal configured
 	if (myStatus > IRIO_success) {                           // y(t) = 4096*sin(2*pi*10000*t)
 		TestUtilsIRIO::getErrors(status);
@@ -540,7 +532,7 @@ TEST(TP_FlexRIO_mod5761, functional) {
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	 myStatus = irio_getSGAmp(&p_DrvPvt,0,&valueReadI32,&status);
-	 cout << "[irio_getSGAmp function] SGAmp0 read " << valueReadI32 << ", meaning " <<
+	 cout << "[irio_getSGAmp function] SGAmp0 read " << (double) valueReadI32 << ", meaning " <<
 			      valueReadI32/CVDAC << " V" << endl;
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -960,44 +952,13 @@ TEST(TP_FlexRIO_mod5761, functionalWT) {
 
 	/**
 	 * TEST 12
-	 * DAQ START
+	 * DMA parameters
 	 */
-	usleep(100);
-	cout << endl << "TEST 12: Set DAQ Start" << endl << endl;
-
-	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
-	myStatus=irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
-	}
-	ASSERT_EQ(myStatus, IRIO_success);
-
-	myStatus = irio_getDAQStartStop(&p_DrvPvt,&valueReadI32,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "[irio_getDAQStartStop function] DAQStartStop read: " << valueReadI32 << endl;
-
-	/**
-	 * LOOP FOR ACQUIRING DMA BLOCKS
-	 */
-	usleep(100);
-	int sampleCounter = 0;
-	int elementsRead = 0;
-	int positiveTest = 0;
-	int negativeTest = 0;
-
 	uint16_t DMATtoHOSTBlockNWords = 0;
 	uint16_t DMATtoHOSTNCh = 0;
 
-	/**
-	 * TEST 13
-	 * GETTING DATA FROM DMA
-	 */
-	cout << endl << "TEST 13: Getting several blocks from DMA" << endl << endl;
-    myStatus = irio_getDMATtoHOSTBlockNWords(&p_DrvPvt,&DMATtoHOSTBlockNWords,&status);
+	cout << endl << "TEST 12: Getting parameters needed to read data from DMA" << endl << endl;
+	myStatus = irio_getDMATtoHOSTBlockNWords(&p_DrvPvt,&DMATtoHOSTBlockNWords,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 		cout << "Test can not continue if there is a failure on getting number of "
@@ -1017,6 +978,17 @@ TEST(TP_FlexRIO_mod5761, functionalWT) {
 	cout << "[irio_getDMATtoHOSTNCh function] Acquiring number of DMA channels. "
 			"DMATtoHOSTNCh: " << DMATtoHOSTNCh << endl;
 
+	/**
+	 * TEST 13
+	 * GETTING DATA FROM DMA
+	 */
+	cout << endl << "TEST 13: Getting several blocks from DMA" << endl << endl;
+
+	usleep(100);
+	int sampleCounter = 0;
+	int elementsRead = 0;
+	int positiveTest = 0;
+	int negativeTest = 0;
 	float timePerWord = 1/((float)samplingRate)*1000; // *1000 = conversion from segs to millisecs
 
 	// User decides how many blocks wants to read
@@ -1025,6 +997,15 @@ TEST(TP_FlexRIO_mod5761, functionalWT) {
 	uint64_t* dataBuffer = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*8];
 	// Timeout needed
 	uint32_t timeout = ceil(timePerWord*blocksToRead*DMATtoHOSTBlockNWords);     // por exceso
+
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl << endl;
+	myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+		cout << "Test can not continue if there is a failure on setting up the DAQ." << endl;
+	}
+	ASSERT_EQ(myStatus, IRIO_success);
+
 	do{
 		myStatus = irio_getDMATtoHostDataWT(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,timeout,&status); // blocksToRead blocks of 4096 64 bit words are expected to be acquired
 		if (myStatus > IRIO_success) {
@@ -1058,6 +1039,24 @@ TEST(TP_FlexRIO_mod5761, functionalWT) {
 	cout << "Samples correctly read: "   << positiveTest << endl;
 	cout << "Samples incorrectly read: " << negativeTest << endl << endl;
 
+	cout << "[irio_setDAQStartStop function] Stop data acquisition" << endl;
+	myStatus = irio_setDAQStartStop(&p_DrvPvt,0,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+		cout << "Test can not continue if there is a failure on stopping the DAQ." << endl;
+	}
+	ASSERT_EQ(myStatus, IRIO_success);
+
+	usleep(100);
+	cout << "[irio_cleanDMAsTtoHost function] Cleaning DMAs" << endl;
+	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+		cout << "Test can not continue if there is a failure on cleaning the DMA." << endl;
+	}
+	ASSERT_EQ(myStatus, IRIO_success);
+
+	cout << endl << "Three more blocks are going to be read" << endl;
 	positiveTest = 0;
 	negativeTest = 0;
 	// User decides how many blocks wants to read
@@ -1066,6 +1065,15 @@ TEST(TP_FlexRIO_mod5761, functionalWT) {
 	uint64_t* dataBuffer2 = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*8];
 	// Timeout needed
 	timeout = ceil(timePerWord*blocksToRead*DMATtoHOSTBlockNWords);     // por exceso
+
+	cout << "[irio_setDAQStartStop function] Restart data acquisition" << endl;
+	myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+		cout << "Test can not continue if there is a failure on stopping the DAQ." << endl;
+	}
+	ASSERT_EQ(myStatus, IRIO_success);
+
 	do{
 		myStatus = irio_getDMATtoHostDataWT(&p_DrvPvt,blocksToRead,0,dataBuffer2,&elementsRead,timeout,&status); // blocksToRead blocks of 4096 64 bit words are expected to be acquired
 		if (myStatus > IRIO_success) {
@@ -1099,7 +1107,6 @@ TEST(TP_FlexRIO_mod5761, functionalWT) {
 	cout << "Samples correctly read: "   << positiveTest << endl;
 	cout << "Samples incorrectly read: " << negativeTest << endl << endl;
 
-	usleep(100000); // This sleep time is to ensure that FIFO is full of data. FIFO will be cleaned below
 	cout << "[irio_setDAQStartStop function] Stop data acquisition" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
@@ -1109,6 +1116,7 @@ TEST(TP_FlexRIO_mod5761, functionalWT) {
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	usleep(100);
+	cout << "[irio_cleanDMAsTtoHost function] Cleaning DMAs" << endl;
 	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
