@@ -924,6 +924,10 @@ int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status){
 //			p_DrvPvt->minAnalogOut=-0.635;
 
 			break;
+
+		default:
+			printf("No adapter module connected to FlexRIO device\n");
+			break;
 		}
 
 
@@ -998,28 +1002,24 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 			break;
 		}
 	}
-	//else REVIEW: What happens in cRIO?. This applies only to NI9205 analog input module. This module is only DC
+	//TODO: REVIEW, What happens in cRIO?. This applies only to NI9205 analog input module. This module is only DC
 	return IRIO_success;
 }
 
-// TODO: Hay que hacer modificaciones sobre esta funcion.
-//       p_DrvPvt->couplingMode siempre se inicializa independientemente
-//           de si el driver si ha inicializado bien o mal, por lo que siempre
-//           va a devolver Success
-//       Añadir otra restriccion a esta funcion o cambiar cuando y bajo que
-//           circunstancias se inicializa p_DrvPvt->couplingMode
-
-// TODO: Revisar. Puesto así porque p_DrvPvt->session es parametro critico
-//           que indica si el driver esta inicializado bien o mal
-int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status)
-{
-	if ((p_DrvPvt->couplingMode != (TIRIOCouplingMode) IRIO_coupling_NULL)
-		&& p_DrvPvt->session != 0){
+int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status){
+	TIRIOStatusCode local_status = IRIO_success;
+	if (p_DrvPvt->enumPlatform.found){
 		*value=p_DrvPvt->couplingMode;
-		return IRIO_success;
 	}
-	else
+	else {
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can't get adapter module analog input coupling mode  \n",__func__,__LINE__,p_DrvPvt->appCallID);
+		local_status |= IRIO_warning;
+	}
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
 		return IRIO_error;
+	}
 }
 
 int irio_getVersion(char *version,TStatus* status)

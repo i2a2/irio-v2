@@ -650,7 +650,7 @@ int irio_getDMATtoHostDataWT(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *
 
 		size_t elementsRemaining=0;
 		*elementsRead=0;
-		NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadFifoU64(p_DrvPvt->session,p_DrvPvt->enumDMATtoHOST[n].value,data,elementsToRead,timeout,NULL));
+		NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadFifoU64(p_DrvPvt->session,p_DrvPvt->enumDMATtoHOST[n].value,data,elementsToRead,timeout,&elementsRemaining));
 		if(NiFpga_IsError(fpgaStatus)){
 			irio_mergeStatus(status,Read_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error reading %s%d. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_DMATTOHOST,n,fpgaStatus);
 			local_status |= IRIO_warning;

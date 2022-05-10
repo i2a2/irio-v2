@@ -38,7 +38,8 @@ using std::string; using std::cerr;
 
 TEST(TP_FlexRIO_mod6581, functional) {
 	string testName = "TP_FlexRIO_mod6581: Functional test of bitfile FlexRIOMod6581";
-	string testDescription = "Test verifies the data acquisition profile in the FlexRIO device";
+	string testDescription = "Test verifies the data digital acquisition profile in "
+			                 "the FlexRIO device using the NI5761 analog input adapter module";
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
@@ -83,7 +84,7 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	 * FPGA START
 	 */
 	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
-	cout << "[irio_setFPGAStart function] Setting up the FPGA" << endl;
+	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning after starting the FPGA, not error
@@ -209,23 +210,23 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	 * TEST 4
 	 * FPGA TEMPERATURE
 	 */
+	cout << endl << "TEST 4: Reading FPGA temperature" << endl << endl;
 	int FPGATemp = -1;
 
 	myStatus = irio_getDevTemp(&p_DrvPvt,&FPGATemp,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
-	cout << endl << "TEST 4: Reading FPGA temperature" << endl << endl;
+	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getDevTemp function] Temperature value read from FPGA: "
 	     << std::setprecision(4) << (float) FPGATemp*0.25 << "ºC" << endl << endl;
-	EXPECT_EQ(myStatus, IRIO_success);
 
 	/**
 	 * TEST 5
 	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 5: Closing IRIO DRIVER" << endl << endl;
-	cout << "Closing driver..." << endl;
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);

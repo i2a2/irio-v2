@@ -101,7 +101,7 @@ TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 1: Closing IRIO DRIVER" << endl << endl;
-	cout << "Closing driver..." << endl;
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -173,7 +173,7 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 1: Closing IRIO DRIVER" << endl << endl;
-	cout << "Closing driver..." << endl;
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -247,7 +247,7 @@ TEST(TP_FlexRIO_onlyResources, onlyResources)
 	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 1: Closing IRIO driver" << endl << endl;
-	cout << "Closing driver..." << endl;
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -291,6 +291,7 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	 */
 	cout << "TEST 0: Testing driver initialization and resources when there are "
 			"missing resources on the bitfile" << endl << endl;
+	cout << "[Bug7516] This tests checks the correct order in error messages when verbosity=1" << endl;
 	cout << "Resources user should found:" << endl;
 	cout << "1 AO + Error finding AO1Enable" << endl;
 	cout << "16 auxAI" << endl;
@@ -324,7 +325,7 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	 * IRIO DRIVER CLOSING
 	 */
 	cout << endl << "TEST 1: Closing IRIO driver" << endl << endl;
-	cout << "Closing driver..." << endl;
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0, &status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);

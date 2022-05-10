@@ -406,19 +406,33 @@ int irio_getSGFref(irioDrv_t* p_DrvPvt, int n, uint32_t* value, TStatus* status)
 }
 
 int irio_getSGCVDAC(irioDrv_t* p_DrvPvt, double* SGCVDAC, TStatus* status) {
-	if (p_DrvPvt->CVDAC != 0) {
+	TIRIOStatusCode local_status = IRIO_success;
+	if (p_DrvPvt->CVDAC != 0.0) {
 		*SGCVDAC=p_DrvPvt->CVDAC;
-		return IRIO_success;
 	}
-	else
+	else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can't obtain CVDAC (conversion from Volts for analog outputs) parameter \n",__func__,__LINE__,p_DrvPvt->appCallID);
+		local_status |= IRIO_warning;
+	}
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
 		return IRIO_error;
+	}
 }
 
 int irio_getSGCVADC(irioDrv_t* p_DrvPvt, double* SGCVADC, TStatus* status) {
-	if (p_DrvPvt->CVADC != 0) {
+	TIRIOStatusCode local_status = IRIO_success;
+	if (p_DrvPvt->CVADC != 0.0) {
 		*SGCVADC=p_DrvPvt->CVADC;
-		return IRIO_success;
 	}
-	else
+	else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can't obtain CVADC (conversion to Volts of analog inputs) parameter \n",__func__,__LINE__,p_DrvPvt->appCallID);
+		local_status |= IRIO_warning;
+	}
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
 		return IRIO_error;
+	}
 }
