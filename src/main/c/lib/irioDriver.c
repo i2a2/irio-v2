@@ -513,9 +513,9 @@ int freeXRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	free(p_DrvPvt->enumSGSignalType);
 	free(p_DrvPvt->enumSGUpdateRate);
 	free(p_DrvPvt->enumSGFref);
+	free(p_DrvPvt->SGfref);
 
 	// DMA for GPU
-
 	free(p_DrvPvt->DMATtoGPUNCh);
 	free(p_DrvPvt->DMATtoGPUChIndex);
 	free(p_DrvPvt->enumDMATtoGPU);
