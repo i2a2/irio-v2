@@ -241,6 +241,8 @@ int irio_closeDriver(irioDrv_t* p_DrvPvt,uint32_t mode, TStatus* status){
 	free(p_DrvPvt->appCallID);
 	free(p_DrvPvt->projectName);
 
+	irio_resetStatus(status);
+
 	if(local_status<IRIO_error){
 		return local_status;
 	}else{

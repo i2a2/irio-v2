@@ -69,6 +69,7 @@ int irio_mergeStatus(TStatus* status,TErrorDetailCode code, int printMsg, const 
 	}else{
 		char* msg_aux=NULL;
 		msg_aux = malloc(strlen(newMsg)+strlen(status->msg)+1);
+
 		if(msg_aux!=NULL){
 			strcpy(msg_aux,status->msg);
 			strcat(msg_aux,newMsg);
@@ -94,7 +95,6 @@ int irio_mergeStatus(TStatus* status,TErrorDetailCode code, int printMsg, const 
 	return 0;
 }
 
-//TODO: Todos los valores no se evalúan en el código...
 int irio_getErrorString(TErrorDetailCode error, char** str){
 	*str=NULL;
 	switch(error){
