@@ -124,7 +124,7 @@ TEST(TP_cRIO_PBP, functional) {
 	 * FPGA VI VERSION
 	 */
 	cout << endl << "TEST 3: Testing FPGA VI Version" << endl << endl;
-	char* VIVersion = new char[FPGAversion.size()];
+	char* VIVersion = new char[FPGAversion.size()+1];
 	unsigned long int valueLength;
 	myStatus = irio_getFPGAVIVersion(&p_DrvPvt,VIVersion,4,&valueLength,&status);
 	if (myStatus > IRIO_success) {
