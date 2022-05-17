@@ -119,7 +119,7 @@ TEST(TP_cRIO_PBP, functional) {
 	 * FPGA VI VERSION
 	 */
 	cout << endl << "TEST 3: Testing FPGA VI Version" << endl << endl;
-	char* VIVersion = new char[strlen(FPGAversion.c_str())];
+	char* VIVersion = new char[FPGAversion.size()+1];
 	unsigned long int valueLength;
 	myStatus = irio_getFPGAVIVersion(&p_DrvPvt,VIVersion,4,&valueLength,&status);
 	if (myStatus > IRIO_success) {
@@ -127,6 +127,8 @@ TEST(TP_cRIO_PBP, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getFPGAVIVersion function] FPGA VI version: " << VIVersion << endl;
+
+	delete [] VIVersion;
 
 	/*
 	 * TEST 4
@@ -352,7 +354,7 @@ TEST(TP_cRIO_PBP, cRIO_IO){
 	 * FPGA VI VERSION
 	 */
 	cout << endl << "TEST 3: Testing FPGA VI Version" << endl << endl;
-	char* VIVersion = new char[strlen(FPGAversion.c_str())];
+	char* VIVersion = new char[FPGAversion.size()+1];
 	unsigned long int valueLength;
 	myStatus = irio_getFPGAVIVersion(&p_DrvPvt,VIVersion,4,&valueLength,&status);
 	if (myStatus > IRIO_success) {
@@ -360,6 +362,7 @@ TEST(TP_cRIO_PBP, cRIO_IO){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getFPGAVIVersion function] FPGA VI version: " << VIVersion << endl;
+	delete [] VIVersion;
 
 	/*
 	 * TEST 4
