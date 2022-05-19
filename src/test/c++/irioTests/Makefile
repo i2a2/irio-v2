@@ -44,7 +44,7 @@ C=gcc
 CC=g++
 CFLAGS=-c -Wall
 CCFLAGS=-c -Wall -std=c++11
-LDFLAGS=
+
 
 ifeq ($(COVERAGE),true)
 	CFLAGS+= -O0 -g --coverage
