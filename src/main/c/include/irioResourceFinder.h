@@ -8,7 +8,7 @@
  * \brief Resource finder and error management methods for IRIO driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -38,8 +38,8 @@
  * Base Strings for FPGA Resource names
  */
 ///@{
-#define STRINGNAME_PREFIX "NiFpga_"
-#define STRINGNAME_BITFILEEXT ".lvbitx"
+#define STRINGNAME_PREFIX "NiFpga_"      //!< Prefix needed to read bitfile and header files
+#define STRINGNAME_BITFILEEXT ".lvbitx"  //!< Bitfiles extension
 ///@}
 
 #ifdef __cplusplus
@@ -102,6 +102,7 @@ int irio_closeFileSearch(irioDrv_t *p_DrvPvt, void** fileContent,TStatus* status
  * @param[in] index Number of the resource. Concatenated to resourceName if greater than -1.
  * @param[out] port Resource port
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @param[in] printErrMsg Control variable to print error messag or not
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_findResourceEnum(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t index, TResourcePort* port,TStatus* status,int printErrMsg);
@@ -118,6 +119,7 @@ int irio_findResourceEnum(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t
  * @param[in] index Number of the resource. Concatenated to resourceName if greater than -1.
  * @param[out] port 64 bits Resource port
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @param[in] printErrMsg Control variable to print error messag or not
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t index, TResourcePort_64* port,TStatus* status,int printErrMsg);

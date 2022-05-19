@@ -8,7 +8,7 @@
  * \brief Initialization and common resources access methods for IRIO Driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@
 
 #ifndef IRIODRIVER_H
 #define IRIODRIVER_H
-#define IRIOVERSION "1.2.0"
+#define IRIOVERSION "1.2.0"   //!< Actual IRIO version
 #include "irioDataTypes.h"
 
 #include <stdint.h>
@@ -75,7 +75,7 @@ extern "C" {
  * @param[in] FPGAversion 		Version of the bitfile (e.g. [1,0] for v1.0). Must match with the value of the FPGA register
  * @param[in] verbosity			Indicates whether or not should the driver print trace messages.
  * @param[in] headerDir			Path where to search for the header file corresponding to the bitfile to be downloaded
- * @param[in] bitfile			Path where to search for the bitfile to be downloaded
+ * @param[in] bitfileDir		Path where to search for the bitfile to be downloaded
  * @param[out] p_DrvPvt		Pointer to the driver structure. Will be initialized with the resources found.
  * @param[out] status		Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.

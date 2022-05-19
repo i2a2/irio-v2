@@ -8,7 +8,7 @@
  * \brief Waveform generator handler methods for IRIO driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -75,7 +75,7 @@ int irio_findSGs(irioDrv_t* p_DrvPvt,TStatus* status);
  * Errors may occur if the port was not found or while reading from the port.
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[in[ n Number of the waveform generator which signal type will be read (SGSignalTypen)
+ * @param[in] n Number of the waveform generator which signal type will be read (SGSignalTypen)
  * @param[out] value  Current value of signal generator signal type
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
@@ -103,7 +103,7 @@ int irio_setSGSignalType(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status
  * Errors may occur if the port was not found or while reading from the port.
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[in[ n Number of the waveform generator which frequency will be read (SGFreq)
+ * @param[in] n Number of the waveform generator which frequency will be read (SGFreq)
  * @param[out] value  Current value of signal generator frequency
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
@@ -131,7 +131,7 @@ int irio_setSGFreq(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status);
  * Errors may occur if the port was not found or while reading from the port.
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[in[ n Number of the waveform generator which phase shift will be read (SGPhaseShift)
+ * @param[in] n Number of the waveform generator which phase shift will be read (SGPhaseShift)
  * @param[out] value  Current value of signal generator phase shift
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
@@ -159,7 +159,7 @@ int irio_setSGPhase(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status);
  * Errors may occur if the port was not found or while reading from the port.
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[in[ n Number of the waveform generator which amplitude will be read (SGAmp)
+ * @param[in] n Number of the waveform generator which amplitude will be read (SGAmp)
  * @param[out] value  Current value of signal generator amplitude
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
@@ -187,7 +187,7 @@ int irio_setSGAmp(irioDrv_t* p_DrvPvt,int n,int32_t value,TStatus* status);
  * Errors may occur if the port was not found or while reading from the port.
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[in[ n Number of the waveform generator which update rate will be read (SGUpdateRate)
+ * @param[in] n Number of the waveform generator which update rate will be read (SGUpdateRate)
  * @param[out] value  Current value of signal generator update rate
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
