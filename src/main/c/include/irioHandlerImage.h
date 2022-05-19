@@ -36,6 +36,8 @@
 
 /**
  * Enum Type for CameraLink supported configurations
+ *
+ * Specify the result of a method call
  */
 typedef enum{
 	CL_BASE,  //!< CameraLink Base mode
@@ -48,6 +50,8 @@ typedef enum{
 /**
  * Enum Type for CameraLink supported extended modes
  * Note: Extended mode is not currently supported
+ *
+ * Specify the result of a method call
  */
 typedef enum{
 	CL_STANDARD,     //!< CameraLink Standard Mapping

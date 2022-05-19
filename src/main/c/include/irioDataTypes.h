@@ -94,6 +94,8 @@ extern "C" {
 
 /**
  * Enum Type for IRIO supported platforms
+ *
+ * Specify the result of a method call
  */
 typedef enum {
 	IRIO_FlexRIO = 0,//!< FlexRIO Devices
@@ -114,6 +116,11 @@ typedef enum  {
 
 #define NUM_ERRORS 18
 
+/*
+ * Enum Type for IRIO error messages
+ *
+ * Specify the result of a method call
+ */
 typedef enum {
 	Generic_Error=-NUM_ERRORS,			//!< To be used by upper layers for custom errors in irio_mergeStatus
 	HardwareNotFound_Error, 			//!< Given serial number was not found
@@ -150,6 +157,11 @@ typedef enum {
 	ResourceRelease_Warning				//!< NIRIO error while releasing Fifo elements
 }TErrorDetailCode;
 
+/*
+ * Enum Type for RIO Device coupling mode
+ *
+ * Specify the result of a method call
+ */
 typedef enum {
 	IRIO_coupling_AC=0,
 	IRIO_coupling_DC,

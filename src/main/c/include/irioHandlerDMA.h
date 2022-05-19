@@ -257,10 +257,10 @@ int irio_setDMATtoHostEnable(irioDrv_t* p_DrvPvt, int n,int32_t value, TStatus* 
 int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, TStatus* status);
 
 /**
- * Reads data from the DMA
+ * Reads data from the DMA using a timeout parameter
  *
- * Reads data blocks from the specified data DMA if they are available. If there are less blocks
- * than requested nothing is read. The size in DMA words of a data block depends on
+ * Reads data blocks from the specified data DMA if they are available inside an window timeout time.
+ * If there are less blocks than requested IRIO timeout warning is given. The size in DMA words of a data block depends on
  * the frame type and block size given by the FPGA registers DMATtoHOSTFrameType and
  * DMATtoHOSTBlockNWords respectively (read into irioDrv_t::DMATtoHOSTFrameType and
  * irioDrv_t::DMATtoHOSTBlockNWords at irio_findDAQDMAs()).
@@ -270,7 +270,7 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
  * @param[in] NBlocks number of data blocks to read.
  * @param[in] n Number of Number of the DMA where data should be read
- * @param[in] timeout Time function waits until stop data acquisition
+ * @param[in] timeout Time function waits until FPGA fills DMA buffer
  * @param[out] data Previously allocated buffer where data read will be stored
  * @param[out elementsRead number of elements read. Can be 0 or NBlocks
  * @param[out] status Warning and error messages produced during the execution of this call will be added here.
@@ -301,7 +301,7 @@ int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t 
 
 /**
  *
- * Reads a specified number of data blocks from the DMA
+ * Reads size of DMA data blocks in terms of DMA words
  *
  * @param[in]  p_DrvPvt 	Pointer to the driver session structure
  * @param[out] Nwords       Numbers of blocks readed
@@ -311,7 +311,7 @@ int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t 
 int irio_getDMATtoHOSTBlockNWords(irioDrv_t* p_DrvPvt, uint16_t* Nwords, TStatus* status);
 
 /**
- * Reads a specified FPGA Channel from the DMA
+ * Reads number of Channels per DMA
  *
  * @param[in]  p_DrvPvt 	Pointer to the driver session structure
  * @param[out] Nch          Channel of the FPGA where user wants to read
