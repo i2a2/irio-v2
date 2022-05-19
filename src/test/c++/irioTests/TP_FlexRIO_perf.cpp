@@ -50,6 +50,10 @@ struct threadData_t{
  */
 
 // TODO: Revisar usleep
+
+void DMAthreadWT(threadData_t*, int, uint32_t, TStatus*);
+void DMAthread(threadData_t*, int, TStatus*);
+
 void DMAthread(threadData_t* data, int blocksToRead, TStatus* status) {
 	int myStatus;
 	int elementsRead = 0;
@@ -309,7 +313,7 @@ TEST(TP_FlexRIO_perf, functional) {
 		float throughput_test = (float) data.blocksRead*DMATtoHOSTBlockNWords*sampleSize*DMATtoHOSTNCh/us.count(); // MB/s
 
 		int DMAsOverflow = -1;
-		cout << "[irio_getDMATtoHostOverflow function] Checking if there has been an overflow in DMA register" << endl;
+		cout << "[irio_getDMATtoHostOverflow function] Checking ...." << endl;
 		myStatus = irio_getDMATtoHostOverflow(&p_DrvPvt,&DMAsOverflow,&status);
 		if (DMAsOverflow==0){
 			cout << "Bandwidth expected: " << throughput << "MB/s during " << timeSleep << " seconds. "
@@ -378,9 +382,9 @@ void DMAthreadWT(threadData_t* data, int blocksToRead, uint32_t timeout, TStatus
 				                            data->DBuffer,&elementsRead,timeout,status);
 		if(myStatus == IRIO_success){
 //			remainingBlocks -= 1;
-			if (elementsRead == blocksToRead){
+			//if (elementsRead == blocksToRead){
 				data->blocksRead += elementsRead;
-			}
+			//}
 		}
 		else
 			TestUtilsIRIO::getErrors(*status);
@@ -500,7 +504,7 @@ TEST(TP_FlexRIO_perf, functionalWT) {
 		 " number of words per block." << endl << endl;
 
 	// User decides how many blocks wants to read. Useful in mod5761 test but useless in performance test
-	int blocksToRead = 1;                // Put a random number here
+	int blocksToRead = 5;                // Put a random number here
 	uint16_t DMATtoHOSTBlockNWords = 0;
 	uint16_t DMATtoHOSTNCh = 0;
 
@@ -535,10 +539,10 @@ TEST(TP_FlexRIO_perf, functionalWT) {
 	// 10 MSamples/seg --> 80MB/s    ; 20 MSamples/seg --> 160MB/s
 	// 25 MSamples/seg --> 200 MB/s  ; 50 MSamples/seg --> 400MB/s
 	// 75 MSamples/seg --> 600 MB/s  ; 100 MSamples/seg --> 800MB/s
-//	std::vector<int32_t> samplingRate = {100000,1000000,10000000,20000000,25000000,50000000,75000000,100000000};
-	std::vector<int32_t> samplingRate = {100000};
 
-	int timeSleep = 5; // User decides how much time the thread is going to acquire data
+	std::vector<int32_t> samplingRate = {100000,1000000,10000000,20000000,25000000,50000000, 100000000};
+
+	int timeSleep = 60; // User decides how much time the thread is going to acquire data
 
 	// Necessary timeout parameters
 	float timePerWord = 0;
@@ -579,9 +583,11 @@ TEST(TP_FlexRIO_perf, functionalWT) {
 
 		timeout = ceil(2*timePerWord*blocksToRead*DMATtoHOSTBlockNWords);  // por exceso
 		cout << "timeout: " << timeout << endl;
-
+		data.flagToFinish = 0;
+		data.blocksRead =0;
 		auto start = clock::now();
-
+		// Once the thread is instantiated it starts to run in parallel to main thread
+		std::thread thr(DMAthreadWT,&data,blocksToRead,timeout,&status);
 		cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
 		myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
 		if (myStatus > IRIO_success) {
@@ -590,8 +596,6 @@ TEST(TP_FlexRIO_perf, functionalWT) {
 		}
 		ASSERT_EQ(myStatus, IRIO_success);
 
-		// Once the thread is instantiated it starts to run in parallel to main thread
-		std::thread thr (DMAthreadWT,&data,blocksToRead,timeout,&status);
 
 		cout << "Thread acquiring data. Test " << i << endl;
 		cout << "Sleep " << timeSleep << " seconds..." << endl;
@@ -604,18 +608,19 @@ TEST(TP_FlexRIO_perf, functionalWT) {
 		}
 		EXPECT_EQ(myStatus, IRIO_success);
 
+		data.flagToFinish=1;
+		thr.join();
 		auto end = clock::now();
 		std::chrono::microseconds us = std::chrono::duration_cast<std::chrono::microseconds> (end-start);
 		std::cout << "It took me " << us.count() << " microseconds start-stop data acquisition" << endl;
 
 		// All data has been read so thread can be joined to main process and be destroyed safely
-		data.flagToFinish=1;
-		thr.join();
+
 
 		float throughput_test = (float) data.blocksRead*DMATtoHOSTBlockNWords*sampleSize*DMATtoHOSTNCh/us.count(); // MB/s
 
 		int DMAsOverflow = -1;
-		cout << "[irio_getDMATtoHostOverflow function] Checking if there has been an overflow in DMA register" << endl;
+		cout << "[irio_getDMATtoHostOverflow function] Checking ....." << endl;
 		myStatus = irio_getDMATtoHostOverflow(&p_DrvPvt,&DMAsOverflow,&status);
 		if (DMAsOverflow==0){
 			cout << "Bandwidth expected: " << throughput << "MB/s during " << timeSleep << " seconds. "
