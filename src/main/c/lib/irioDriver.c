@@ -53,7 +53,7 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <math.h>
-
+#include <sys/mman.h>
 
 /** @name Common Resource Strings
  * Strings for common FPGA Resources
@@ -126,11 +126,17 @@ int findIOSamplingRate(irioDrv_t* p_DrvPvt,TStatus* status);
 
 int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status);
 
+int valid_pointer(void *p, size_t len);
 
 
 int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const char *RIODeviceModel,
 					const char *projectName, const char *FPGAversion, int verbosity,
 					const char *headerDir,const char *bitfileDir, irioDrv_t* p_DrvPvt, TStatus* status){
+
+	//The user can provide a pointer to a TStatus variable that is not initialized
+	if (status==NULL){
+    	return IRIO_error;
+    }
 
 	TIRIOStatusCode local_status = IRIO_success;
 	memset(p_DrvPvt,0x00,sizeof(irioDrv_t));
@@ -1370,3 +1376,5 @@ int irio_getSamplingRate(irioDrv_t* p_DrvPvt,int n,int32_t* value, TStatus* stat
 		return IRIO_error;
 	}
 }
+
+

@@ -397,7 +397,7 @@ static void mod5761Test(bool tout){
 
 	do{
 		if (tout)
-			myStatus = irio_getDMATtoHostDataWT(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,timeout,&status);
+			myStatus = irio_getDMATtoHostData_timeout(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,timeout,&status);
 		else
 			myStatus = irio_getDMATtoHostData(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,&status);
 
@@ -617,7 +617,7 @@ static void mod5761Test(bool tout){
 	}
 	do {
 		if (tout)
-			myStatus = irio_getDMATtoHostDataWT(&p_DrvPvt,blocksToRead,0,dataBuffer3,&elementsRead,timeout,&status);
+			myStatus = irio_getDMATtoHostData_timeout(&p_DrvPvt,blocksToRead,0,dataBuffer3,&elementsRead,timeout,&status);
 		else
 			myStatus = irio_getDMATtoHostData(&p_DrvPvt,blocksToRead,0,dataBuffer3,&elementsRead,&status);
 		if (myStatus > IRIO_success) {
