@@ -61,7 +61,7 @@ static void DMAthread(threadData_t* data, int blocksToRead, int timeout, bool to
 	while(data->flagToFinish == 0){
 
 		if (tout){
-			myStatus = irio_getDMATtoHostDataWT(data->p_Drv,blocksToRead,DMATtoHOSTFrameType,
+			myStatus = irio_getDMATtoHostData_timeout(data->p_Drv,blocksToRead,DMATtoHOSTFrameType,
 					                            data->DBuffer,&elementsRead,timeout,status);
 			if(myStatus == IRIO_success){
 					data->blocksRead += elementsRead;

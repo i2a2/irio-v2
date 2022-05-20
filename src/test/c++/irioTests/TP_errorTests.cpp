@@ -1385,7 +1385,7 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	int blocksToRead = 1;
 	uint64_t* dataBuffer = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*8];
 	uint32_t timeout = ceil(timePerWord*blocksToRead*DMATtoHOSTBlockNWords);
-	myStatus = irio_getDMATtoHostDataWT(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,floor(timeout/3),&status); // blocksToRead blocks of 4096 64 bit words are expected to be acquired
+	myStatus = irio_getDMATtoHostData_timeout(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,floor(timeout/3),&status); // blocksToRead blocks of 4096 64 bit words are expected to be acquired
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -1406,7 +1406,7 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	blocksToRead = 2;
 	uint64_t* dataBuffer2 = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*8];
 	timeout = 0;
-	myStatus = irio_getDMATtoHostDataWT(&p_DrvPvt,blocksToRead,0,dataBuffer2,&elementsRead,timeout,&status); // blocksToRead blocks of 4096 64 bit words are expected to be acquired
+	myStatus = irio_getDMATtoHostData_timeout(&p_DrvPvt,blocksToRead,0,dataBuffer2,&elementsRead,timeout,&status); // blocksToRead blocks of 4096 64 bit words are expected to be acquired
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}

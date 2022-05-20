@@ -576,8 +576,8 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
 		NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadFifoU64(p_DrvPvt->session,p_DrvPvt->enumDMATtoHOST[n].value,data,0,0,&elementsRemaining));
 
 		if (elementsRemaining>=elementsToRead){
-			int attempts=0;
-			do{ //[BUG7807] elementRemaining indicates that samples greater than elementsToRead are in the buffer but next call can fail.
+			//int attempts=0;
+			//do{ //[BUG7807] elementRemaining indicates that samples greater than elementsToRead are in the buffer but next call can fail.
 				NiFpga_MergeStatus(&fpgaStatus,NiFpga_ReadFifoU64(p_DrvPvt->session,
 								  p_DrvPvt->enumDMATtoHOST[n].value,
 								  data,
@@ -587,27 +587,27 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
 								  &elementsRemaining));
 				if(NiFpga_IsError(fpgaStatus)){
 					irio_mergeStatus(status,Read_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error reading %s%d. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_DMATTOHOST,n,fpgaStatus);
-					printf("\n[BUG7807] DMATtoHOSTBlockNWords:%d elementsToRead=%d elementsRemaining=%d\n",p_DrvPvt->DMATtoHOSTBlockNWords[n], (int) elementsToRead, (int)elementsRemaining);
-					attempts++;
-					printf("[BUG7807] Attempt #N=%d\n", attempts);
-					if (attempts==3) {
-						local_status |= IRIO_warning;
-						printf("[BUG7807] Exiting with error\n");
-					}else
-					{
-						fpgaStatus = NiFpga_Status_Success;
-						printf("[BUG7807]Attempting...\n");
-					}
+					//printf("\n[BUG7807] DMATtoHOSTBlockNWords:%d elementsToRead=%d elementsRemaining=%d\n",p_DrvPvt->DMATtoHOSTBlockNWords[n], (int) elementsToRead, (int)elementsRemaining);
+					//attempts++;
+					//printf("[BUG7807] Attempt #N=%d\n", attempts);
+					//if (attempts==3) {
+					local_status |= IRIO_warning;
+					//	printf("[BUG7807] Exiting with error\n");
+					//}else
+					//{
+					//	fpgaStatus = NiFpga_Status_Success;
+					//	printf("[BUG7807]Attempting...\n");
+					//}
 				}else{
 					*elementsRead=NBlocks;
-					attempts=3;
+					//attempts=3;
 					}
-			}while (attempts<3);
+			//}while (attempts<3);
 		  }
-	}else{
-		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_DMATTOHOST,n);
-		local_status |= IRIO_warning;
-	}
+		}else{
+			irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s%d was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_DMATTOHOST,n);
+			local_status |= IRIO_warning;
+		}
 
 	if(local_status<IRIO_error){
 		return local_status;
@@ -616,7 +616,7 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
 	}
 }
 
-int irio_getDMATtoHostDataWT(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, uint32_t timeout, TStatus* status){
+int irio_getDMATtoHostData_timeout(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, uint32_t timeout, TStatus* status){
 	if(!p_DrvPvt->DMATtoHOSTNo.found){
 		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can not use DMAs. DMAs were not searched or found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		return IRIO_warning;
