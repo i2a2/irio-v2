@@ -7,7 +7,7 @@
  * \brief Functions for error management
  * \date Nov., 2015
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -59,6 +59,8 @@ int irio_mergeStatus(TStatus* status,TErrorDetailCode code, int printMsg, const 
 		va_end(argptr);
 		return -1;
 	}
+
+	va_end(argptr);
 
 	if(printMsg){
 		printf("\n\n%s\n",newMsg);

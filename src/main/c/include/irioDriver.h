@@ -59,6 +59,10 @@ extern "C" {
  * error codes (if any) in status->msg. The error codes shown this way correspond to NiFpga
  * library error codes.
  *
+ * If any of the mandatory resources are missing the method will return error but its irioDrv_t->session parameter
+ * will remain open, so user should close the session manually because IRIO allows to use its methods
+ * if the session is open.
+ *
  *	Some important fields modified in this call are:
  *		\n irioDrv_t::fpgaRIO
  *		\n irioDrv_t::session
