@@ -86,67 +86,13 @@ TEST(TP_errorTests, wrongFPGAVersion)
 	cout << "IRIO Library is designed to create a session before check FPGA version, "
 			"so user should finalize IRIO driver. irio_closeDriver() must run successfully" << endl;
 
-	cout << endl << "TEST 1: Closing IRIO driver" << endl << endl;
+	cout << endl << "TEST 1: Closing IRIO driver after failure on initialization" << endl << endl;
 	cout << "[irio_closeDriver function] Closing driver... " << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
-}
-
-TEST(TP_errorTests, wrongFilePath)
-{
-	string testName = "TP_errorTests, onlyResources bitfile: Wrong file path test";
-	string testDescription = "Test verifies driver’s ability to detect that path "
-							 "where bitfiles are located is not correct";
-
-	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
-	TestUtilsIRIO::displayTitle(testDescription);
-
-	// Environment variables
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
-
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
-	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
-	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
-
-	int myStatus = 0;
-	irioDrv_t p_DrvPvt;
-	TStatus status;
-	irio_initStatus(&status);
-
-	cout << "TEST 0: Testing driver initialization and resources after failure "
-			"on driver initialization" << endl << endl;
-	myStatus = irio_initDriver("wrongFilePathTest",
-							   RIOSerial.c_str(),
-							   NIRIOmodel.c_str(),
-							   bitfileName.c_str(),
-							   FPGAversion.c_str(),
-							   verbosity,
-							   "wrongFilePath",
-							   filePath.c_str(),
-							   &p_DrvPvt,
-							   &status);
-
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 1: Closing IRIO driver after failure on initialization" << endl << endl;
-	cout << "[irio_closeDriver function] Closing driver..." << endl;
-	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
 }
 
 TEST(TP_errorTests, wrongRIOSerial)
@@ -296,7 +242,7 @@ TEST(TP_errorTests, wrongBitfileName)
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	cout << endl << endl << "TEST 1: Closing IRIO driver after failure on initialization" << endl << endl;
+	cout << endl << "TEST 1: Closing IRIO driver after failure on initialization" << endl << endl;
 	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
@@ -356,9 +302,10 @@ TEST(TP_errorTests, wrongRIODevice)
 
 // Set of tests using noModule bitfile
 TEST(TP_errorTests, setFPGATwice) {
-	string testName = "TP_errorTests, noModule bitfile: Set FPGA twice test";
+	string testName = "TP_errorTests, noModule bitfile: Set FPGA twice test and manage non implemented ports";
 	string testDescription = "Test verifies driver’s ability to check that the "
-							 "FPGA is started twice in a row";
+							 "FPGA is started twice in a row and if user tries to read/write "
+							 "on non implemented ports";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
@@ -420,7 +367,104 @@ TEST(TP_errorTests, setFPGATwice) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	cout << endl << "TEST 2: Closing IRIO DRIVER" << endl << endl;
+	cout << endl << "TEST 2: Testing an auxiliary analog output port not "
+			        "implemented in the FPGA setting a value" << endl << endl;
+	int analogValue = 0;
+	cout << "[irio_setAuxAO function] Value " << analogValue << " is set in not "
+			"implemented auxAO6. Error/warning expected" << endl;
+	myStatus = irio_setAuxAO(&p_DrvPvt,6,analogValue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 3: Testing an auxiliary analog output port not "
+		 	        "implemented in the FPGA getting its value" << endl << endl;
+
+	cout << "[irio_getAuxAO function] Trying to read auxAO6..." << endl;
+	myStatus = irio_getAuxAO(&p_DrvPvt,6,&aivalue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 4: Testing an auxiliary analog input port not "
+			        "implemented in the FPGA getting its value" << endl << endl;
+
+	cout << "[irio_getAuxAI function] Trying to read auxAI10..." << endl;
+	myStatus = irio_getAuxAI(&p_DrvPvt,10,&aivalue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 5: Testing an auxiliary 64 bits analog output port not "
+					"implemented in the FPGA setting a value" << endl << endl;
+
+	int64_t avalue = 0;
+	cout << "[irio_setAuxAO_64 function] Value " << avalue << " is set in not "
+			"implemented aux64AO6. Error/warning expected" << endl;
+	myStatus = irio_setAuxAO_64(&p_DrvPvt,6,avalue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 6: Testing an auxiliary 64 bits analog output port not "
+					"implemented in the FPGA getting its value" << endl << endl;
+
+	cout << "[irio_getAuxAO_64 function] Trying to read aux64AO6..." << endl;
+	myStatus = irio_getAuxAO_64(&p_DrvPvt,6,&avalue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 7: Testing an auxiliary 64 bits analog input port not "
+					"implemented in the FPGA getting its value" << endl << endl;
+
+	cout << "[irio_getAuxAI_64 function] Trying to read aux64AI10..." << endl;
+	myStatus = irio_getAuxAI_64(&p_DrvPvt,10,&avalue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	int digitalValue = 0;
+
+	cout << endl << "TEST 8: Testing an auxiliary digital output port not "
+			        "implemented in the FPGA setting a value" << endl << endl;
+
+	cout << "[irio_setAuxDO function] Value " << digitalValue << " is set in not "
+			"implemented auxDO6. Error/warning expected" << endl;
+	myStatus = irio_setAuxDO(&p_DrvPvt,6,digitalValue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 9: Testing an auxiliary digital output port not "
+		 	        "implemented in the FPGA getting its value" << endl << endl;
+
+	cout << "[irio_getAuxDO function] Trying to read auxDO6..." << endl << endl;
+	myStatus = irio_getAuxDO(&p_DrvPvt,6,&digitalValue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 10: Testing an auxiliary digital input port not "
+			        "implemented in the FPGA getting its value" << endl << endl;
+
+	cout << "[irio_getAuxDI function] Trying to read auxDI6..." << endl;
+	myStatus = irio_getAuxDI(&p_DrvPvt,6,&digitalValue,&status);
+	if (myStatus > IRIO_success) {
+		TestUtilsIRIO::getErrors(status);
+	}
+	EXPECT_NE(myStatus, IRIO_success);
+
+	cout << endl << "TEST 11: Closing IRIO DRIVER" << endl << endl;
 	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
@@ -495,175 +539,6 @@ TEST(TP_errorTests, setFPGAInitError) {
 	EXPECT_NE(myStatus, IRIO_success);
 }
 
-TEST(TP_errorTests, manageNonImplementedPorts) {
-	string testName = "TP_errorTests, noModule bitfile: managing non implemented auxiliary analog/digital I/O ports test";
-	string testDescription = "Test verifies driver’s ability to check the error "
-			                 "if user tries to write on a port that is not implemented in the FPGA";
-
-	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
-	TestUtilsIRIO::displayTitle(testDescription);
-
-	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
-
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
-	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
-	string bitfileName = "FlexRIOnoModule_"+RIODevice;
-
-	int aivalue=0;
-
-	int myStatus = 0;
-	irioDrv_t p_DrvPvt;
-	TStatus status;
-	irio_initStatus(&status);
-
-	cout << "TEST 0: Testing driver initialization" << endl << endl;
-	myStatus = irio_initDriver("nonImplementedPortsTest",
-							   RIOSerial.c_str(),
-							   NIRIOmodel.c_str(),
-							   bitfileName.c_str(),
-							   FPGAversion.c_str(),
-							   verbosity,
-							   filePath.c_str(),
-							   filePath.c_str(),
-							   &p_DrvPvt,
-							   &status);
-
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-		cout << "FPGA must not be started if driver is not initialized correctly." << endl;
-	}
-	ASSERT_EQ(myStatus, IRIO_success);
-
-	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
-	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
-	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
-	// IRIO can manage success or warning after starting the FPGA, not error
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	ASSERT_NE(myStatus, IRIO_error);
-
-	// This function does not modify status neither myStatus, it is not necessary to check that variables
-	aivalue = 0;
-	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
-	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
-
-	cout << endl << "TEST 2: Testing an auxiliary analog output port not "
-			        "implemented in the FPGA setting a value" << endl << endl;
-	usleep(100);
-	int analogValue = 0;
-	cout << "[irio_setAuxAO function] Value " << analogValue << " is set in not "
-			"implemented auxAO6. Error/warning expected" << endl;
-	myStatus = irio_setAuxAO(&p_DrvPvt,6,analogValue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 3: Testing an auxiliary analog output port not "
-		 	        "implemented in the FPGA getting its value" << endl << endl;
-
-	cout << "[irio_getAuxAO function] Trying to read auxAO6..." << endl;
-	myStatus = irio_getAuxAO(&p_DrvPvt,6,&aivalue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 4: Testing an auxiliary analog input port not "
-			        "implemented in the FPGA getting its value" << endl << endl;
-
-	cout << "[irio_getAuxAI function] Trying to read auxAI10..." << endl;
-	myStatus = irio_getAuxAI(&p_DrvPvt,10,&aivalue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	usleep(100);
-	cout << endl << "TEST 5: Testing an auxiliary 64 bits analog output port not "
-					"implemented in the FPGA setting a value" << endl << endl;
-
-	int64_t avalue = 0;
-	cout << "[irio_setAuxAO_64 function] Value " << avalue << " is set in not "
-			"implemented aux64AO6. Error/warning expected" << endl;
-	myStatus = irio_setAuxAO_64(&p_DrvPvt,6,avalue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 6: Testing an auxiliary 64 bits analog output port not "
-					"implemented in the FPGA getting its value" << endl << endl;
-
-	cout << "[irio_getAuxAO_64 function] Trying to read aux64AO6..." << endl;
-	myStatus = irio_getAuxAO_64(&p_DrvPvt,6,&avalue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 7: Testing an auxiliary 64 bits analog input port not "
-					"implemented in the FPGA getting its value" << endl << endl;
-
-	cout << "[irio_getAuxAI_64 function] Trying to read aux64AI10..." << endl;
-	myStatus = irio_getAuxAI_64(&p_DrvPvt,10,&avalue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	usleep(100);
-	int digitalValue = 0;
-
-	cout << endl << "TEST 8: Testing an auxiliary digital output port not "
-			        "implemented in the FPGA setting a value" << endl << endl;
-
-	cout << "[irio_setAuxDO function] Value " << digitalValue << " is set in not "
-			"implemented auxDO6. Error/warning expected" << endl;
-	myStatus = irio_setAuxDO(&p_DrvPvt,6,digitalValue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 9: Testing an auxiliary digital output port not "
-		 	        "implemented in the FPGA getting its value" << endl << endl;
-
-	cout << "[irio_getAuxDO function] Trying to read auxDO6..." << endl << endl;
-	myStatus = irio_getAuxDO(&p_DrvPvt,6,&digitalValue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 10: Testing an auxiliary digital input port not "
-			        "implemented in the FPGA getting its value" << endl << endl;
-
-	cout << "[irio_getAuxDI function] Trying to read auxDI6..." << endl;
-	myStatus = irio_getAuxDI(&p_DrvPvt,6,&digitalValue,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_NE(myStatus, IRIO_success);
-
-	cout << endl << "TEST 11: Closing IRIO DRIVER" << endl << endl;
-	cout << "[irio_closeDriver function] Closing driver..." << endl;
-	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_EQ(myStatus, IRIO_success);
-}
-
 // Test using FlexRIO mod5761 bitfile
 TEST(TP_errorTests, failInitDriver5761) {
 	string testName = "TP_errorTests, mod5761 bitfile. Failure on driver initilization test";
@@ -723,7 +598,7 @@ TEST(TP_errorTests, failInitDriver5761) {
 
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode after failure on driver initialization" << endl << endl;
 	int valueReadI32 = 0;
-	usleep(100);
+
 	cout << "[irio_setDebugMode function] DebugMode set to 0 (OFF)" << endl;
 	myStatus = irio_setDebugMode(&p_DrvPvt,0,&status); // Debug mode set to OFF, value 0
 	if (myStatus > IRIO_success) {
@@ -738,7 +613,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 3: Configuring Signal Generator Signal type after failure on driver initialization" << endl << endl;
 	cout << "[irio_setSGSignalType function] SGSignalType0 set to 0 (DC)" << endl;
 	myStatus = irio_setSGSignalType(&p_DrvPvt,0,0,&status); // DC signal configured, value 0
@@ -754,7 +628,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	int digitalValue = 2048;
 	cout << endl << "TEST 4: Configuring the Analog output on port 0 with a digital value after failure on driver initialization" << endl << endl;
 	cout << "[irio_setAO function] AO0 set to 2048 (digital value)" << endl;
@@ -771,7 +644,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 5: Configuring the Analog output enable on port 0 after failure on driver initialization" << endl << endl;
 	cout << "[irio_setAOEnable] AOEnable0 set to 1 (ENABLE)" << endl;
 	myStatus = irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
@@ -789,7 +661,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 
 
 	int valueReadAuxAI9 = 0;
-	usleep(100);
 	cout << endl << "TEST 6: auxAI9 register after failure on initializing "
 				 "the driver" << endl << endl;
 	cout << "[irio_getAuxAI function] Trying to read auxAI9... " << endl;
@@ -799,7 +670,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 7: Testing DMAs cleaning after failure on driver initialization. "
 			     "No output if DMAs have been cleaned successfully" << endl;
 
@@ -810,7 +680,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 8: Testing configurations of DMAs after failure on initializing "
 			     "the driver. No output if DMAs have been configured successfully" << endl;
 
@@ -824,7 +693,7 @@ TEST(TP_errorTests, failInitDriver5761) {
 	cout << endl << "TEST 9: Testing DMAs sampling rate configuration after failure on driver initialization." << endl << endl;
 	int32_t samplingRate = 500000; // 500k samples/seg
 	int32_t Fref = 0;
-	usleep(100);
+
 	cout << "[irio_getFref function] Trying to get FPGA Clock reference..." << endl;
 	myStatus = irio_getFref(&p_DrvPvt,&Fref,&status);
 	if (myStatus > IRIO_success) {
@@ -850,7 +719,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	EXPECT_NE(myStatus, IRIO_success);
 
 	int coupling = std::stoi(Coupling);
-	usleep(100);
 	cout << endl << "TEST 10: Testing coupling configuration for NI5761 adapter module" << endl << endl;
 
 	cout << "[irio_setAICoupling function] AICoupling (AC = 0, DC = 1) set to : " << coupling << endl;
@@ -867,7 +735,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 11: Testing DMA Enable" << endl << endl;
 
 	cout << "[irio_setDMATtoHostEnable function] DMATtoHostEnable0 set to 1 (ON)" << endl;
@@ -884,7 +751,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 12: Set DAQ Start" << endl << endl;
 
 	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
@@ -901,7 +767,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	int elementsRead = 0;
 	uint16_t DMATtoHOSTBlockNWords = 0;
 	uint16_t DMATtoHOSTNCh = 0;
@@ -931,8 +796,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100); // This sleep time is to ensure that FIFO is full of data. FIFO will be cleaned below
-
 	cout << "[irio_setDAQStartStop function] DAQStartStop set to 0 (OFF)" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
@@ -950,7 +813,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	uint32_t SGFref = 0;
 	int SGChannel = 0;
 	samplingRate = 10000000;
@@ -1022,7 +884,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	EXPECT_NE(myStatus, IRIO_success);
 
 	cout << endl << "TEST 18: Set Signal Generator type" << endl << endl;
-	usleep(100);
 	cout << "[irio_setAOEnable function] AO0 enable set to 0 (DISABLE) " << endl;
 	myStatus = irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO is disabled
 	if (myStatus > IRIO_success) {
@@ -1051,7 +912,6 @@ TEST(TP_errorTests, failInitDriver5761) {
 	EXPECT_NE(myStatus, IRIO_success);
 
 	cout << endl << "TEST 19: Get data from DMA" << endl << endl;
-	usleep(100);
 	cout << "Inside the following 60 samples must be approximately 50 samples "
 		    "that represent one sine cycle with a maximum and minimum of +-" <<
 		    amplitude/CVDAC << " raw_value +-" << amplitude << endl;
@@ -1132,7 +992,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
 	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
@@ -1149,9 +1008,7 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
 		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
 
-	usleep(100);
 	int valueReadI32 = 0;
-	usleep(100);
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode" << endl << endl;
 	cout << "[irio_setDebugMode function] DebugMode set to 0 (OFF)" << endl;
 
@@ -1174,7 +1031,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	        "the output of the waveform-generator from and auxiliary register" << endl <<
 	        "##############################################################" << endl;
 
-	usleep(100);
 	cout << endl << "TEST 3: Configuring Signal Generator Signal type" << endl << endl;
 	cout << "[irio_setSGSignalType function] SGSignalType0 set to 0 (DC)" << endl;
 	myStatus = irio_setSGSignalType(&p_DrvPvt,0,0,&status); // DC signal configured, value 0
@@ -1190,7 +1046,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	cout << "[irio_getSGSignalType function] SGSignalType0 read: " << valueReadI32 << endl;
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	int digitalValue = 2048;
 	cout << endl << "TEST 4: Configuring the Analog output on port 0 with a digital value" << endl << endl;
 	cout << "[irio_setAO function] AO0 set to 2048 (digital value)" << endl;
@@ -1208,7 +1063,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	cout << "[irio_getAO function] AO0 read: " << valueReadI32 << endl;
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 5: Configuring the Analog output enable on port 0" << endl << endl;
 	cout << "[irio_setAOEnable function] AOEnable0 set to 1 (ENABLE)" << endl;
 
@@ -1226,7 +1080,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	int valueReadAuxAI9 = 0;
-	usleep(100);
 	cout << endl << "TEST 6: auxAI9 register must have the same value as the output of the "
 			     "signal generator: in this case 2048" << endl << endl;
 
@@ -1241,7 +1094,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
  * DMA FUNCTION TESTS
  */
 
-	usleep(100);
 	cout << endl << "TEST 7: Testing DMAs' cleaning." << endl << endl;
 	cout << "[irio_cleanDMAsTtoHost function] No output if DMAs have been cleaned successfully" << endl;
 
@@ -1251,7 +1103,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 8: Testing DMAs' set up configuration." << endl << endl;
 	cout << "[irio_setUpDMAsTtoHost function] No output if DMAs have been configured successfully" << endl;
 	myStatus = irio_setUpDMAsTtoHost(&p_DrvPvt,&status);
@@ -1263,7 +1114,7 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 
 	int32_t samplingRate = 500000;
 	int32_t Fref = 0;
-	usleep(100);
+
 	cout << endl << "TEST 9: Testing DMAs' sampling rate configuration." << endl << endl;
 
 	myStatus = irio_getFref(&p_DrvPvt,&Fref,&status);
@@ -1295,7 +1146,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	}
 
 	int coupling = std::stoi(Coupling);
-	usleep(100);
 	cout << endl << "TEST 10: Testing coupling configuration for NI5761 adapter module" << endl << endl;
 
 	cout << "[irio_setAICoupling function] AICoupling (AC = 0, DC = 1) set to : " << coupling << endl;
@@ -1312,7 +1162,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	cout << "[irio_getAICoupling function] AICoupling read: " << coupling << endl;
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 11: Testing DMAs' Enable" << endl << endl;
 
 	cout << "[irio_setDMATtoHostEnable function] DMATtoHostEnable0 set to 1 (ON)" << endl;
@@ -1331,7 +1180,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	ASSERT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getDMATtoHostEnable function] DMATtoHostEnable0 read: " << valueReadI32 << endl;
 
-	usleep(100);
 	cout << endl << "TEST 12: Set DAQ Start" << endl << endl;
 
 	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
@@ -1352,7 +1200,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	/**
 	 * LOOP FOR ACQUIRING DMA BLOCKS
 	 */
-	usleep(100);
 	int elementsRead = 0;
 
 	uint16_t DMATtoHOSTBlockNWords = 0;
@@ -1428,7 +1275,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << "[irio_cleanDMAsTtoHost function] Cleaning DMAs" << endl;
 	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
@@ -1438,7 +1284,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	// Once data acquisition has finished DMAs have to be closed
-	usleep(100);
 	cout << endl << "TEST 14: Closing DMAS" << endl << endl;
 	cout << "[irio_closeDMAsTtoHost function] No output if DMAs have been closed successfully" << endl;
 	myStatus = irio_closeDMAsTtoHost(&p_DrvPvt,&status);
@@ -1447,7 +1292,6 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 15: Closing IRIO DRIVER" << endl << endl;
 	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
@@ -1457,8 +1301,8 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	EXPECT_EQ(myStatus, IRIO_success);
 }
 
-// Test using FlexRIO mod5761-perf bitfile
-TEST (TP_errorTests, failInitDriver5761Perf) {
+// Test using FlexRIO perf bitfile
+TEST (TP_errorTests, failInitDriverPerf) {
 	string testName = "TP_errorTests: Test of bitfile FlexRIO_perf "
 			          "when there is a failure on driver initialization";
 	string testDescription = "Test verifies several warnings and errors if "
@@ -1483,7 +1327,7 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	int valueReadI32 = 0; // Used in getter functions
 
 	cout << "TEST 0: Testing driver initialization and resources after failure on driver initialization" << endl << endl;
-	myStatus = irio_initDriver("failInitDriver5761PerfTest",
+	myStatus = irio_initDriver("failInitDriverPerfTest",
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -1513,7 +1357,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
 		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
 
-	usleep(100);
 	cout << endl << "TEST 2: Testing debug mode configuration, ON mode" << endl << endl;
 	cout << "[irio_setDebugMode function] DebugMode set to 1 (ON)" << endl;
 
@@ -1530,7 +1373,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 3: Configuring Signal Generator Type" << endl << endl;
 	cout << "[irio_setSGSignalType function] SGSignalType0 set to 1 (SINE)" << endl;
 	myStatus = irio_setSGSignalType(&p_DrvPvt,0,1,&status);
@@ -1546,7 +1388,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	uint32_t SGFref = 0;
 	int SGChannel = 0;
 	int32_t samplingRate = 10000000;
@@ -1573,7 +1414,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 5: Set Signal Generator frequency" << endl << endl;
 	uint32_t freqDesired = 100;
 	int accIncr = freqDesired*(UINT_MAX/samplingRate);
@@ -1592,7 +1432,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 6: Set Signal Generator amplitude" << endl << endl;
 	int32_t amplitude = 4096;
 	double CVDAC = 0.0;
@@ -1616,7 +1455,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 7: Configuring the Analog output enable on port 0" << endl << endl;
 	cout << "[irio_setAOEnable] AOEnable0 set to 1 (ENABLE)" << endl;
 	myStatus = irio_setAOEnable(&p_DrvPvt,0,1,&status);
@@ -1632,7 +1470,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 8: Testing DMAs' cleaning." << endl << endl;
 	cout << "[irio_cleanDMAsTtoHost function] No output if DMAs have been cleaned successfully" << endl;
 	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
@@ -1641,7 +1478,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 9: Testing DMAs' set up configuration" << endl << endl;
 	cout << "[irio_setUpDMAsTtoHost function] No output if DMAs have been configured successfully" << endl;
 	myStatus = irio_setUpDMAsTtoHost(&p_DrvPvt,&status);
@@ -1650,7 +1486,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	samplingRate = 1000;
 	int32_t Fref = 0;
 	cout << endl << "TEST 10: Testing DMAs' sampling rate configuration." << endl << endl;
@@ -1678,7 +1513,6 @@ TEST (TP_errorTests, failInitDriver5761Perf) {
 	}
 	EXPECT_NE(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << endl << "TEST 11: Testing DMAs' Enable" << endl << endl;
 	cout << "[irio_setDMATtoHostEnable function] DMATtoHostEnable0 set to 1 (ON)" << endl;
 	myStatus = irio_setDMATtoHostEnable(&p_DrvPvt,0,1,&status);
@@ -1953,6 +1787,7 @@ TEST(TP_errorTests, failInitDriver1483UART) {
 	EXPECT_NE(myStatus, IRIO_success);
 
 	message.assign(msg,strlen(msg));
+	delete [] msg;
 
 	if (len>0)
 		cout << "MSG received: " << message << endl;
@@ -2101,6 +1936,7 @@ TEST(TP_errorTests, missingResources1483UART) {
 	EXPECT_NE(myStatus, IRIO_success);
 
 	message.assign(msg,strlen(msg));
+	delete [] msg;
 
 	if (len>0)
 		cout << "MSG received: " << message << endl;
@@ -2344,7 +2180,6 @@ TEST(TP_errorTests, missingResources1483IMAQ) {
 			cout << "Frame acquired [" << std::setw(3) << std::setfill('0') << i << "], "
 					"counter value obtained from image: " << fc << endl;
 		}else{
-			usleep(100);
 			cout << "No data obtained" << endl << endl;
 		}
 	}
@@ -2365,7 +2200,7 @@ TEST(TP_errorTests, missingResources1483IMAQ) {
 
 // Test using cRIO PBP profile bitfile
 TEST(TP_errorTests, failInitDriverCRIOPBP) {
-	string testName = "TP_cRIO_PBP: Test of bitfile cRIO_PBP when failure";
+	string testName = "TP_errorTests: Test of bitfile cRIO_PBP when failure";
 	string testDescription = "Test verifies driver’s ability to check error messages "
 							 "after failure on driver's initialization";
 
@@ -2427,6 +2262,8 @@ TEST(TP_errorTests, failInitDriverCRIOPBP) {
 	}
 	EXPECT_NE(myStatus, IRIO_error);
 	cout << "FPGA VI version: " << VIVersion << endl;
+
+	delete [] VIVersion;
 
 	cout << endl << "TEST 3: Testing device quality status" << endl << endl;
 	cout << "[irio_getDevQualityStatus function] Trying to read device quality status..." << endl;
@@ -2529,7 +2366,7 @@ TEST(TP_errorTests, failInitDriverCRIOPBP) {
 }
 
 TEST(TP_errorTests, missingResourcesCRIOPBP) {
-	string testName = "TP_cRIO_PBP: Test of bitfile cRIO_PBP when failure";
+	string testName = "TP_errorTests: Test of bitfile cRIO_PBP when failure";
 	string testDescription = "Test verifies driver’s ability to check error messages "
 							 "after failure on driver's initialization";
 
@@ -2579,6 +2416,8 @@ TEST(TP_errorTests, missingResourcesCRIOPBP) {
 	}
 	EXPECT_NE(myStatus, IRIO_error);
 	cout << "FPGA VI version: " << VIVersion << endl;
+
+	delete [] VIVersion;
 
 	cout << endl << "TEST 2: Testing device quality status" << endl << endl;
 	cout << "[irio_getDevQualityStatus function] Trying to read device quality status..." << endl;
@@ -2678,5 +2517,3 @@ TEST(TP_errorTests, missingResourcesCRIOPBP) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 }
-
-// TODO: Falta cRIO DAQ tests

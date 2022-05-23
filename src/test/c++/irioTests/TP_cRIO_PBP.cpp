@@ -269,7 +269,6 @@ TEST(TP_cRIO_PBP, cRIO_IO){
 	 * TEST 1
 	 * FPGA START
 	 */
-	usleep(100);
 	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
 	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);

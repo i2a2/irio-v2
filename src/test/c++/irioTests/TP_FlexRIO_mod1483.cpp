@@ -305,8 +305,6 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
 		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
 
-	usleep(100);
-
 	/*
 	 * TEST 3
 	 * ACQUIRING IMAGES

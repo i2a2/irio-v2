@@ -107,12 +107,10 @@ TEST(TP_FlexRIO_perf, functional) {
 	performanceTest();
 }
 
-// TODO: Revisar nombre
-TEST(TP_FlexRIO_perf, functionalWT) {
+TEST(TP_FlexRIO_perf, functional_timeout) {
 	performanceTest(true);
 }
 
-// TODO: Revisar nombre
 static void performanceTest(bool tout) {
 	string testName = "TP_FlexRIO_perf: Functional test of bitfile FlexRIO_perf";
 	string testDescription = "Test verifies the performance of a FlexRIO device";

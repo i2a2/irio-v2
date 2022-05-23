@@ -102,7 +102,6 @@ static void mod5761Test(bool tout){
 	 * TEST 1
 	 * FPGA START
 	 */
-	usleep(100);
 	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
 	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
@@ -123,9 +122,7 @@ static void mod5761Test(bool tout){
 	 * TEST 2
 	 * DEBUG MODE CONFIGURATION
 	 */
-	usleep(100);
 	int valueReadI32 = 0;
-	usleep(100);
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode" << endl << endl;
 	cout << "[irio_setDebugMode function] DebugMode set to 0 (OFF)" << endl;
 
@@ -152,7 +149,6 @@ static void mod5761Test(bool tout){
 	 * TEST 3
 	 * SIGNALTYPE FOR WG 0 CONFIGURATION
 	 */
-	usleep(100);
 	cout << endl << "TEST 3: Configuring Signal Generator Signal type" << endl << endl;
 	cout << "[irio_setSGSignalType function] SGSignalType0 set to 0 (DC)" << endl;
 	myStatus = irio_setSGSignalType(&p_DrvPvt,0,0,&status); // DC signal configured, value 0
@@ -172,7 +168,6 @@ static void mod5761Test(bool tout){
     * TEST 4
 	* AO0 (FROM WG0) IS CONFIGURED WITH 2048 DIGITAL DC VALUE
 	*/
-	usleep(100);
 	int digitalValue = 2048;
 	cout << endl << "TEST 4: Configuring the Analog output on port 0 with a digital value" << endl << endl;
 	cout << "[irio_setAO function] AO0 set to 2048 (digital value)" << endl;
@@ -194,7 +189,6 @@ static void mod5761Test(bool tout){
 	 * TEST 5
 	 * AO0 ENABLE
 	 */
-	usleep(100);
 	cout << endl << "TEST 5: Configuring the Analog output enable on port 0" << endl << endl;
 	cout << "[irio_setAOEnable function] AOEnable0 set to 1 (ENABLE)" << endl;
 
@@ -216,7 +210,6 @@ static void mod5761Test(bool tout){
 	 * auxAI9 WILL BE READ, AND 2048 DIGITAL VALUE IS EXPECTED
 	 */
 	int valueReadAuxAI9 = 0;
-	usleep(100);
 	cout << endl << "TEST 6: auxAI9 register must have the same value as the output of the "
 			     "signal generator: in this case 2048" << endl << endl;
 
@@ -232,7 +225,6 @@ static void mod5761Test(bool tout){
 	 * Coupling configuration for NI5761
 	 */
 	int coupling = std::stoi(Coupling);
-	usleep(100);
 	cout << endl << "TEST 7: Testing coupling configuration for NI5761 adapter module" << endl << endl;
 
 	cout << "[irio_setAICoupling function] AICoupling (AC = 0, DC = 1) set to : " << coupling << endl;
@@ -256,7 +248,6 @@ static void mod5761Test(bool tout){
 	 * TEST 8
 	 * DMA SET UP
 	 */
-	usleep(100);
 	cout << endl << "TEST 8: Testing DMAs' set up configuration." << endl << endl;
 	cout << "[irio_setUpDMAsTtoHost function] No output if DMAs have been configured successfully" << endl;
 
@@ -275,7 +266,6 @@ static void mod5761Test(bool tout){
 	 */
 	int32_t samplingRate = 500000; // 500k samples/seg, max 125MSamples/s
 	int32_t Fref = 0;
-	usleep(100);
 	// Equation applied to set DMATtoHostSamplingRate: Fref/samplingRate=DecimationFactor
 	// Where - Fref is p_DrvPvt.Fref, this value is read from FPGA by irioDriver initialization
 	//		 - SamplingRate is the sampling rate desired to be configured
@@ -315,7 +305,6 @@ static void mod5761Test(bool tout){
 	 * TEST 10
 	 * DMA ENABLE
 	 */
-	usleep(100);
 	cout << endl << "TEST 10: Testing DMAs' Enable" << endl << endl;
 
 	cout << "[irio_setDMATtoHostEnable function] DMATtoHostEnable0 set to 1 (ON)" << endl;
@@ -368,7 +357,6 @@ static void mod5761Test(bool tout){
 	 */
 	cout << endl << "TEST 12: Getting several blocks from DMA" << endl << endl;
 
-	usleep(100);
 	int sampleCounter = 0;
 	int elementsRead = 0;
 	int positiveTest = 0;
@@ -443,7 +431,6 @@ static void mod5761Test(bool tout){
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	cout << "[irio_cleanDMAsTtoHost function] Cleaning DMAs" << endl;
 	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
@@ -465,7 +452,6 @@ static void mod5761Test(bool tout){
 	 * TEST 13
 	 * SG Update rate
 	 */
-	usleep(100);
 	uint32_t SGFref = 0;
 	int SGChannel = 0;
 	samplingRate = 10000000;
@@ -500,7 +486,6 @@ static void mod5761Test(bool tout){
 	 * TEST 14
 	 * SG Frequency
 	 */
-	usleep(100);
 	cout << endl << "TEST 14: Set Signal Generator frequency" << endl << endl;
 	// We want program signal generator with 10kHz periodic signal
 	// Equation to apply to obtain freq_desired is:
@@ -526,7 +511,6 @@ static void mod5761Test(bool tout){
 	 * TEST 15
 	 * SG Amplitude
 	 */
-	usleep(100);
 	cout << endl << "TEST 15: Set Signal Generator amplitude" << endl << endl;
 	int32_t amplitude = 4096;
 	double CVDAC = 0.0;
@@ -556,7 +540,6 @@ static void mod5761Test(bool tout){
 	 * TEST 16
 	 * SG Type
 	 */
-	usleep(100);
 	cout << endl << "TEST 16: Set Signal Generator type" << endl << endl;
 	myStatus = irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO is disabled
 	if (myStatus > IRIO_success) {
@@ -578,7 +561,6 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	usleep(100);
 	myStatus = irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -589,7 +571,6 @@ static void mod5761Test(bool tout){
 	 * TEST 17
 	 * DMA DATA
 	 */
-	usleep(100);
 	cout << endl << "TEST 17: Get data from DMA" << endl << endl;
 	cout << "Inside the following 60 samples must be approximately 50 samples "
 			"that represent one sine cycle with a maximum and minimum of +-" <<
@@ -654,7 +635,6 @@ static void mod5761Test(bool tout){
 	 * CLOSING DMAS
 	 */
 	// Once data acquisition has finished DMAs have to be closed
-	usleep(100);
 	cout << endl << "TEST 18: Closing DMAS" << endl << endl;
 	cout << "[irio_closeDMAsTtoHost function] No output if DMAs have been closed successfully" << endl;
 	myStatus = irio_closeDMAsTtoHost(&p_DrvPvt,&status);
@@ -667,7 +647,6 @@ static void mod5761Test(bool tout){
 	 * TEST 19
 	 * IRIO DRIVER CLOSING
 	 */
-	usleep(100);
 	cout << endl << "TEST 19: Closing IRIO DRIVER" << endl << endl;
 	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);

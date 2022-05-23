@@ -99,7 +99,6 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
 		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
 
-	usleep(100);
 	/*
 	 * TEST 2
 	 * SETTING AND GETTING FROM AUX DIGITAL OUTPUT
@@ -128,7 +127,6 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	 * TEST 3
 	 * WRITING AND READING DIGITAL I/O, BOTH VALUES: 0 AND 1.
 	 */
-	usleep(10);
 	cout << endl << "IRIO test 3: This test write 0 and 1, into every digital output, "
 			        "and it is read from DO register." << endl << endl;
 	cout << "Hardware digital I/O [7-0] are interconnected physically, "
@@ -157,7 +155,6 @@ TEST(TP_FlexRIO_mod6581, functional) {
 
 		EXPECT_EQ(myStatus, IRIO_success);
 
-		usleep(20);
 		myStatus = irio_getDI(&p_DrvPvt,i,&valueReadI32,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
@@ -191,7 +188,6 @@ TEST(TP_FlexRIO_mod6581, functional) {
 
 		EXPECT_EQ(myStatus, IRIO_success);
 
-		usleep(20);
 		myStatus = irio_getDI(&p_DrvPvt,i,&valueReadI32,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
