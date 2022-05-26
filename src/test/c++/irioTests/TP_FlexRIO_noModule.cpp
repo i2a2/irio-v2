@@ -48,9 +48,6 @@ TEST(TP_FlexRIO_noModule, functional) {
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
-
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";

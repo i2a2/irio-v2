@@ -43,8 +43,9 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = "7965";
-	string RIOSerial = "0x01666C59";
+	// Environment variables
+	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";

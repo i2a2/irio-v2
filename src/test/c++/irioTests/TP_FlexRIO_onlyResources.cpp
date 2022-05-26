@@ -49,9 +49,6 @@ TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
-
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.0";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
@@ -122,9 +119,6 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
-
 	// User don't have to know what FPGA Version is used
 	string FPGAversion = "V1.0";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
@@ -193,9 +187,6 @@ TEST(TP_FlexRIO_onlyResources, onlyResources)
 	// Environment variables
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
@@ -269,9 +260,6 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	// Environment variables
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-
-	// Makes no sense to execute IRIO Library if rioDevice is not correct
-	ASSERT_TRUE(RIODevice=="7965" || RIODevice=="7966") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";

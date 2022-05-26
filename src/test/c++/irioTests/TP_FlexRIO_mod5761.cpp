@@ -61,8 +61,9 @@ static void mod5761Test(bool tout){
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = "7966";
-	string RIOSerial = "0x0177A2AD";
+	// Environment variables
+	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 	string Coupling  = TestUtilsIRIO::getEnvVar("Coupling");
 
 	// User doesn't have to know what FPGA Version is used

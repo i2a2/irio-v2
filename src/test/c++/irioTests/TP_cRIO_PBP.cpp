@@ -40,8 +40,9 @@ TEST(TP_cRIO_PBP, functional) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = "9159";
-	string RIOSerial = "0x01C10FAC";
+	// Environment variables
+	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// User don't have to know what FPGA Version is used
 	string FPGAversion = "V1.0";
@@ -227,8 +228,9 @@ TEST(TP_cRIO_PBP, cRIO_IO){
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = "9159";
-	string RIOSerial = "0x01C10FAC";
+	// Environment variables
+	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
 	// User don't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
