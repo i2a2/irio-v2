@@ -64,7 +64,8 @@ static void mod5761Test(bool tout){
 	// Environment variables
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-	string Coupling  = TestUtilsIRIO::getEnvVar("Coupling");
+	string Coupling  = TestUtilsIRIO::getEnvVar("Coupling");   // Coupling must be 0 (AC, supported by ITER)
+	                                                           // or 1 (DC, not supported by ITER)
 
 	// User doesn't have to know what FPGA Version is used
 	string FPGAversion = "V1.1";
@@ -225,6 +226,11 @@ static void mod5761Test(bool tout){
 	 * TEST 7
 	 * Coupling configuration for NI5761
 	 */
+	if (Coupling.compare("DC"))
+		Coupling = "1";
+	else
+		Coupling = "0"; // AC Coupling by default if a wrong parameter is passed
+
 	int coupling = std::stoi(Coupling);
 	cout << endl << "TEST 7: Testing coupling configuration for NI5761 adapter module" << endl << endl;
 
