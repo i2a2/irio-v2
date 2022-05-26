@@ -19,7 +19,7 @@ be able to know how to use the library according to it.
 The first thing that the user should know is in which software layer, related to the hardware, is
 located this library. The figure below explains it. 
 
-@image html softwareLayerIRIOLibrary.svg
+@image html softwareLayerIRIOLibrary.png
 @image latex softwareLayerIRIOLibrary.png Software layers used by IRIO Library 
 
 As usual Linux device driver implementations, NI RIO Linux device driver (Level 0), requires
@@ -78,10 +78,10 @@ Fig. 2, green arrows represent direct (software-hardware) communication with the
 through NI-RIO Linux Device Driver. Red discontinuous arrows represent the relationship
 between the IRIO library calls and the terminals implemented with LabVIEW for FPGA.
 
-@image html IRIOLibraryUse.svg
+@image html IRIOLibraryUse.png
 @image latex IRIOLibraryUse.png Software layers used by IRIO Library 
 
-@image html exampleIRIOUSe.svg
+@image html exampleIRIOUse.png
 @image latex exampleIRIOUse.png 
 
 Software layers which use IRIO Library
@@ -92,7 +92,7 @@ not require modifying the EPICS device support, only records database and st.cmd
 would be required. The same philosophy is applied for the implementation of a Nominal Device 
 Support application using the IRIO library. These examples are shown in next figure.
 
-@image html softwareLayerIRIOLibrary.svg
+@image html softwareLayerIRIOLibrary.png
 @image latex softwareLayerIRIOLibrary.png IRIO Library used for implementing an EPICS device support with asyn, NDS, etc
 
 Development workflow with IRIO Library
@@ -103,13 +103,13 @@ the development of the software using IRIO Library. The next figure summarizes a
 program a RIO device with the binary image supporting the FPGA functionality <a>(bitfile)</a>.
 Previous to implement any application for RIO devices using the IRIO library in CCS, this
 aforementioned <a>bitfile</a> and <a>header</a> file obtained using LabVIEW tools are needed.
-@image html developmentCycle.svg
+@image html developmentCycle.png
 @image latex developmentCycle.png Developing applications with LabVIEW FPGA for RIO 
 
 The complete development workflow to be followed in order to implement applications for
 RIO devices using IRIO Library and developed with LabVIEW for FPGA is summarized in
 the next picture 
-@image html completeDevelopmentCycle.svg
+@image html completeDevelopmentCycle.png
 @image latex completeDevelopmentCycle.png Developing cycle for RIO applications
 
 Por terminar resto de apartados 
