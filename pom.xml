@@ -21,9 +21,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.iter.codac.units</groupId>
-    <artifactId>irio-v2</artifactId>
+    <artifactId>irio</artifactId>
     <packaging>codac</packaging>
-    <version>1.1.2</version>
+    <version>1.2.0</version>
     <name>CODAC Core System IRIO core library module</name>
     <description>CODAC Core System IRIO core library module</description>
     <url>http://www.iter.org/</url>
@@ -83,11 +83,11 @@
                         </package>
 
                         <package name="examples">
-                            <include type="file" source="main/c/examples" target="examples/irio-v2" />
+                            <include type="file" source="main/c/examples" target="examples/irio" />
                         </package>
 
-                        <package name="doc">
-                            <include type="doxygen" name="irio-v2" project="${project.name}" version="${project.version}" optimize="c">
+                        <!-- <package name="doc">
+                            <include type="doxygen" name="irio" project="${project.name}" version="${project.version}" optimize="c">
                                 <filepattern>*.dox</filepattern>
                 				<filepattern>*.h</filepattern>
                 				<filepattern>*.c</filepattern>
@@ -96,7 +96,6 @@
                                 <input>main/c/doc</input>
                                 <input>main/c/include</input>
                                 <input>main/c/lib</input>
-                                <!-- <input>main/c/irioCorelib</input> -->
                                 <imagepath>doc</imagepath>
                                 <properties>
                                     <SORT_MEMBER_DOCS>NO</SORT_MEMBER_DOCS> 
@@ -121,7 +120,7 @@
                                     <EXTRACT_STATIC>YES</EXTRACT_STATIC>
                                 </properties>
                             </include>
-                        </package>
+                        </package>  -->
                     </packaging>
                 </configuration>
             </plugin>
