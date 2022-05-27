@@ -27,6 +27,11 @@ using std::string;
  * This test is related to the following requirements:
  *
  * NI9159 Chassis
+ *
+ * The execution of this test requires to have an environment variable indicating the
+ * serial number of the RIO board to be used. Execute in a command shell the lsrio command
+ * execute export RIOSerial=0x..........
+ * execute export RIODevice=xxxx, where xxxx = 9159
  */
 
 TEST(TP_cRIO_PBP, functional) {

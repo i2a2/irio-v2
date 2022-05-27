@@ -27,12 +27,14 @@ using std::string; using std::cerr;
  * Test verifies the use of digital lines in the NI6581.
  * This test is related to the following requirements:
  *
- * PXIE7965R
- * PXIE7966R
+ * PXIe-7965R or PXIe-7965R or PXIe-7966R
  *
  * NI6581 adapter module
  *
- * This test is executed only with a PXIE7965R
+ * The execution of this test requires to have an environment variable indicating the
+ * serial number of the RIO board to be used. Execute in a command shell the lsrio command
+ * execute export RIOSerial=0x..........
+ * execute export RIODevice=xxxx, where xxxx = 7961, 7965, 7966
  *
  */
 

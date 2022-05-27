@@ -26,15 +26,12 @@ using std::string; using std::cerr;
  * between auxiliar I/O analog/digital FPGA registers.
  * This test is related to the following requirements:
  *
- * PXIE7965R
- * PXIE7966R
- *
- * This test is executed only with a PXIE7966R
+ * PXIe-7961R or PXIe-7965R or PXIe-7966R or PXIe-7975R
  *
  * The execution of this test requires to have an environment variable indicating the
  * serial number of the RIO board to be used. Execute in a command shell the lsrio command
  * execute export RIOSerial=0x..........
- * execute export RIODevice=xxxx, where xxxx = 7965, 7966
+ * execute export RIODevice=xxxx, where xxxx = 7961, 7965, 7966, 7975
  */
 
 TEST(TP_FlexRIO_noModule, functional) {

@@ -31,14 +31,14 @@ static void mod5761Test(bool tout = false);
  * generator is needed because the example uses the internal signal generator implemented in the FPGA
  * This test is related to the following requirements:
  *
- * PXIE7966R. 7966R device can not be substituted by any other model
+ * PXIe-7966R or PXIe-7975R
  *
  * NI5761 adapter module
  *
- * This test must be executed with a PXIE7966R
- *
  * The execution of this test requires to have an environment variable indicating the
  * coupling mode that user want to use
+ * execute export RIOSerial=0x..........
+ * execute export RIODevice=xxxx, where xxxx = 7966, 7975
  * execute export Coupling=X, X=0 (Coupling mode supported by ITER), 1 (Not supported by ITER)
  */
 
@@ -226,7 +226,7 @@ static void mod5761Test(bool tout){
 	 * TEST 7
 	 * Coupling configuration for NI5761
 	 */
-	if (Coupling.compare("DC"))
+	if (Coupling.compare("DC") == 0)
 		Coupling = "1";
 	else
 		Coupling = "0"; // AC Coupling by default if a wrong parameter is passed
