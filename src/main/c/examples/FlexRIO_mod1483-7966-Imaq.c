@@ -76,11 +76,11 @@ void msgerr(TIRIOStatusCode code, int nTest, const char* testName, TStatus* stat
 
 void usage(char *name) {
         printf("This example checks the image acquisition from a cameralink compatible device\n"
-                "This example requires a FlexRIO device 7966 with a NI1483\n"
+                "This example requires a FlexRIO device 7966 with a NI1483 and a cameralink simulator\n"
                 "Use lsrio.py to identify the RIO devices included in the fast controller\n"
         		"\n"
-                "Usage: %s <SERIAL_NUMBER> <RIOMODEL> \n"
-                "Example: %s 0x01666C59 7965 \n", name, name);
+                "Usage: %s <SERIAL_NUMBER> <RIOMODEL> <FC (HW/SW)> <max count>\n"
+                "Example: %s 0x01666C59 7965 HW 65536\n", name, name);
 }
 
 int main (int argc, char **argv)
@@ -90,16 +90,28 @@ int main (int argc, char **argv)
 	irio_initStatus(&status);
 	int myStatus;
 	int verbosity=1;
-
+	int frame_counter_mode=0; //0: HW 1:SW
+	int max_counter=65536;
 	char *filePath=NULL;
 	char *bitfileName=NULL;
 	char *NIriomodel=NULL;
 
-	if (argc != 3)
+	if (argc != 5)
 	{
 		usage(argv[0]);
 		return 1;
 	}
+    if (strcmp(argv[3], "HW")==0) {
+    	//Simulator with framecounter included in the HW functionality
+    	frame_counter_mode=0;
+    	max_counter=atoi(argv[4]);
+    }
+    if (strcmp(argv[3],"SW")==0){
+    	//The simulator doesn't provide the HW counter functionality but the images contains the first two bytes as counter
+    	frame_counter_mode=1;
+    	max_counter=atoi(argv[4]);
+    }
+
 
 	asprintf(&filePath,"%s/resourceTest/%s/",get_current_dir_name(),argv[2]);
 	asprintf(&NIriomodel,"PXIe-%sR",argv[2]);
@@ -155,7 +167,7 @@ int main (int argc, char **argv)
 				fc2=(uint16_t*)dataBuffer; //In this example the cameralink simulator is injecting a counter in the first two pixels (bytes)
 				if(firstImage){
 					firstImage=0;
-				}else if((fc+1)%65536!=fc2[0]){
+				}else if((fc+1)%max_counter!=fc2[0]){
 					irio_mergeStatus(&status,Generic_Error,verbosity,"\nFrameCounter Error at Image fc[i]=%d, fc[i-1]=%d, img: %d\n",fc2[0],fc, i);
 					myStatus=IRIO_error;
 					break;
