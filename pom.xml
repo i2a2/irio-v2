@@ -86,7 +86,8 @@
                             <include type="file" source="main/c/examples" target="examples/irio" />
                         </package>
 
-                        <!-- <package name="doc">
+						<!-- Comentado solo para instalar los paquetes en la máquina para usar EPICS. Descomentar cuando se quiera crear documentación  -->
+                        <package name="doc">
                             <include type="doxygen" name="irio" project="${project.name}" version="${project.version}" optimize="c">
                                 <filepattern>*.dox</filepattern>
                 				<filepattern>*.h</filepattern>
@@ -96,7 +97,7 @@
                                 <input>main/c/doc</input>
                                 <input>main/c/include</input>
                                 <input>main/c/lib</input>
-                                <imagepath>doc</imagepath>
+                                <imagepath>images</imagepath>
                                 <properties>
                                     <SORT_MEMBER_DOCS>NO</SORT_MEMBER_DOCS> 
                                     <HIDE_UNDOC_CLASSES>YES</HIDE_UNDOC_CLASSES>
@@ -120,7 +121,7 @@
                                     <EXTRACT_STATIC>YES</EXTRACT_STATIC>
                                 </properties>
                             </include>
-                        </package>  -->
+                        </package>
                     </packaging>
                 </configuration>
             </plugin>

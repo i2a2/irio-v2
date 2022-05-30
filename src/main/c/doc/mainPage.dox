@@ -70,7 +70,7 @@ threshold, an auxiliary Boolean output register will be latched to ON. The data 
 period could be configured through an auxiliary input register, with a scalar value containing
 the microseconds to wait for the next iteration. After configuring the FPGA (step 1), to control
 and monitor this part of the FPGA the user , can program the auxiliary output register number 1
-(defined as auxAO1) with the value, for instance, 1250 this means a period of 1250μs (step
+(defined as auxAO1) with the value, for instance, 1250 this means a period of 1250us (step
 2). The user does not require knowing neither the mapping address nor the name of the
 LabVIEW controls and indicators (I/O registers) because IRIO library is doing this translation.
 The step 3 represents the user reading from the auxiliary digital input register 0 (auxDI0). In
