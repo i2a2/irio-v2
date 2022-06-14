@@ -26,8 +26,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * \endcond
  *****************************************************************************/
-#define _GNU_SOURCE //include asprintf, get_current_dir_name
-
 #include "irioResourceFinder.h"
 #include "irioDataTypes.h"
 #include "irioError.h"
@@ -50,30 +48,24 @@
 #ifdef CLOSE_VERSION_NIRIO
 	#define DRV_CALL "lsni -v "
 #else
-
-	#define DRV_CALL "lsrio "
+	#define DRV_CALL "lsrio "        //!< Command with RIO devices information
 #endif
-#define TMP_FILE "/tmp/RIOinfo.txt"
-#define RM_CALL "rm -f "
+#define TMP_FILE "/tmp/RIOinfo.txt"  //!< Path of temporary file
+#define RM_CALL "rm -f "             //!< Command to delete files
 ///@}
 
 /** @name Driver Resource Strings
  * Strings for field search in driver output
  */
 ///@{
-#define STRINGNAME_PORT "RIO"
-#define STRINGNAME_MODEL "Model Name"
-#define STRINGNAME_SERIALNO "Serial Number"
-#define STRINGNAME_DEVICE "Device"
-#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"
-#define STRINGNAME_PORTEND "--" //!<String to search for moving after STRINGNAME_PORT and search for another device
-#define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!<String to move right before resource list in the privative driver
+#define STRINGNAME_PORT "RIO"                                               //!< Device type
+#define STRINGNAME_MODEL "Model Name"                                       //!< RIO device model name
+#define STRINGNAME_SERIALNO "Serial Number"                                 //!< RIO device serial number
+#define STRINGNAME_DEVICE "Device"                                          //!< RIO device identificator
+#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"                           //!< RIO device sub-system device identificator
+#define STRINGNAME_PORTEND "--"                                             //!< String to search for moving after STRINGNAME_PORT and search for another device
+#define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!< String to move right before resource list in the privative driver
 ///@}
-
-
-int parseDriverInfo(irioDrv_t *p_DrvPvt,TStatus* status);
-
-int findDeviceInfo(irioDrv_t *p_DrvPvt, const char* fileContent, const char* toSearch, char* info,TStatus* status);
 
 int irio_findRIO(irioDrv_t *p_DrvPvt,TStatus* status){
 	TIRIOStatusCode local_status = IRIO_success;

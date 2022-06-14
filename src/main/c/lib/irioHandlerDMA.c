@@ -43,16 +43,15 @@
  * Strings for DMA FPGA Resources
  */
 ///@{
-#define STRINGNAME_DMATTOHOSTNCH "_IndicatorArrayU16_DMATtoHOSTNCh"
-#define STRINGNAME_DMATTOHOSTNCHSIZE "_IndicatorArrayU16Size_DMATtoHOSTNCh"
-#define STRINGNAME_DMATTOHOSTOVERFLOWS "_IndicatorU16_DMATtoHOSTOverflows"
-#define STRINGNAME_DMATTOHOST "_TargetToHostFifoU64_DMATtoHOST"
-#define STRINGNAME_DMATTOHOSTENABLE "_ControlBool_DMATtoHOSTEnable"
-#define STRINGNAME_DMATTOHOSTSAMPLINGRATE  "_ControlU16_DMATtoHOSTSamplingRate"
-#define STRINGNAME_DMATTOHOSTFRAMETYPE "_IndicatorArrayU8_DMATtoHOSTFrameType"
-#define STRINGNAME_DMATTOHOSTSAMPLESIZE "_IndicatorArrayU8_DMATtoHOSTSampleSize"
-#define STRINGNAME_DMATTOHOSTBLOCKNWORDS "_IndicatorArrayU16_DMATtoHOSTBlockNWords"
-
+#define STRINGNAME_DMATTOHOSTNCH "_IndicatorArrayU16_DMATtoHOSTNCh"                  //!< Identifies DMATtoHOSTNCh register
+#define STRINGNAME_DMATTOHOSTNCHSIZE "_IndicatorArrayU16Size_DMATtoHOSTNCh"          //!< Identifies DMATtoHOSTNo register
+#define STRINGNAME_DMATTOHOSTOVERFLOWS "_IndicatorU16_DMATtoHOSTOverflows"           //!< Identifies DMATtoHOSTOverflows register
+#define STRINGNAME_DMATTOHOST "_TargetToHostFifoU64_DMATtoHOST"                      //!< Identifies DMATtoHOST register
+#define STRINGNAME_DMATTOHOSTENABLE "_ControlBool_DMATtoHOSTEnable"                  //!< Identifies DMATtoHOSTEnable register
+#define STRINGNAME_DMATTOHOSTSAMPLINGRATE  "_ControlU16_DMATtoHOSTSamplingRate"      //!< Identifies DMATtoHOSTSamplingRate register
+#define STRINGNAME_DMATTOHOSTFRAMETYPE "_IndicatorArrayU8_DMATtoHOSTFrameType"       //!< Identifies DMATtoHOSTFrameType register
+#define STRINGNAME_DMATTOHOSTSAMPLESIZE "_IndicatorArrayU8_DMATtoHOSTSampleSize"     //!< Identifies DMATtoHOSTSampleSize register
+#define STRINGNAME_DMATTOHOSTBLOCKNWORDS "_IndicatorArrayU16_DMATtoHOSTBlockNWords"  //!< Identifies DMATtoHOSTBlockNWords register
 ///@}
 
 int irio_findDAQDMAs(irioDrv_t* p_DrvPvt, TStatus* status){

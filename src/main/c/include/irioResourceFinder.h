@@ -63,6 +63,15 @@ extern "C" {
 int irio_findRIO(irioDrv_t *p_DrvPvt,TStatus* status);
 
 /**
+ * Storage on the irioCore main structure all necessary info about the RIO device
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int parseDriverInfo(irioDrv_t *p_DrvPvt,TStatus* status);
+
+/**
  * Initialize file search resources
  *
  * Read the content of the given file into the pointer passed as parameter.
@@ -89,6 +98,20 @@ int irio_initFileSearch(irioDrv_t *p_DrvPvt, char* filePath, void** fileContent,
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_closeFileSearch(irioDrv_t *p_DrvPvt, void** fileContent,TStatus* status);
+
+/**
+ * Find all necessary info to identify the RIO device
+ *
+ * Device type, model and serial number are identified
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] fileContent Device type
+ * @param[in] toSearch Identify the device with its serial number
+ * @param[out] info Port to store the device serial number
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int findDeviceInfo(irioDrv_t *p_DrvPvt, const char* fileContent, const char* toSearch, char* info,TStatus* status);
 
 /**
  * Search resource port

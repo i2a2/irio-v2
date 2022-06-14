@@ -32,8 +32,6 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,49 +42,45 @@
  * Strings for CameraLink configuration FPGA Resources
  */
 ///@{
-#define STRINGNAME_UARTBYTEMODE 		"_ControlBool_uartByteMode"
-#define STRINGNAME_UARTSETBAUDRATE 		"_ControlBool_uartSetBaudRate"
-#define STRINGNAME_UARTTRANSMIT 		"_ControlBool_uartTransmit"
-#define STRINGNAME_UARTRECEIVE 			"_ControlBool_uartReceive"
-#define STRINGNAME_UARTBAUDRATE 		"_ControlU8_uartBaudRate"
-#define STRINGNAME_UARTTXBYTE 			"_ControlU8_uartTxByte"
-#define STRINGNAME_FVALHIGH 			"_ControlBool_FVALHigh"
-#define STRINGNAME_LVALHIGH 			"_ControlBool_LVALHigh"
-#define STRINGNAME_DVALHIGH 			"_ControlBool_DVALHigh"
-#define STRINGNAME_SPAREHIGH 			"_ControlBool_SpareHigh"
-#define STRINGNAME_CONTROLENABLE 		"_ControlBool_ControlEnable"
-#define STRINGNAME_LINESCAN 			"_ControlBool_LineScan"
-#define STRINGNAME_SIGNALMAPPING 		"_ControlU8_SignalMapping"
-#define STRINGNAME_CONFIGURATION 		"_ControlU8_Configuration"
-#define STRINGNAME_UARTTXREADY			"_IndicatorBool_uartTxReady"
-#define STRINGNAME_UARTRXREADY			"_IndicatorBool_uartRxReady"
-#define STRINGNAME_UARTOVERRUNERROR 	"_IndicatorBool_uartOverrunError"
-#define STRINGNAME_UARTFRAMINGERROR 	"_IndicatorBool_uartFramingError"
-#define STRINGNAME_UARTBREAKINDICATOR 	"_IndicatorBool_uartBreakIndicator"
-#define STRINGNAME_UARTRXBYTE 			"_IndicatorU8_uartRxByte"
+#define STRINGNAME_UARTBYTEMODE 		"_ControlBool_uartByteMode"         //!< Identifies uartByteMode register
+#define STRINGNAME_UARTSETBAUDRATE 		"_ControlBool_uartSetBaudRate"      //!< Identifies uartSetBaudRate register
+#define STRINGNAME_UARTTRANSMIT 		"_ControlBool_uartTransmit"         //!< Identifies uartTransmit register
+#define STRINGNAME_UARTRECEIVE 			"_ControlBool_uartReceive"          //!< Identifies uartReceive register
+#define STRINGNAME_UARTBAUDRATE 		"_ControlU8_uartBaudRate"           //!< Identifies uartBaudRate register
+#define STRINGNAME_UARTTXBYTE 			"_ControlU8_uartTxByte"             //!< Identifies uartTxByte register
+#define STRINGNAME_FVALHIGH 			"_ControlBool_FVALHigh"             //!< Identifies FVALHigh register
+#define STRINGNAME_LVALHIGH 			"_ControlBool_LVALHigh"             //!< Identifies LVALHigh register
+#define STRINGNAME_DVALHIGH 			"_ControlBool_DVALHigh"             //!< Identifies DVALHigh register
+#define STRINGNAME_SPAREHIGH 			"_ControlBool_SpareHigh"            //!< Identifies SpareHigh register
+#define STRINGNAME_CONTROLENABLE 		"_ControlBool_ControlEnable"        //!< Identifies ControlEnable register
+#define STRINGNAME_LINESCAN 			"_ControlBool_LineScan"             //!< Identifies LineScan register
+#define STRINGNAME_SIGNALMAPPING 		"_ControlU8_SignalMapping"          //!< Identifies SignalMapping register
+#define STRINGNAME_CONFIGURATION 		"_ControlU8_Configuration"          //!< Identifies Configuration register
+#define STRINGNAME_UARTTXREADY			"_IndicatorBool_uartTxReady"        //!< Identifies uartTxReady register
+#define STRINGNAME_UARTRXREADY			"_IndicatorBool_uartRxReady"        //!< Identifies uartRxReady register
+#define STRINGNAME_UARTOVERRUNERROR 	"_IndicatorBool_uartOverrunError"   //!< Identifies uartOverrunError register
+#define STRINGNAME_UARTFRAMINGERROR 	"_IndicatorBool_uartFramingError"   //!< Identifies uartFrammingError register
+#define STRINGNAME_UARTBREAKINDICATOR 	"_IndicatorBool_uartBreakIndicator" //!< Identifies uartBreakIndicator register
+#define STRINGNAME_UARTRXBYTE 			"_IndicatorU8_uartRxByte"           //!< Identifies uartRxByte register
 ///@}
 
 /** @name Acknowledge Values
  * Values of acknowledge and not-acknowledge for serial communications
  */
 ///@{
-#define NACK 0x16
-#define ACK 0x06
+#define NACK 0x16 //!< Not-acknowledge identificator
+#define ACK 0x06  //!< Acknowledge identificator
 ///@}
 
 /** @name CameraLink Parameters Range
  * Definition of range for some CameraLink configuration parameters
  */
 ///@{
-#define CL_CONFIG_LIMIT 2
-#define CL_SIGNALMAPPING_LIMIT 2
-#define UART_BAUDRATE_LIMIT 7
-#define UART_BAUDRATE_USTIMEOUT 1000
+#define CL_CONFIG_LIMIT 2             //!< Maximum number of CameraLink configuration
+#define CL_SIGNALMAPPING_LIMIT 2      //!< Maximum number of signal mapping configuration
+#define UART_BAUDRATE_LIMIT 7         //!< Maximum number of baud rate configuration
+#define UART_BAUDRATE_USTIMEOUT 1000  //!< Maximum timeout in micro-seconds for baud rate configuration
 ///@}
-
-int irio_findCLUart(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int irio_findCLConfig(irioDrv_t* p_DrvPvt,TStatus* status);
 
 int irio_findCL(irioDrv_t* p_DrvPvt, TStatus* status){
 

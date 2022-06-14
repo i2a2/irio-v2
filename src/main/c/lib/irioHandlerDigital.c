@@ -43,10 +43,10 @@
  * Strings for digital FPGA Resources
  */
 ///@{
-#define STRINGNAME_DIGITALINPUT "_IndicatorBool_DI"
-#define STRINGNAME_DIGITALOUTPUT "_ControlBool_DO"
-#define STRINGNAME_AUXDI "_IndicatorBool_auxDI"
-#define STRINGNAME_AUXDO "_ControlBool_auxDO"
+#define STRINGNAME_DIGITALINPUT "_IndicatorBool_DI"  //!< Identifies DI registers
+#define STRINGNAME_DIGITALOUTPUT "_ControlBool_DO"   //!< Identifies DO registers
+#define STRINGNAME_AUXDI "_IndicatorBool_auxDI"      //!< Identifies auxDI registers
+#define STRINGNAME_AUXDO "_ControlBool_auxDO"        //!< Identifies auxDO registers
 ///@}
 
 int irio_findDigitals(irioDrv_t* p_DrvPvt, TStatus* status){

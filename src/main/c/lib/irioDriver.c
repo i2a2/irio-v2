@@ -26,7 +26,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * \endcond
  *****************************************************************************/
-#define _GNU_SOURCE //include asprintf, get_current_dir_name
+#define _GNU_SOURCE //!< include asprintf, get_current_dir_name
 
 #include "irioDriver.h"
 #include "irioDataTypes.h"
@@ -59,21 +59,21 @@
  * Strings for common FPGA Resources
  */
 ///@{
-#define STRINGNAME_SIGNATURE "_Signature"
-#define STRINGNAME_PLATFORM "_IndicatorU8_Platform"
-#define STRINGNAME_FPGAVIVERSION "_IndicatorArrayU8_FPGAVIversion"
-#define STRINGNAME_INITDONE  "_IndicatorBool_InitDone"
-#define STRINGNAME_FREQREF "_IndicatorU32_Fref"
-#define STRINGNAME_DEVQUALITYSTATUS "_IndicatorU8_DevQualityStatus"
-#define STRINGNAME_DEVTEMP "_IndicatorI16_DevTemp"
-#define STRINGNAME_DEVPROFILE "_IndicatorU8_DevProfile"
-#define STRINGNAME_DAQSTARTSTOP "_ControlBool_DAQStartStop"
-#define STRINGNAME_DEBUGMODE "_ControlBool_DebugMode"
-#define STRINGNAME_INSERTEDIOMODULEID "_IndicatorU32_InsertedIOModuleID"
-#define STRINGNAME_RIOADAPTERCORRECT "_IndicatorBool_RIOAdapterCorrect"
-#define STRINGNAME_INSERTEDIOMODULESID "_IndicatorArrayU16_InsertedIOModulesID" //for cRIO
-#define STRINGNAME_CRIOMODULESOK "_IndicatorBool_cRIOModulesOK"
-#define STRINGNAME_SAMPLINGRATE "_ControlU16_SamplingRate"
+#define STRINGNAME_SIGNATURE "_Signature"                                        //!< Identifies the bitfile downloaded to the FPGA
+#define STRINGNAME_PLATFORM "_IndicatorU8_Platform"                              //!< Identifies using Unsigned-8bits indicator variable the RIO device used
+#define STRINGNAME_FPGAVIVERSION "_IndicatorArrayU8_FPGAVIversion"               //!< Identifies using Array Unsigned-8bits indicator variable the LabVIEW FPGA VI Version
+#define STRINGNAME_INITDONE  "_IndicatorBool_InitDone"                           //!< Identifies using a boolean indicator variable if the adapter module is ready
+#define STRINGNAME_FREQREF "_IndicatorU32_Fref"                                  //!< Identifies using Unsigned-32bits indicator variable the FPGA reference frequency clock
+#define STRINGNAME_DEVQUALITYSTATUS "_IndicatorU8_DevQualityStatus"              //!< Identifies using Unsigned-8bits indicator variable the device status
+#define STRINGNAME_DEVTEMP "_IndicatorI16_DevTemp"                               //!< Identifies using Unsigned-16bits indicator variable the device temperature
+#define STRINGNAME_DEVPROFILE "_IndicatorU8_DevProfile"                          //!< Identifies using Unsigned-8bits indicator variable the device profile
+#define STRINGNAME_DAQSTARTSTOP "_ControlBool_DAQStartStop"                      //!< Identifies using a boolean control variable if the DAQ acquisition is running or not
+#define STRINGNAME_DEBUGMODE "_ControlBool_DebugMode"                            //!< Identifies using a boolean control variable if debugging mode is to be used
+#define STRINGNAME_INSERTEDIOMODULEID "_IndicatorU32_InsertedIOModuleID"         //!< Identifies using Unsigned-32 bits indicator variable the adapter module if FlexRIO is used or the cRIO modules if cRIO device is used
+#define STRINGNAME_RIOADAPTERCORRECT "_IndicatorBool_RIOAdapterCorrect"          //!< Identifies using a boolean variable if the adapter module connected is supported
+#define STRINGNAME_INSERTEDIOMODULESID "_IndicatorArrayU16_InsertedIOModulesID"  //!< Identifies using Array Unsigned-16bits indicator variable if the inserted I/O modules are correct if cRIO device is used
+#define STRINGNAME_CRIOMODULESOK "_IndicatorBool_cRIOModulesOK"                  //!< Identifies using a boolean variable if the cRIO modules inserted are correct
+#define STRINGNAME_SAMPLINGRATE "_ControlU16_SamplingRate"                       //!< Identifies using Unsigned-16bits control variable the I/O sampling rates
 ///@}
 
 /**@name cRIO Module Names
@@ -89,45 +89,8 @@ cRIOmodule cRIOIDs[8] = {
 		{0x736A,"NI9426"},
 		{0x7133,"NI9476"},
 		{0x71CB,"NI9477"}
-};
+};                          //!< Structure to identifie the cRIO modules and their identificator
 ///@}
-
-int initializeLibrary(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int finalizeLibrary(irioDrv_t* p_DrvPvt, TStatus* status);
-
-int configureTarget(irioDrv_t* p_DrvPvt, char* bitFilePath, TStatus* status);
-
-int searchPlatform( irioDrv_t* p_DrvPvt,TStatus* status);
-
-int allocFlexRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int allocCRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int freeXRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchMandatoryResourcesAllPlatforms(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchProfile( irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchDAQResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchIMAQResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-#ifdef IRIO_GPU
-int searchDAQGPUResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchIMAQGPUResources(irioDrv_t* p_DrvPvt,TStatus* status);
-#endif
-
-int searchIOResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int findIOSamplingRate(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int valid_pointer(void *p, size_t len);
-
 
 int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const char *RIODeviceModel,
 					const char *projectName, const char *FPGAversion, int verbosity,

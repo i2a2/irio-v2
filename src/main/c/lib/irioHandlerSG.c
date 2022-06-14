@@ -32,8 +32,6 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,14 +41,14 @@
  * Strings for SG FPGA Resources
  */
 ///@{
-#define STRINGNAME_SGNO "_IndicatorU8_SGNo"
-#define STRINGNAME_SGFREQ "_ControlU32_SGFreq"
-#define STRINGNAME_SGAMP "_ControlU16_SGAmp"
-#define STRINGNAME_SGPHASE "_ControlU32_SGPhase"
-#define STRINGNAME_SGSIGNALTYPE "_ControlU8_SGSignalType"
-#define STRINGNAME_SGUPDATERATE "_ControlU32_SGUpdateRate"
-#define STRINGNAME_SGFREF "_IndicatorU32_SGFref"
-#define STRINGNAME_FREQREF "_IndicatorU32_Fref"
+#define STRINGNAME_SGNO "_IndicatorU8_SGNo"                //!< Identifies SGNo register
+#define STRINGNAME_SGFREQ "_ControlU32_SGFreq"             //!< Identifies SGFreq register
+#define STRINGNAME_SGAMP "_ControlU16_SGAmp"               //!< Identifies SGAmp register
+#define STRINGNAME_SGPHASE "_ControlU32_SGPhase"           //!< Identifies SGPhase register
+#define STRINGNAME_SGSIGNALTYPE "_ControlU8_SGSignalType"  //!< Identifies SGSignalType register
+#define STRINGNAME_SGUPDATERATE "_ControlU32_SGUpdateRate" //!< Identifies SGPUpdateRate register
+#define STRINGNAME_SGFREF "_IndicatorU32_SGFref"           //!< Identifies SGFref register
+#define STRINGNAME_FREQREF "_IndicatorU32_Fref"            //!< Identifies Fref register
 ///@}
 
 int irio_findSGs(irioDrv_t* p_DrvPvt, TStatus* status){
