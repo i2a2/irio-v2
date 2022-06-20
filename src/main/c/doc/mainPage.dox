@@ -2,7 +2,7 @@
 
 @mainpage irio-v2
 
-Version: 1.1.2
+Version: 1.2
 Overview
 ========
 IRIO software library has been designed with the goal of simplifying the interface with RIO
@@ -112,8 +112,8 @@ the next picture
 @image html completeDevelopmentCycle.png
 @image latex completeDevelopmentCycle.png Developing cycle for RIO applications
 
-Por terminar resto de apartados 
-===============================
+
+
 
 
 \n
