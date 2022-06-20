@@ -1,0 +1,121 @@
+/**
+
+@mainpage irio-v2
+
+Version: 1.1.2
+Overview
+========
+IRIO software library has been designed with the goal of simplifying the interface with RIO
+devices (compactRIO and FlexRIO). These devices are based on an FPGA which implies an 
+infinite number of possible implementations depending on the FPGA project developer
+requirements. This means that the IRIO library user, hereinafter along this document <b>“the
+user”</b>, must know about how the RIO device has been configured, in order to implement
+correctly the software application. The user, will receive the FPGA <a>bitfile</a>, the file to be used by
+IRIO library to program the FPGA (RIO device), and the FPGA <a>header</a> file that contains the
+mapping addresses of the FPGA resources. Both files correspond to a specific RIO
+configuration.
+In subsequent sections it will be explained how the device is configured and how the user will
+be able to know how to use the library according to it.
+The first thing that the user should know is in which software layer, related to the hardware, is
+located this library. The figure below explains it. 
+
+@image html softwareLayerIRIOLibrary.svg
+@image latex softwareLayerIRIOLibrary.png Software layers used by IRIO Library 
+
+As usual Linux device driver implementations, NI RIO Linux device driver (Level 0), requires
+its corresponding user space library (Level 1) that permits the access to the RIO device. Finally
+IRIO library (Level 2) uses the NI RIO library to interface the user application with the
+hardware. The reasons because IRIO library has been added to the upper part of the software
+layer are:
+- RIO devices are reconfigurable devices. This means that their hardware resources (I/O
+registers and data streams, DMAs), and the logic implemented depends on the FPGA
+project developer implementation. Every time there is a new FPGA configuration for a
+different purpose, hardware resources have different map addressing. IRIO library
+obtains from the FPGA header file all the resources mapping, creating a data structure
+to manage them dynamically, and loads the FPGA bitfile into the RIO device,
+configuring the FPGA in run time. <b>In the case of the NI RIO EPICS Device driver
+that uses this library, IRIO library avoids the recompilation of the NI RIO EPICS
+Device driver to support every new RIO configuration obtained following the
+IRIO design rules</b>.
+- RIO configuration can be oriented towards different purposes, with different methods
+or approaches for implementing data acquisition, real-time pre-processing etc. These
+type of “behaviours” have been defined as profiles. IRIO design rules document defines
+different types of profiles, according to support cRIO implementations, for different I/O
+modules, and different set of FlexRIO bundles from the ITER Fast controller hardware
+catalog, including data acquisition, image acquisition, with data transfer Device-To-
+Host, and Device-To-GPU. IRIO library provides a set of functions for achieving all
+these actions, and other ones, avoiding to the user to know how the RIO device has
+been configured. The user only requires the FPGA configuration, to know which FPGA
+resources can be used.
+
+IRIO Library use
+================
+The figure below depicts the use of IRIO library. The first step consists of the FPGA configuration using
+LabVIEW tools in a Windows platform. This is described in the IRIO Design Rules for
+LabVIEW-FPGA and is performed by the FPGA project developer attending to the fast
+controller specifications. The results of this task are a FPGA <a>bitfile</a> and a FPGA <a>header</a> file.
+IRIO library requires these files to configure the FPGA in run time and to address the hardware
+resources respectively. Once the FPGA is configured IRIO library performs the different
+actions with the RIO devices.
+IRIO library performs the initialization of the RIO device, as explained later, calling to the
+irio_initDriver function. This function prints out all the resources found in the FPGA according
+to the design rules.
+The FPGA project developer has to provide a table 
+containing all the resources used. These resources include the analog and digital I/O elements,
+the FIFO elements for moving data, and the list of all FPGA registers including the user
+defined auxiliary registers. The piece of LabVIEW code depicted in next pictures exemplifies I/O
+operations through FPGA auxiliary registers. In this example FPGA developer requires a logic
+that acquires single analog input data values(ADC), and in case of overcoming a static
+threshold, an auxiliary Boolean output register will be latched to ON. The data acquisition
+period could be configured through an auxiliary input register, with a scalar value containing
+the microseconds to wait for the next iteration. After configuring the FPGA (step 1), to control
+and monitor this part of the FPGA the user , can program the auxiliary output register number 1
+(defined as auxAO1) with the value, for instance, 1250 this means a period of 1250μs (step
+2). The user does not require knowing neither the mapping address nor the name of the
+LabVIEW controls and indicators (I/O registers) because IRIO library is doing this translation.
+The step 3 represents the user reading from the auxiliary digital input register 0 (auxDI0). In
+Fig. 2, green arrows represent direct (software-hardware) communication with the FPGA
+through NI-RIO Linux Device Driver. Red discontinuous arrows represent the relationship
+between the IRIO library calls and the terminals implemented with LabVIEW for FPGA.
+
+@image html IRIOLibraryUse.svg
+@image latex IRIOLibraryUse.png Software layers used by IRIO Library 
+
+@image html exampleIRIOUSe.svg
+@image latex exampleIRIOUse.png 
+
+Software layers which use IRIO Library
+======================================
+One of the examples of use of IRIO library is the NI-RIO EPICS device driver available in CCS 
+that permits to create EPICS IOC applications. The different implementations using RIO devices do 
+not require modifying the EPICS device support, only records database and st.cmd file configuration 
+would be required. The same philosophy is applied for the implementation of a Nominal Device 
+Support application using the IRIO library. These examples are shown in next figure.
+
+@image html softwareLayerIRIOLibrary.svg
+@image latex softwareLayerIRIOLibrary.png IRIO Library used for implementing an EPICS device support with asyn, NDS, etc
+
+Development workflow with IRIO Library
+======================================
+The development cycle to be followed in order to build applications using IRIO Library
+requires two major steps. The former is the hardware implementation in the FPGA and the later
+the development of the software using IRIO Library. The next figure summarizes all the steps needed to
+program a RIO device with the binary image supporting the FPGA functionality <a>(bitfile)</a>.
+Previous to implement any application for RIO devices using the IRIO library in CCS, this
+aforementioned <a>bitfile</a> and <a>header</a> file obtained using LabVIEW tools are needed.
+@image html developmentCycle.svg
+@image latex developmentCycle.png Developing applications with LabVIEW FPGA for RIO 
+
+The complete development workflow to be followed in order to implement applications for
+RIO devices using IRIO Library and developed with LabVIEW for FPGA is summarized in
+the next picture 
+@image html completeDevelopmentCycle.svg
+@image latex completeDevelopmentCycle.png Developing cycle for RIO applications
+
+Por terminar resto de apartados 
+===============================
+
+
+\n
+
+*/

@@ -31,21 +31,29 @@
 # List of examples to build (source files)
 #EXAMPLES := cRIO_IO.c cRIO_DAQDMA.c
 
-EXAMPLES = FlexRIO_noModule.cpp	  
+EXAMPLES += FlexRIO_noModule.cpp
+EXAMPLES += FlexRIO_onlyResources.cpp
+EXAMPLES += FlexRIO_mod6581-7965.cpp
+EXAMPLES += FlexRIO_mod5761-7966.cpp
+EXAMPLES += FlexRIO_mod5734-7966.cpp
+EXAMPLES += FlexRIO_mod1483-7966-lmaq.cpp
 #EXAMPLES += FlexRIO_mod5761-7966.c FlexRIO_onlyResources.c
 #EXAMPLES += FlexRIO_mod5761-7966-perf.c  FlexRIO_mod6581-7965.c FlexRIO_mod1483-7966-Imaq.c FlexRIO_mod1483-7966-uart.c
 #EXAMPLES += FlexRIO_mod5734-7966.c
-LIBRARIES := m rt irioCore
+LIBRARIES := m rt irioCore irioCoreCPP
 
-ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
-	IRIO_GPU = 1
-	CFLAGS += -DIRIO_GPU
-	EXAMPLES += FlexRIO_mod1483-7966-Imag-GPU.c
-	LIBRARIES += iriocuda 
-endif
+IRIOCORE_DIR := $(realpath ../../../lib)
 
 
-IRIOCORE_DIR := $(realpath ../../../../target/lib)
+#ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
+#	IRIO_GPU = 1
+#	CFLAGS += -DIRIO_GPU
+#	EXAMPLES += FlexRIO_mod1483-7966-Imag-GPU.c
+#	LIBRARIES += iriocuda 
+#endif
+
+
+#IRIOCORE_DIR := $(realpath ../../../../target/lib)
 
 
 # Additional include directories
@@ -55,13 +63,13 @@ ifndef CODAC_ROOT
 #INCLUDE_DIRS += ../support
 	CFLAGS += -DCLOSE_VERSION_NIRIO -fPIC -Wall -D_GNU_SOURCE
 	LDFLAGS += -Wall -Wl,-rpath=$(IRIOCORE_DIR)
-	INCLUDE_DIRS += $(NIRIO)/include 
-	LIBRARY_DIRS =  $(NIRIO)/lib $(IRIOCORE_DIR)
+	INCLUDE_DIRS += $(NIRIO)/include ../include
+	LIBRARY_DIRS =  $(NIRIO)/lib $(IRIOCORE_DIR) ../lib
 else
 	CFLAGS += -DOPEN_VERSION_NIRIO -fPIC -Wall -O3 -D_GNU_SOURCE
 	LDFLAGS += -Wall -Wl,-rpath=$(IRIOCORE_DIR) 
-	INCLUDE_DIRS += $(CODAC_ROOT)/include
-	LIBRARY_DIRS =  $(CODAC_ROOT)/lib $(IRIOCORE_DIR)
+	INCLUDE_DIRS += $(CODAC_ROOT)/include ../include
+	LIBRARY_DIRS =  $(CODAC_ROOT)/lib $(IRIOCORE_DIR) ../lib
 endif
 
 ifeq ($(COVERAGE),true)
@@ -110,13 +118,13 @@ endif
 
 # Sources
 sources := $(EXAMPLES)
-include_dirs := . ../../c/include $(INCLUDE_DIRS)
+include_dirs := . ../include ../../c/include $(INCLUDE_DIRS) 
 
 # Binaries
 alltargets := $(basename $(sources))
 
 # Library dependencies
-library_dirs := ../lib $(LIBRARY_DIRS)
+library_dirs := ../lib ../../c/lib $(LIBRARY_DIRS) 
 libraries := pthread $(LIBRARIES)
 
 # Compiler/linker flags
