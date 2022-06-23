@@ -95,8 +95,8 @@ TEST(TP_cRIO_DAQ, functional) {
 
 	// TODO: Comentado para probar codigo mas rapido.
 	//       Descomentar cuando este terminado definitivamente
-//	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-//	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 //	string debugMode = TestUtilsIRIO::getEnvVar("debugMode");
 //	string CH0Voltage = TestUtilsIRIO::getEnvVar("CH0Voltage");
 //	string CH1Voltage = TestUtilsIRIO::getEnvVar("CH1Voltage");
@@ -104,8 +104,6 @@ TEST(TP_cRIO_DAQ, functional) {
 //	string acquisitionMode = TestUtilsIRIO::getEnvVar("acquisitionMode");
 //	string blockLength = TestUtilsIRIO::getEnvVar("blockLength");
 
-	string RIODevice = "9159";
-	string RIOSerial = "0x01B54986";
 	string debugMode = "1";
 	string CH0Voltage = "+5.0";
 	string CH1Voltage = "-5.0";
@@ -229,8 +227,6 @@ TEST(TP_cRIO_DAQ, functional) {
 			 << valueGetter << ", meaning " << Fref*valueGetter << " Samples/s" << endl;
 	}
 
-	// TODO: Usar metodos de informacion de la FPGA? No dan nada de info interesante...
-	//       Profile sí, para que diga que es DAQ profile
 	/*
 	 * TEST 4
 	 * DEVICE PROFILE
@@ -242,17 +238,17 @@ TEST(TP_cRIO_DAQ, functional) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "[irio_getDevProfile function] Device Profile configured in the FPGA is: "
-		 <<	valueGetter << ". This Device should be 0. (0->DAQ DMA, 1->Point by Point)" << endl;
+	cout << "[irio_getDevProfile function] Device Profile configured in the FPGA "
+			"expected is 0. Value read: " << valueGetter << " (0-DAQ DMA, 1-Point by Point)" << endl;
 
 	/**
 	 * TEST 5
 	 * DEBUG MODE CONFIGURATION
 	 */
 	int32_t debugmode = std::stoi(debugMode);
-	cout << endl << "TEST 5: Testing debug mode configuration" << endl << endl;
+	cout << endl << "TEST 5: Testing debug mode configuratiosn" << endl << endl;
 	cout << "[irio_setDebugMode function] DebugMode set to " << debugmode
-		 << ". (0-->OFF, 1-->ON)" << endl;
+		 << " (0-OFF, 1-ON)" << endl;
 	myStatus = irio_setDebugMode(&p_DrvPvt,debugmode,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -324,7 +320,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	 * STARTING DATA ACQUISITION
 	 */
 	cout << endl << "TEST 7: Set DAQ Start" << endl << endl;
-	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl << endl;
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (0-OFF, 1-ON)" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -411,7 +407,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	 * SG Type
 	 */
 	cout << endl << "TEST 10: Set Signal Generator type" << endl << endl;
-	cout << "[irio_setSGSignalType function] SGSignalType0 set to 2 (SQUARE) " << endl;
+	cout << "[irio_setSGSignalType function] SGSignalType0 set to 2 (0-DC, 1-SINE, 2- SQUARE, 3-TRIANGULAR) " << endl;
 	myStatus = irio_setSGSignalType(&p_DrvPvt,0,2,&status); //0=DC, 1=SINE 2=SQUARE 3=TRIANGULAR
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -427,10 +423,10 @@ TEST(TP_cRIO_DAQ, functional) {
 	cout << "[irio_getSGSGSignalType function] SGSignalType0 read: " << valueGetter << endl;
 
 	/**
-	 * TEST 10
+	 * TEST 11
 	 * SG Amplitude
 	 */
-	cout << endl << "TEST 10: Set Signal Generator amplitude" << endl << endl;
+	cout << endl << "TEST 11: Set Signal Generator amplitude" << endl << endl;
 	double amplitude = 0.4; // Amplitude in V
 
 	cout << "[irio_setSGAmp function] SGAmp0 set to " << (int)(amplitude*CVDAC)
@@ -451,10 +447,10 @@ TEST(TP_cRIO_DAQ, functional) {
 		 << ", meaning " << valueGetter/CVDAC << " V" << endl;
 
 	/**
-	 * TEST 11
+	 * TEST 12
 	 * SG Phase
 	 */
-	cout << endl << "TEST 11: Testing Signal Generator phase" << endl << endl;
+	cout << endl << "TEST 12: Testing Signal Generator phase" << endl << endl;
 	int phase = 90;
 	cout << "[irio_setSGPhase function] SGPhase0 set to " << phase << endl;
 	myStatus = irio_setSGPhase(&p_DrvPvt,0,phase,&status);
@@ -472,48 +468,32 @@ TEST(TP_cRIO_DAQ, functional) {
 	cout << "[irio_getSGPhase function] SGPhase0 read: " << valueGetter << endl;
 
 	/**
-	 * TEST 12
+	 * TEST 13
 	 * AO ENABLE
 	 */
-	cout << endl << "TEST 12: Configuring the Analog output enable on CH0, CH1" << endl << endl;
-	cout << "[irio_setAOEnable function] AOEnable0 set to 1 (ENABLE)" << endl;
+	cout << endl << "TEST 13: Configuring the Analog output enable on CH0, CH1" << endl << endl;
+	for (int channel = 0; channel < 2; channel++) {
+		cout << "[irio_setAOEnable function] AOEnable" << channel << " set to 1 (0-DISABLE, 1-ENABLE)" << endl;
+		myStatus = irio_setAOEnable(&p_DrvPvt,channel,1,&status);
+		if (myStatus > IRIO_success) {
+			TestUtilsIRIO::getErrors(status);
+		}
+		EXPECT_EQ(myStatus, IRIO_success);
 
-	myStatus = irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO0 is enabled
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
+		valueGetter = -1;
+		myStatus = irio_getAOEnable(&p_DrvPvt,channel,&valueGetter,&status);
+		if (myStatus > IRIO_success) {
+			TestUtilsIRIO::getErrors(status);
+		}
+		EXPECT_EQ(myStatus, IRIO_success);
+		cout << "[irio_getAOEnable function] AOEnable" << channel << " read: " << valueGetter << endl;
 	}
-	EXPECT_EQ(myStatus, IRIO_success);
-
-	valueGetter = -1;
-	myStatus = irio_getAOEnable(&p_DrvPvt,0,&valueGetter,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "[irio_getAOEnable function] AOEnable0 read: " << valueGetter << endl;
-
-	cout << "[irio_setAOEnable function] AOEnable1 set to 1 (ENABLE)" << endl;
-
-	myStatus = irio_setAOEnable(&p_DrvPvt,1,1,&status); // AO1 is enabled
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_EQ(myStatus, IRIO_success);
-
-	valueGetter = -1;
-	myStatus = irio_getAOEnable(&p_DrvPvt,1,&valueGetter,&status);
-	if (myStatus > IRIO_success) {
-		TestUtilsIRIO::getErrors(status);
-	}
-	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "[irio_getAOEnable function] AOEnable1 read: " << valueGetter << endl;
 
 	/**
-	 * TEST 13
+	 * TEST 14
 	 * ANALOG INPUT PORTS
 	 */
-
-	cout << endl << "TEST 13: Testing Analog Input on CH0, CH1" << endl << endl;
+	cout << endl << "TEST 14: Testing Analog Input on CH0, CH1" << endl << endl;
 	double CVADC = 0.0;
 	myStatus = irio_getSGCVADC(&p_DrvPvt,&CVADC,&status);
 	if (myStatus > IRIO_success) {
@@ -542,12 +522,11 @@ TEST(TP_cRIO_DAQ, functional) {
 			"AI1 read: " << valueGetter*CVADC << endl;
 
 	/**
-	 * TEST 14
+	 * TEST 15
 	 * DMA ENABLE
 	 */
-	cout << endl << "TEST 14: Testing DMAs' Enable" << endl << endl;
-
-	cout << "[irio_setDMATtoHostEnable function] DMATtoHostEnable0 set to 1 (ON)" << endl;
+	cout << endl << "TEST 15: Testing DMAs' Enable" << endl << endl;
+	cout << "[irio_setDMATtoHostEnable function] DMATtoHostEnable0 set to 1 (0-OFF, 1-ON)" << endl;
 	myStatus = irio_setDMATtoHostEnable(&p_DrvPvt,0,1,&status); //DMA data transfer to Host is activated
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -565,10 +544,10 @@ TEST(TP_cRIO_DAQ, functional) {
 	cout << "[irio_getDMATtoHostEnable function] DMATtoHostEnable0 read: " << valueGetter << endl;
 
 	/**
-	 * TEST 15
+	 * TEST 16
 	 * DMA PARAMETERS
 	 */
-	cout << endl << "TEST 15: Getting parameters needed to read data from DMA" << endl << endl;
+	cout << endl << "TEST 16: Getting parameters needed to read data from DMA" << endl << endl;
 	uint16_t DMATtoHOSTBlockNWords = 0;
 	uint16_t DMATtoHOSTNCh = 0;
 
@@ -592,12 +571,11 @@ TEST(TP_cRIO_DAQ, functional) {
 	cout << "[irio_getDMATtoHOSTNCh function] Acquiring number of DMA channels. "
 			"DMATtoHOSTNCh: " << DMATtoHOSTNCh << endl;
 
-
 	/**
-	 * TEST 16
+	 * TEST 17
 	 * GETTING DATA FROM DMA
 	 */
-	cout << endl << "TEST 16: Getting data from DMA" << endl << endl;
+	cout << endl << "TEST 17: Getting data from DMA" << endl << endl;
 
 	// Total samples to acquire
 	int TotalsamplesToAcq = -1;
@@ -659,8 +637,8 @@ TEST(TP_cRIO_DAQ, functional) {
 		if (myStatus > IRIO_success) {
 			errorFounds++;
 			// TODO: Revisar si esto sirve de algo
-//			status.code = IRIO_success;
-//			myStatus = IRIO_success;
+			status.code = IRIO_success;
+			myStatus = IRIO_success;
 		}
 		if (elementsRead == nBlocksPerDMAAcc){
 			timeout = 0;
@@ -698,10 +676,10 @@ TEST(TP_cRIO_DAQ, functional) {
 	delete [] data2;
 
 	/**
-	 * TEST 17
+	 * TEST 18
 	 * CLEANING DMAS
 	 */
-	cout << endl << "TEST 17: Cleaning DMAs channels" << endl << endl;
+	cout << endl << "TEST 18: Cleaning DMAs channels" << endl << endl;
 	cout << "[irio_cleanDMAsTtoHost function] Cleaning DMAs" << endl;
 	myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
@@ -710,11 +688,11 @@ TEST(TP_cRIO_DAQ, functional) {
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	/**
-	 * TEST 18
+	 * TEST 19
 	 * CLOSING DMAS
 	 */
 	// Once data acquisition has finished DMAs have to be closed
-	cout << endl << "TEST 18: Closing DMAS" << endl << endl;
+	cout << endl << "TEST 19: Closing DMAS" << endl << endl;
 	cout << "[irio_closeDMAsTtoHost function] Closing DMAs" << endl;
 	myStatus = irio_closeDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
@@ -723,10 +701,10 @@ TEST(TP_cRIO_DAQ, functional) {
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	/**
-	 * TEST 19
+	 * TEST 20
 	 * IRIO DRIVER CLOSING
 	 */
-	cout << endl << "TEST 19: Closing IRIO DRIVER" << endl << endl;
+	cout << endl << "TEST 20: Closing IRIO DRIVER" << endl << endl;
 	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {

@@ -152,8 +152,8 @@ TEST(TP_cRIO_PBP, functional){
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
-	cout << "[irio_getDevProfile function] Device Profile configured in the FPGA is: "
-		 <<	valueGetter << ". This Device should be 1 (0: DAQ DMA, 1: Point by Point)" << endl;
+	cout << "[irio_getDevProfile function] Device Profile configured in the FPGA "
+			"expected is 1. Value read: " << valueGetter << " (0: DAQ DMA, 1: Point by Point)" << endl;
 
 	/**
 	 * TEST 5
