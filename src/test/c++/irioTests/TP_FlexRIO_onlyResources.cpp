@@ -25,7 +25,7 @@ using std::string;
  * Test verifies driver’s ability to read and testing resources in the FPGA.
  * This test is related to the following requirements:
  *
- * PXIe-7961R or PXIe-7965R or PXIe-7966R or PXIe-7975R
+ * PXIe-7961R, PXIe-7965R, PXIe-7966R, PXIe-7975R
  *
  * The execution of this test requires to have an environment variable indicating the
  * serial number of the RIO board to be used. Execute in a command shell the lsrio command
@@ -46,11 +46,11 @@ TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.0";
+	string appCallID = "functionalCPUDAQTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIO_CPUDAQ_"+RIODevice;
+	string FPGAversion = "V1.0"; // User doesn't have to know what FPGA Version is used
+	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;
@@ -74,7 +74,7 @@ TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 	cout << "2 auxDO" << endl;
 	cout << "2 SG" << endl << endl;
 
-	myStatus = irio_initDriver("functionalCPUDAQTest",
+	myStatus = irio_initDriver(appCallID.c_str(),
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -116,11 +116,11 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// User don't have to know what FPGA Version is used
-	string FPGAversion = "V1.0";
+	string appCallID = "functionalCPUIMAQTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice;
 	string bitfileName = "FlexRIO_CPUIMAQ_"+RIODevice;
+	string FPGAversion = "V1.0"; // User don't have to know what FPGA Version is used
+	string filePath = "../resources/"+RIODevice;
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;
@@ -143,7 +143,7 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	cout << "2 auxDI" << endl;
 	cout << "2 auxDO" << endl << endl;
 
-	myStatus = irio_initDriver("functionalCPUIMAQTest",
+	myStatus = irio_initDriver(appCallID.c_str(),
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -185,11 +185,11 @@ TEST(TP_FlexRIO_onlyResources, onlyResources)
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// User don't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string appCallID = "functionalOnlyResourcesTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;
@@ -214,7 +214,7 @@ TEST(TP_FlexRIO_onlyResources, onlyResources)
 	cout << "54 DO" << endl;
 	cout << "2 SG" << endl << endl;
 
-	myStatus = irio_initDriver("functionalOnlyResourcesTest",
+	myStatus = irio_initDriver(appCallID.c_str(),
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -258,12 +258,11 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// User don't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string appCallID = "wrongBitfileResourcesTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/failResources/"+RIODevice+"/";
-
 	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
+	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string filePath = "../resources/failResources/"+RIODevice+"/";
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;
@@ -288,7 +287,7 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	cout << "0 SG + Error finding SGFref0 and SGSignalType1" << endl;
 	cout << "0 DMAs + Error finding DMATtoHOSTSamplingRate0" << endl << endl;
 
-	myStatus = irio_initDriver("wrongBitfileResourcesTest",
+	myStatus = irio_initDriver(appCallID.c_str(),
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -302,8 +301,7 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
-	EXPECT_TRUE((myStatus!=IRIO_success) &&
-				((status.detailCode==ResourceNotFound_Error) || (status.detailCode==ResourceNotFound_Warning)));
+	EXPECT_TRUE(myStatus!=IRIO_success);
 
 	/**
 	 * TEST 1

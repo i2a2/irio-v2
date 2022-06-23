@@ -43,9 +43,9 @@ using std::cin;
  * serial number of the RIO board to be used. Execute in a command shell the lsrio command
  * execute export RIOSerial=0x..........
  * execute export RIODevice=xxxx, where xxxx = 7966, 7975
- * execute export Simulator = yyyy, yyyy = GIDEL, SW (Sowftware simulator);
- * 										   EDT, HW (Hardware simulator)
- * execute export maxcount = number;
+ * execute export Simulator = yyyy, yyyy = GIDEL or SW (Sowftware simulator)
+ * 										   EDT or HW (Hardware simulator)
+ * execute export maxCounter = number  (GIDEL = 10, EDT = 65536)
  */
 
 TEST(TP_FlexRIO_mod1483, functionalUART){
@@ -60,17 +60,17 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 
 	// Two options: GIDEL simulator or EDT simulator
 	string Simulator = TestUtilsIRIO::getEnvVar("Simulator");
-	int simulator = -1;
+	int simulator = 1;
 
 	if (Simulator.compare("HW") == 0 || Simulator.compare("EDT") == 0)
-		simulator = 1;
+		simulator = 0;
 
-	if (simulator) {   // UART test only supported with Hardware-EDT simulator
-		// User doesn't have to know what FPGA Version is used
-		string FPGAversion = "V1.1";
+	if (!simulator) {   // UART test only supported with Hardware-EDT simulator
+		string appCallID = "functionalMod1483UartTest";
 		string NIRIOmodel = "PXIe-"+RIODevice+"R";
-		string filePath = "../resources/"+RIODevice+"/";
 		string bitfileName = "FlexRIOMod1483_"+RIODevice;
+		string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+		string filePath = "../resources/"+RIODevice+"/";
 
 		int myStatus = 0;
 		irioDrv_t p_DrvPvt;
@@ -82,7 +82,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		 * DRIVER INITIALIZATION
 		 */
 		cout << "TEST 0: Testing driver initialization" << endl << endl;
-		myStatus = irio_initDriver("functionalMod1483UartTest",
+		myStatus = irio_initDriver(appCallID.c_str(),
 								   RIOSerial.c_str(),
 								   NIRIOmodel.c_str(),
 								   bitfileName.c_str(),
@@ -99,7 +99,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		}
 		ASSERT_EQ(myStatus, IRIO_success);
 
-		/*
+		/**
 		 * TEST 1
 		 * CAMERALINK CONFIGURATION
 		 */
@@ -119,6 +119,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		EXPECT_EQ(myStatus, IRIO_success);
 		cout << "[irio_getUARTBaudRate function] Default baud rate: " << value << endl;
 
+		value = -1;
 		myStatus = irio_getUARTBreakIndicator(&p_DrvPvt,&value,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
@@ -126,6 +127,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		EXPECT_EQ(myStatus, IRIO_success);
 		cout << "[irio_getUARTBreakIndicator function] UART Break indicator: " << value << endl;
 
+		value = -1;
 		myStatus = irio_getUARTFrammingError(&p_DrvPvt,&value,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
@@ -133,6 +135,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		EXPECT_EQ(myStatus, IRIO_success);
 		cout << "[irio_getUARTFrammingError function] UART framing error: " << value << endl;
 
+		value = -1;
 		myStatus = irio_getUARTOverrunError(&p_DrvPvt,&value,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
@@ -140,23 +143,24 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		EXPECT_EQ(myStatus, IRIO_success);
 		cout << "[irio_getUARTOverrunError function] UART overrun eror: " << value << endl;
 
-		/*
+		/**
 		 * TEST 2
 		 * Set up DMAs to host
 		 */
-		cout << endl << "TEST 2: Setting up DMAs to host" << endl;
+		cout << endl << "TEST 2: Testing DMAs' set up configuration." << endl << endl;
+		cout << "[irio_setUpDMAsTtoHost function] Set up DMAs" << endl;
 		myStatus = irio_setUpDMAsTtoHost(&p_DrvPvt,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
 		}
 		EXPECT_EQ(myStatus, IRIO_success);
 
-		/*
+		/**
 		 * TEST 3
 		 * FPGA START
 		 */
 		cout << endl << "TEST 3: Starting FPGA" << endl << endl;
-		cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
+		cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value 1" << endl;
 		myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 		// IRIO can manage success or warning after starting the FPGA, not error
 		if (myStatus > IRIO_success) {
@@ -168,9 +172,9 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		int aivalue=0;
 		irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 		cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-			 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+			 << aivalue << " (0-stopped, 1-running)" << endl;
 
-		/*
+		/**
 		 * TEST 4
 		 * SET BAUD RATE
 		 */
@@ -183,7 +187,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		}
 		EXPECT_EQ(myStatus, IRIO_success);
 
-		/*
+		/**
 		 * TEST 5
 		 * SEND UART MESSAGE
 		 */
@@ -211,13 +215,13 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 
 		getline(cin, message);
 
-		/*
+		/**
 		 * TEST 6
 		 * RECEIVE UART MESSAGE
 		 */
-		cout << endl << "TEST 6: Receiving data from CameraLink" << endl << endl;
+		cout << "TEST 6: Receiving data from CameraLink" << endl << endl;
 		int len = 0;
-		int msg_len = 4;
+		int msg_len = 4;  // User can decide how long can be the message received
 		char* msg = new char[msg_len+1]; //+1 because of terminator character \0
 
 		cout << "Receiving UART message" << endl;
@@ -249,7 +253,8 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		EXPECT_EQ(myStatus, IRIO_success);
 	}
 	else
-		cout << "Image Simulator error: Select a correct simulator, EDT. GIDEL Simulator don't support UART test." << endl;
+		cout << "[ERROR] Image Simulator: Select the correct simulator, EDT. "
+				"GIDEL Simulator doesn't support UART test." << endl << endl;
 }
 
 TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
@@ -277,11 +282,11 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	// Counter frame for each image simulator
 	int maxCounter = stoi(TestUtilsIRIO::getEnvVar("maxCounter"));
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string appCallID = "functionalMod1483ImaqTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod1483_"+RIODevice;
+	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;
@@ -295,7 +300,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	cout << "TEST 0: Testing driver initialization" << endl << endl;
 	cout << "**************** IRIO IMAQ Profile Example ****************" << endl;
 	cout << "**************** Image Acquisition Example ****************" << endl;
-	myStatus = irio_initDriver("functionalMod1483ImaqTest",
+	myStatus = irio_initDriver(appCallID.c_str(),
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -312,7 +317,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	 /*
+	/**
 	 * TEST 1
 	 * PRE FPGA START CONFIG
 	 */
@@ -324,12 +329,12 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	/*
+	/**
 	 * TEST 2
 	 * FPGA START
 	 */
 	cout << endl << "TEST 2: Testing FPGA start mode" << endl << endl;
-	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
+	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value 1" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning after starting the FPGA, not error
@@ -342,9 +347,9 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	int aivalue=0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
-	/*
+	/**
 	 * TEST 3
 	 * ACQUIRING IMAGES
 	 */
@@ -392,10 +397,11 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 					firstImage=0;
 				}else if((fc+1)%maxCounter!=fc2[0]){
 					irio_mergeStatus(&status,Generic_Error,verbosity,
-							         "\nFrameCounter Error at Image fc[i]=%d, fc[i-1]=%d, img: %d\n",fc2[0],fc, i);
+							         "\nFrameCounter Error at Image fc[i]=%d, fc[i-1]=%d, img: %d\n"
+							         "Review your counter used: %d\n",fc2[0],fc,i,maxCounter);
 					TestUtilsIRIO::getErrors(status);
 					if (frame_counter_mode) {
-						cout << "Image Simulator error: check that the first two bytes of each image frame contains the counter "
+						cout << "[ERROR] Image Simulator: check that the first two bytes of each image frame contains the counter "
 								"or review that your frame counter parameter is correct. "
 								"Frame counter: " << maxCounter << endl << endl;
 					}

@@ -46,7 +46,7 @@ TEST(TP_FlexRIO_mod5761, functional){
 	mod5761Test();
 }
 
-TEST(TP_FlexRIO_mod5761, functionalWT){
+TEST(TP_FlexRIO_mod5761, functional_timeout){
 	mod5761Test(true);
 }
 
@@ -67,11 +67,11 @@ static void mod5761Test(bool tout){
 	string Coupling  = TestUtilsIRIO::getEnvVar("Coupling");   // Coupling must be 0 (AC, supported by ITER)
 	                                                           // or 1 (DC, not supported by ITER)
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string appCallID = "functionalMod5761Test";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod5761_"+RIODevice;
+	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;
@@ -83,7 +83,7 @@ static void mod5761Test(bool tout){
 	 * DRIVER INITIALIZATION
 	 */
 	cout << "TEST 0: Testing driver initialization" << endl << endl;
-	myStatus = irio_initDriver("functionalMod5761Test",
+	myStatus = irio_initDriver(appCallID.c_str(),
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -105,7 +105,7 @@ static void mod5761Test(bool tout){
 	 * FPGA START
 	 */
 	cout << endl << "TEST 1: Testing FPGA start mode" << endl << endl;
-	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value " << 1 << endl;
+	cout << "[irio_setFPGAStart function] FPGA hardware logic is started (\"Running\") Value 1" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	// IRIO can manage success or warning after starting the FPGA, not error
@@ -115,16 +115,15 @@ static void mod5761Test(bool tout){
 	ASSERT_NE(myStatus, IRIO_error);
 
 	// This function does not modify status neither myStatus, it is not necessary to check that variables
-	int aivalue=0;
-	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
+	int valueReadI32 = -1;
+	irio_getFPGAStart(&p_DrvPvt,&valueReadI32,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << valueReadI32 << " (0-stopped, 1-running)" << endl;
 
 	/**
 	 * TEST 2
 	 * DEBUG MODE CONFIGURATION
 	 */
-	int valueReadI32 = 0;
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode" << endl << endl;
 	cout << "[irio_setDebugMode function] DebugMode set to 0 (OFF)" << endl;
 
@@ -134,6 +133,7 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	myStatus = irio_getDebugMode(&p_DrvPvt,&valueReadI32,&status); // DebugMode FPGA register is read
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -159,6 +159,7 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	myStatus = irio_getSGSignalType(&p_DrvPvt,0,&valueReadI32,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -180,6 +181,7 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	myStatus = irio_getAO(&p_DrvPvt,0,&valueReadI32,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -200,6 +202,7 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	myStatus = irio_getAOEnable(&p_DrvPvt,0,&valueReadI32,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -211,7 +214,7 @@ static void mod5761Test(bool tout){
 	 * TEST 6
 	 * auxAI9 WILL BE READ, AND 2048 DIGITAL VALUE IS EXPECTED
 	 */
-	int valueReadAuxAI9 = 0;
+	int valueReadAuxAI9 = -1;
 	cout << endl << "TEST 6: auxAI9 register must have the same value as the output of the "
 			     "signal generator: in this case 2048" << endl << endl;
 
@@ -234,7 +237,7 @@ static void mod5761Test(bool tout){
 	int coupling = std::stoi(Coupling);
 	cout << endl << "TEST 7: Testing coupling configuration for NI5761 adapter module" << endl << endl;
 
-	cout << "[irio_setAICoupling function] AICoupling (AC = 0, DC = 1) set to : " << coupling << endl;
+	cout << "[irio_setAICoupling function] AICoupling set to: " << coupling << " (AC = 0, DC = 1)" << endl;
 	myStatus = irio_setAICoupling(&p_DrvPvt,(TIRIOCouplingMode) coupling,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -256,7 +259,7 @@ static void mod5761Test(bool tout){
 	 * DMA SET UP
 	 */
 	cout << endl << "TEST 8: Testing DMAs' set up configuration." << endl << endl;
-	cout << "[irio_setUpDMAsTtoHost function] No output if DMAs have been configured successfully" << endl;
+	cout << "[irio_setUpDMAsTtoHost function] Set up DMAs" << endl;
 
 	// All DMAs are configured. In this case there is only one DMA implemented in the FPGA
 	// with four channels (every channel has a digital value of 16 bits)
@@ -268,7 +271,7 @@ static void mod5761Test(bool tout){
 	ASSERT_EQ(myStatus, IRIO_success);
 
 	/**
-	 * TEST 10
+	 * TEST 9
 	 * DMA SAMPLING RATE CONFIGURATION
 	 */
 	int32_t samplingRate = 500000; // 500k samples/seg, max 125MSamples/s
@@ -299,6 +302,7 @@ static void mod5761Test(bool tout){
 		}
 		EXPECT_EQ(myStatus, IRIO_success);
 
+		valueReadI32 = -1;
 		myStatus = irio_getDMATtoHostSamplingRate(&p_DrvPvt,0,&valueReadI32,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
@@ -322,6 +326,7 @@ static void mod5761Test(bool tout){
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	myStatus = irio_getDMATtoHostEnable(&p_DrvPvt,0,&valueReadI32,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -368,18 +373,18 @@ static void mod5761Test(bool tout){
 	int elementsRead = 0;
 	int positiveTest = 0;
 	int negativeTest = 0;
-	float timePerWord = 0.0;
-	uint32_t timeout = 0;
+	float timePerWord;
+	uint32_t timeout;
 
 	// User decides how many blocks wants to read
-	int blocksToRead = 2;
+	int blocksToRead = 1;
 	// Each block: 4096 words * 64 bits/word = 4096 words * 8 bytes/word
 	uint64_t* dataBuffer = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*8];
 
 	if (tout) {
 		// Timeout needed
-		timePerWord = 1/((float)samplingRate)*1000; // *1000 = conversion from segs to millisecs
-		timeout = ceil(timePerWord*blocksToRead*DMATtoHOSTBlockNWords); // por exceso
+		timePerWord = 1/((float)samplingRate)*1000; // *1000 = conversion from secs to millisecs
+		timeout = ceil(timePerWord*blocksToRead*DMATtoHOSTBlockNWords); // Always by excess
 	}
 
 	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl << endl;
@@ -430,7 +435,7 @@ static void mod5761Test(bool tout){
 	cout << "Samples correctly read: "   << positiveTest << endl;
 	cout << "Samples incorrectly read: " << negativeTest << endl << endl;
 
-	cout << "[irio_setDAQStartStop function] Stop data acquisition" << endl;
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 0 (OFF)" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -446,9 +451,9 @@ static void mod5761Test(bool tout){
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	/**
-	 * WAVEFORM GENERATOR RECONFIGURATION FOR TESTING SAMPLING RATE AND SIGNAL GENERATION FREQUENCIES
-	 */
+/**
+ * WAVEFORM GENERATOR RECONFIGURATION FOR TESTING SAMPLING RATE AND SIGNAL GENERATION FREQUENCIES
+ */
 	cout << endl << "##############################################################" << endl;
 	cout << "The purpose of tests: 13, 14, 15, 16 and 17 consist of configuring "
 			"internal waveform-generator 0" << endl << " with a SINE signal pattern with an amplitude "
@@ -461,7 +466,7 @@ static void mod5761Test(bool tout){
 	 */
 	uint32_t SGFref = 0;
 	int SGChannel = 0;
-	samplingRate = 10000000;
+	int32_t updateRate = 10000000;
 
 	cout << endl << "TEST 13: Set Signal Generator update rate" << endl << endl;
 	myStatus = irio_getSGFref(&p_DrvPvt,SGChannel,&SGFref,&status);
@@ -474,19 +479,21 @@ static void mod5761Test(bool tout){
 	// Where - SGFref is p_DrvPvt.SGfref, this value is read from FPGA by irioDriver initialization
 	//		 - samplesPerSeg is the amount of samples that are going to be generated
 	// E.g., If you want 100000 Samples/s then configure (p_DrvPvt.SGfref/10000) in third parameter of irio_setSGUpdateRate
-	cout << "[irio_setSGUpdateRate function] SGUpdateRate0 set to " << samplingRate << " Samples/s" << endl;
-	myStatus = irio_setSGUpdateRate(&p_DrvPvt,0,SGFref/samplingRate,&status);
+	cout << "[irio_setSGUpdateRate function] SGUpdateRate0 set to " << SGFref/updateRate
+		 << ", meaning " << updateRate << " Samples/s" << endl;
+	myStatus = irio_setSGUpdateRate(&p_DrvPvt,0,SGFref/updateRate,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	myStatus = irio_getSGUpdateRate(&p_DrvPvt,0,&valueReadI32,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
 	cout << "[irio_getSGUpdateRate function] SGUpdateRate0 read: "
-		 << valueReadI32*samplingRate << " Samples/s" << endl;
+		 << valueReadI32 << ", meaning " << valueReadI32*updateRate << " Samples/s" << endl;
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	/**
@@ -498,7 +505,7 @@ static void mod5761Test(bool tout){
 	// Equation to apply to obtain freq_desired is:
 	//       SGFreq = Freq_desired*((2to32)/(Samples/s))
 	uint32_t freqDesired = 10000;
-	int SGFreq = freqDesired*(UINT_MAX/samplingRate);
+	int SGFreq = freqDesired*(UINT_MAX/updateRate);
 	cout << "[irio_setSGFreq function] SGFreq0 set to " << SGFreq << ", meaning " << freqDesired << " Hz" << endl;
 	myStatus = irio_setSGFreq(&p_DrvPvt,0,SGFreq,&status);
 	if (myStatus > IRIO_success) {
@@ -506,9 +513,10 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	 myStatus = irio_getSGFreq(&p_DrvPvt,0,&valueReadI32,&status);
 	 cout << "[irio_getSGFreq function] SGFreq0 read " << valueReadI32 << ", meaning " <<
-			      valueReadI32/(UINT_MAX/samplingRate) << " Hz" << endl;
+			      valueReadI32/(UINT_MAX/updateRate) << " Hz" << endl;
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -535,9 +543,10 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	 myStatus = irio_getSGAmp(&p_DrvPvt,0,&valueReadI32,&status);
-	 cout << "[irio_getSGAmp function] SGAmp0 read " << (double) valueReadI32 << ", meaning " <<
-			      valueReadI32/CVDAC << " V" << endl;
+	valueReadI32 = -1;
+	myStatus = irio_getSGAmp(&p_DrvPvt,0,&valueReadI32,&status);
+	cout << "[irio_getSGAmp function] SGAmp0 read " << (double) valueReadI32
+		 << ", meaning " << valueReadI32/CVDAC << " V" << endl;
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -548,7 +557,8 @@ static void mod5761Test(bool tout){
 	 * SG Type
 	 */
 	cout << endl << "TEST 16: Set Signal Generator type" << endl << endl;
-	myStatus = irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO is disabled
+	cout << "[irio_setAOEnable function] AOEnable0 set to 0 (DISABLE)" << endl;
+	myStatus = irio_setAOEnable(&p_DrvPvt,0,0,&status); // AO0 is disabled
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -561,6 +571,7 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
+	valueReadI32 = -1;
 	myStatus = irio_getSGSignalType(&p_DrvPvt,0,&valueReadI32,&status);
 	cout << "[irio_getSGSGSignalType function] SGSignalType0 read " << valueReadI32 << endl;
 	if (myStatus > IRIO_success) {
@@ -568,7 +579,8 @@ static void mod5761Test(bool tout){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	myStatus = irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO is enabled
+	cout << "[irio_setAOEnable function] AOEnable0 set to 1 (ENABLE)" << endl;
+	myStatus = irio_setAOEnable(&p_DrvPvt,0,1,&status); // AO0 is enabled
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
@@ -582,7 +594,7 @@ static void mod5761Test(bool tout){
 	cout << "Inside the following 60 samples must be approximately 50 samples "
 			"that represent one sine cycle with a maximum and minimum of +-" <<
 		    amplitude/CVDAC << " raw_value +-" << amplitude << endl;
-	cout << "[irio_setDAQStartStop function] Restart data acquisition" << endl;
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (ON)" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -593,7 +605,7 @@ static void mod5761Test(bool tout){
 	elementsRead = 0;
 	sampleCounter = 0;
 	// User decides how many blocks wants to read
-	blocksToRead = 3;
+	blocksToRead = 1;
 	// Each block: 4096 words * 64 bits/word = 4096 words * 8 bytes/word
 	uint64_t* dataBuffer3 = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*8];
 
@@ -601,7 +613,7 @@ static void mod5761Test(bool tout){
 		// Timeout needed
 		samplingRate = 500000;  // DMA sampling rate of test 8
 		timePerWord = 1/((float)samplingRate)*1000;
-		timeout = ceil(timePerWord*blocksToRead*DMATtoHOSTBlockNWords);     // por exceso
+		timeout = ceil(timePerWord*blocksToRead*DMATtoHOSTBlockNWords); // Always by excess
 	}
 	do {
 		if (tout)
@@ -643,7 +655,7 @@ static void mod5761Test(bool tout){
 	 */
 	// Once data acquisition has finished DMAs have to be closed
 	cout << endl << "TEST 18: Closing DMAS" << endl << endl;
-	cout << "[irio_closeDMAsTtoHost function] No output if DMAs have been closed successfully" << endl;
+	cout << "[irio_closeDMAsTtoHost function] Closing DMAs" << endl;
 	myStatus = irio_closeDMAsTtoHost(&p_DrvPvt,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
