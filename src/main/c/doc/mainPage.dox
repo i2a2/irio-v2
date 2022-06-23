@@ -19,7 +19,7 @@ be able to know how to use the library according to it.
 The first thing that the user should know is in which software layer, related to the hardware, is
 located this library. The figure below explains it. 
 
-@image html softwareLayerIRIOLibrary.png
+@image html softwareLayerIRIOLibrary.png Software layers used by IRIO Library 
 @image latex softwareLayerIRIOLibrary.png Software layers used by IRIO Library 
 
 As usual Linux device driver implementations, NI RIO Linux device driver (Level 0), requires
@@ -78,11 +78,11 @@ Fig. 2, green arrows represent direct (software-hardware) communication with the
 through NI-RIO Linux Device Driver. Red discontinuous arrows represent the relationship
 between the IRIO library calls and the terminals implemented with LabVIEW for FPGA.
 
-@image html IRIOLibraryUse.png
+@image html IRIOLibraryUse.png Software layers used by IRIO Library 
 @image latex IRIOLibraryUse.png Software layers used by IRIO Library 
 
-@image html exampleIRIOUse.png
-@image latex exampleIRIOUse.png 
+@image html exampleIRIOUse.png Example of use 
+@image latex exampleIRIOUse.png Example of use 
 
 Software layers which use IRIO Library
 ======================================
@@ -92,8 +92,8 @@ not require modifying the EPICS device support, only records database and st.cmd
 would be required. The same philosophy is applied for the implementation of a Nominal Device 
 Support application using the IRIO library. These examples are shown in next figure.
 
-@image html softwareLayerIRIOLibrary.png
-@image latex softwareLayerIRIOLibrary.png IRIO Library used for implementing an EPICS device support with asyn, NDS, etc
+@image html layersUsingIRIO.png IRIO Library used for implementing an EPICS device support with asyn, NDS, etc
+@image latex layersUsingIRIO.png IRIO Library used for implementing an EPICS device support with asyn, NDS, etc
 
 Development workflow with IRIO Library
 ======================================
@@ -109,12 +109,55 @@ aforementioned <a>bitfile</a> and <a>header</a> file obtained using LabVIEW tool
 The complete development workflow to be followed in order to implement applications for
 RIO devices using IRIO Library and developed with LabVIEW for FPGA is summarized in
 the next picture 
-@image html completeDevelopmentCycle.png
-@image latex completeDevelopmentCycle.png Developing cycle for RIO applications
+@image html completeDevelopmentCycle.png Development cycle for RIO applications
+@image latex completeDevelopmentCycle.png Development cycle for RIO applications
 
+IRIO Library key concept: FPGA resources
+========================================
 
+The implementation of FPGA code has to 	ºmeet the design rules document. That document describes the different profiles 
+available to be implemented for the user in cRIO and FlexRIO technology. Once the design has been compiled and the 
+bitfile have been tested using LabVIEW, the FPGA application is ready to be moved to Codac Core System.
+The header file and the bitfile obtained with C API generator have to be copied to the corresponding folder depending 
+of the application type.
+Depending on the profile implemented resources are organized in:
+- 1. Common resources
+- 2. Specific profile resources
+- 3. Optional Resources.
+The resources in the FPGA are identified using the specific labels described in the design rules document.
 
+IRIO Library key concept: Basic use
+========================================
 
+The use of IRIO library requires following a sequence of specific steps. These steps are depicted in figure below and can be described as:
+- Initialization of IRIO driver. This is accomplished with the irio_initDriver function. This function performs 
+all the library initialization. The main operations implemented in the function are: download the bitfile to the FPGA, 
+resources identification depending on the profile implemented in the FPGA and data structure initialization for later 
+use by other API calls. This function returns a structure of type irioDrv_t that contains the mapping of all resources found in the FPGA.
+
+- Use of getters and setters. The applications using the IRIO library can access to read/write the terminal available in the 
+FPGA in order to know the initialization value or to set this. All getters/setters use a similar prototype with these 
+parameters in common:
+	- irioDrv_t* p_DrvPvt, this is data structure for the RIO device
+	- TStatus* status, this is data structure containing the status and errors obtained once the function has been executed.
+- If the application is using DMA (for image acquisition profiles or DAQ acquisition profile) the user needs to configure 
+	the DMA using irio_setupDMAstoHost.	
+- Execution of the hardware implemented in the FPGA. In the initialization the bitfile 
+	is downloaded but it is not executed. This means that the FPGA is waiting until the software send a run command. This run command is executed with the irio_setFPGAstart.
+	Once the FPGA is running the application the user can interact with the FPGA terminals using the setters/getters and can 
+	trigger data acquisition retrieving the data using the irio_getDMATtoHost. There are many more functions explained in the 
+	Library API part of this document.	For closing the driver and release the resources, irio_closeDriver is required to be invoked.
+- If the application is using DMA (for image acquisition profiles or DAQ acquisition profile) the user needs to configure 
+the DMA using irio_setupDMAstoHost
+- Execution of the hardware implemented in the FPGA. In the initialization the bitfile is downloaded but it is not executed. 
+This means that the FPGA is waiting until the software send a run command. This run command is executed with the irio_setFPGAstart
+- Once the FPGA is running the application the user can interact with the FPGA terminals using the setters/getters and can trigger 
+data acquisition retrieving the data using the irio_getDMATtoHost. There are many more functions explained in the Library API part 
+of this document.
+- For closing the driver and release the resources, irio_closeDriver is required to be invoked
+
+@image html IRIOLibraryBasicUse.png Basic steps to use IRIO Libray
+@image latex IRIOLibraryBasicUse.png Basic steps to use IRIO Libray
 
 \n
 
