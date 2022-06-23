@@ -2,6 +2,9 @@
 
 #include <cstdlib>
 
+// C++ <csignal> header is the equivalent from C <signal> header
+#include <csignal>
+
 // IRIO Library
 extern "C" {
 #include <irioDriver.h>
@@ -26,6 +29,23 @@ static int verbosity = 1;
 
 using std::cout; using std::endl;
 using std::string; using std::cerr;
+
+int dataExit = 0; //Global variable used for checking if continuous acquisition must be stopped.
+
+/**
+ *  SIGNAL handler. In case of user type Ctrl+C while acquisition is continuous, then acquisition stops, and program continues
+ */
+static void signal_handler (int);
+
+static void signal_handler (int signal){
+	switch (signal)	{
+	case SIGINT:
+		dataExit = 1;
+		break;
+	default:
+		break;
+	}
+}
 
 /*
  * Necessary structure to manage data acquisition thread
@@ -59,7 +79,6 @@ static void DMAthread(threadData_t* data, int blocksToRead, int timeout, bool to
 	int DMATtoHOSTFrameType = 0;
 
 	while(data->flagToFinish == 0){
-
 		if (tout){
 			myStatus = irio_getDMATtoHostData_timeout(data->p_Drv,blocksToRead,DMATtoHOSTFrameType,
 					                            data->DBuffer,&elementsRead,timeout,status);
@@ -85,6 +104,10 @@ static void DMAthread(threadData_t* data, int blocksToRead, int timeout, bool to
 			}
 		}
 	}
+
+//	if (dataExit) {
+//		myStatus = irio_setDAQStartStop(data->p_Drv,0,status); // Stop data acquisition
+//	}
 }
 
 static void performanceTest(bool tout = false);
@@ -120,26 +143,29 @@ static void performanceTest(bool tout) {
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
-	string RIODevice = "7966";
-	string RIOSerial = "0x0177A2AD";
+	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string appCallID = "functionalPerformanceTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
-	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIO_perf_"+RIODevice;
+	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;
 	TStatus status;
 	irio_initStatus(&status);
 
-	/*
+	//Signal handler registration. It permits stops continuous acquisition with Ctrl+C
+	std::signal(SIGINT,signal_handler);
+
+	/**
 	 * TEST 0
 	 * DRIVER INITIALIZATION
 	 */
 	cout << "TEST 0: Testing driver initialization" << endl << endl;
-	myStatus = irio_initDriver("functionalPerformanceTest",
+	myStatus = irio_initDriver(appCallID.c_str(),
 							   RIOSerial.c_str(),
 							   NIRIOmodel.c_str(),
 							   bitfileName.c_str(),
@@ -156,7 +182,7 @@ static void performanceTest(bool tout) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	/*
+	/**
 	 * TEST 1
 	 * FPGA START
 	 */
@@ -168,7 +194,7 @@ static void performanceTest(bool tout) {
 	}
 	ASSERT_NE(myStatus, IRIO_error);
 
-	/*
+	/**
 	 * TEST 2
 	 * DEBUG MODE CONFIGURATION
 	 */
@@ -178,7 +204,7 @@ static void performanceTest(bool tout) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	/*
+	/**
 	 * TEST 3
 	 * DMA CONFIGURATION
 	 */
@@ -189,7 +215,7 @@ static void performanceTest(bool tout) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	/*
+	/**
 	 * TEST 4
 	 * DMA ENABLE
 	 */
@@ -200,7 +226,7 @@ static void performanceTest(bool tout) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	/*
+	/**
 	 * TEST 5
 	 * FPGA CLOCK REFERENCE CONFIGURATION
 	 */
@@ -214,7 +240,7 @@ static void performanceTest(bool tout) {
 	ASSERT_NE(Fref, 0);
 	cout << endl << "FPGA Clock reference, Fref: " << Fref << " Hz" << endl;
 
-	/*
+	/**
 	 * TEST 6
 	 * DMA PARAMETERS
 	 */
@@ -239,15 +265,14 @@ static void performanceTest(bool tout) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
-	/*
+	/**
 	 * TEST 7
 	 * PERFORMANCE TESTS
 	 */
 	cout << endl << "*** PERFORMANCE TESTS ***" << endl;
-	cout << "These tests pretends to show that IRIO library is not able to overcome the throughput of 800.000MB/s" << endl;
+	cout << "These tests pretends to show that IRIO library is not able to overcome the throughput of 750.000MB/s" << endl;
 
 	uint32_t sampleSize = 2;        // 2 bytes for each word read on each DMA channel
-	int32_t decimationFactor = 0;
 	int i = 0;
 
 	// 1 Sample = 1 word of 8 bytes  ; 8 bytes = 4 DMA channels, 2 bytes of sample size each DMA channel
@@ -260,7 +285,7 @@ static void performanceTest(bool tout) {
 	int timeSleep = 5; // User decides how much time the thread is going to acquire data
 
 	// Necessary timeout parameters
-	float timePerWord = 0;
+	float timePerWord;
 	uint32_t timeout = 0;
 
 	/*
@@ -269,9 +294,11 @@ static void performanceTest(bool tout) {
 	threadData_t data;
 	data.p_Drv = &p_DrvPvt;
 	data.DBuffer = new uint64_t[blocksToRead*DMATtoHOSTBlockNWords*sampleSize*DMATtoHOSTNCh];
+
+	// Chrono used to test how much time the data has been acquired
 	using clock = std::chrono::high_resolution_clock;
 
-	for(std::vector<int>::iterator it = samplingRate.begin() ; it != samplingRate.end(); ++it) {
+	for(std::vector<int>::iterator it = samplingRate.begin(); it != samplingRate.end() && dataExit==0; ++it) {
 		i += 1;
 		float throughput = (float)(*it)*sampleSize*DMATtoHOSTNCh/1000000; //  MB/s transfered
 																		  //  /1000000 = conversion from B/s to MB/s
@@ -282,7 +309,7 @@ static void performanceTest(bool tout) {
 		//		 - samplesPerSeg is the amount of samples that are going to be generated
 		//		 - decimationFactor, is the value configured in the FPGA to obtain the sampling rate desired
 		// E.g., If you want 10000 Samples/s then configure (p_DrvPvt.Fref/10000) in third parameter of irio_setDMATtoHostSamplingRate
-		decimationFactor = Fref/(*it);
+		int32_t decimationFactor = Fref/(*it);
 		myStatus = irio_setDMATtoHostSamplingRate(&p_DrvPvt,0,decimationFactor,&status);
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
@@ -326,6 +353,10 @@ static void performanceTest(bool tout) {
 
 		int DMAsOverflow = -1;
 		myStatus = irio_getDMATtoHostOverflow(&p_DrvPvt,&DMAsOverflow,&status);
+		if (myStatus > IRIO_success) {
+			TestUtilsIRIO::getErrors(status);
+		}
+		ASSERT_EQ(myStatus, IRIO_success);
 		if (DMAsOverflow==0){
 			cout << "Bandwidth expected: " << throughput << "MB/s during " << timeSleep << " seconds. "
 				 << throughput*timeSleep << "MB of data reception are expected" << endl;
@@ -339,10 +370,9 @@ static void performanceTest(bool tout) {
 							 "Bandwidth tested: %.2fMB/s [ERROR]. DMA Overflow with data loss\n",throughput);
 			TestUtilsIRIO::getErrors(status);
 		}
-		if (myStatus > IRIO_success) {
-			TestUtilsIRIO::getErrors(status);
-		}
-		ASSERT_EQ(myStatus, IRIO_success);
+
+		// TODO: Review this condition with Cppcheck
+		EXPECT_TRUE(DMAsOverflow==0 || (DMAsOverflow!=0 && throughput > 750));
 
 		myStatus = irio_cleanDMAsTtoHost(&p_DrvPvt,&status);
 		if (myStatus > IRIO_success) {
@@ -365,10 +395,11 @@ static void performanceTest(bool tout) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
-	/*
+	/**
 	 * TEST 9
 	 * IRIO DRIVER CLOSING
 	 */
+	cout << "[irio_closeDriver function] Closing driver..." << endl;
 	myStatus = irio_closeDriver(&p_DrvPvt,0,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
