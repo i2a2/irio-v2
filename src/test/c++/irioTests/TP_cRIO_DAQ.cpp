@@ -33,7 +33,7 @@ using std::string;
  *
  * NI9159 Chassis
  *
- * /**
+ *
  * Main Test program.
  * Input parameters expected as environment variables:
  * Param 1<s/n>: Device serial number, uses lsrio command to get it.
@@ -105,7 +105,7 @@ TEST(TP_cRIO_DAQ, functional) {
 //	string blockLength = TestUtilsIRIO::getEnvVar("blockLength");
 
 	string RIODevice = "9159";
-	string RIOSerial = "0x01C10FAC";
+	string RIOSerial = "0x01B54986";
 	string debugMode = "1";
 	string CH0Voltage = "+5.0";
 	string CH1Voltage = "-5.0";
