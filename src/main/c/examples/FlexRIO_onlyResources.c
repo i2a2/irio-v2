@@ -63,7 +63,7 @@ void msgerr(TIRIOStatusCode code, int nTest, const char* testName, TStatus* stat
 		}else{
 			printf("\n\tCheck previous messages for more detailed information of the error\n");
 		}
-		free(detailStr);
+		free(detailStr); detailStr = NULL;
 		fflush(stdout);
 		irio_resetStatus(status);
 
@@ -89,7 +89,7 @@ int main (int argc, char **argv)
 	irioDrv_t p_DrvPvt;
 	TStatus status;
 	irio_initStatus(&status);
-	int myStatus;
+	int myStatus = 0;
 
 	char *NIriomodel=NULL;
 	char *filePath=NULL;
@@ -162,35 +162,7 @@ int main (int argc, char **argv)
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 	msgerr(myStatus,2,"MAXIO Test",&status,verbosity,0);
 
-	//NEW TEST
-	//TODO: Hay que pensar cómo dejar estos ejemplos
-	// 2 opciones: dejar este test como una sub-versión del anterior (Test 2 + Test 2.1)
-	//             o modificar el Test 2 para que solo tenga en cuenta el bitfile con la
-	//             modificacion de los puertos de 64 bits
-	//-----------------all possible FlexRIO I/O resources Test including 64 bits auxiliary analog I/O
-	msgtest(2,MAXIO Test 64 bits);
-	asprintf(&bitfileName,"FlexRIOonlyResources_%s_64",argv[2]);
-	printf("Test 2.1: MAXIO including 64 bits auxiliary analog I/O ports. It should be Found:\n");
-	printf("1 DMA\n");
-	printf("2 AO\n");
-	printf("16 aux32AI\n");
-	printf("16 aux64AI\n");
-	printf("16 aux32AO\n");
-	printf("16 aux64AO\n");
-	printf("16 auxDI\n");
-	printf("16 auxDO\n");
-	printf("54 DI \n");
-	printf("54 DO \n");
-	printf("2 SG\n");
-
-//	asprintf(&VIName,"FlexRIOonlyResources_%s",riomodel_folder);
-	myStatus=irio_initDriver("testMAXIO",argv[1],NIriomodel,bitfileName,"V1.1",verbosity,filePath,filePath,&p_DrvPvt,&status);
-	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
-	msgerr(myStatus,2,"MAXIO Test",&status,verbosity,0);
-
-
 	msgtest(3,Missing resources test);
-	asprintf(&bitfileName,"FlexRIOonlyResources_%s",argv[2]);
 	printf("[Bug7516] This tests checks the correct order in error messages when verbosity=1 \n");
 	printf("Test 3: Missing resources. It should be Found:\n");
 	printf("1 AO + Error finding AO1Enable\n");
@@ -207,7 +179,7 @@ int main (int argc, char **argv)
 
 	myStatus=irio_initDriver("testMAXIO",argv[1],NIriomodel,bitfileName,"V1.1",verbosity,filePath,filePath,&p_DrvPvt,&status);
 	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
-	free(errorFilePath);
+	free(errorFilePath); errorFilePath = NULL;
 	//Invert status -> previous call should fail
 	if(myStatus!=IRIO_success){
 		myStatus=IRIO_success;
@@ -254,9 +226,9 @@ int main (int argc, char **argv)
 //	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
 //	msgerr(myStatus,5,"GPUIMAQ Test",&status,verbosity,0);
 
-	free(NIriomodel);
-	free(filePath);
-	free(bitfileName);
+	free(NIriomodel); NIriomodel = NULL;
+	free(filePath); filePath = NULL;
+	free(bitfileName); bitfileName = NULL;
 
 	return 0;
 }

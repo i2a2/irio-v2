@@ -8,7 +8,7 @@
  * \brief Initialization and common resources access methods for IRIO Driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * \endcond
  *****************************************************************************/
+#define _GNU_SOURCE //!< include asprintf, get_current_dir_name
 
 #include "irioDriver.h"
 #include "irioDataTypes.h"
@@ -37,7 +38,7 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include <niflexrio.h> //located in /opt/codac/include
+#include <niflexrio.h>
 #ifdef IRIO_GPU
 #include "irioHandlerDMAGPU.h"
 #endif
@@ -52,27 +53,27 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <math.h>
-
+#include <sys/mman.h>
 
 /** @name Common Resource Strings
  * Strings for common FPGA Resources
  */
 ///@{
-#define STRINGNAME_SIGNATURE "_Signature"
-#define STRINGNAME_PLATFORM "_IndicatorU8_Platform"
-#define STRINGNAME_FPGAVIVERSION "_IndicatorArrayU8_FPGAVIversion"
-#define STRINGNAME_INITDONE  "_IndicatorBool_InitDone"
-#define STRINGNAME_FREQREF "_IndicatorU32_Fref"
-#define STRINGNAME_DEVQUALITYSTATUS "_IndicatorU8_DevQualityStatus"
-#define STRINGNAME_DEVTEMP "_IndicatorI16_DevTemp"
-#define STRINGNAME_DEVPROFILE "_IndicatorU8_DevProfile"
-#define STRINGNAME_DAQSTARTSTOP "_ControlBool_DAQStartStop"
-#define STRINGNAME_DEBUGMODE "_ControlBool_DebugMode"
-#define STRINGNAME_INSERTEDIOMODULEID "_IndicatorU32_InsertedIOModuleID"
-#define STRINGNAME_RIOADAPTERCORRECT "_IndicatorBool_RIOAdapterCorrect"
-#define STRINGNAME_INSERTEDIOMODULESID "_IndicatorArrayU16_InsertedIOModulesID" //for cRIO
-#define STRINGNAME_CRIOMODULESOK "_IndicatorBool_cRIOModulesOK"
-#define STRINGNAME_SAMPLINGRATE "_ControlU16_SamplingRate"
+#define STRINGNAME_SIGNATURE "_Signature"                                        //!< Identifies the bitfile downloaded to the FPGA
+#define STRINGNAME_PLATFORM "_IndicatorU8_Platform"                              //!< Identifies using Unsigned-8bits indicator variable the RIO device used
+#define STRINGNAME_FPGAVIVERSION "_IndicatorArrayU8_FPGAVIversion"               //!< Identifies using Array Unsigned-8bits indicator variable the LabVIEW FPGA VI Version
+#define STRINGNAME_INITDONE  "_IndicatorBool_InitDone"                           //!< Identifies using a boolean indicator variable if the adapter module is ready
+#define STRINGNAME_FREQREF "_IndicatorU32_Fref"                                  //!< Identifies using Unsigned-32bits indicator variable the FPGA reference frequency clock
+#define STRINGNAME_DEVQUALITYSTATUS "_IndicatorU8_DevQualityStatus"              //!< Identifies using Unsigned-8bits indicator variable the device status
+#define STRINGNAME_DEVTEMP "_IndicatorI16_DevTemp"                               //!< Identifies using Unsigned-16bits indicator variable the device temperature
+#define STRINGNAME_DEVPROFILE "_IndicatorU8_DevProfile"                          //!< Identifies using Unsigned-8bits indicator variable the device profile
+#define STRINGNAME_DAQSTARTSTOP "_ControlBool_DAQStartStop"                      //!< Identifies using a boolean control variable if the DAQ acquisition is running or not
+#define STRINGNAME_DEBUGMODE "_ControlBool_DebugMode"                            //!< Identifies using a boolean control variable if debugging mode is to be used
+#define STRINGNAME_INSERTEDIOMODULEID "_IndicatorU32_InsertedIOModuleID"         //!< Identifies using Unsigned-32 bits indicator variable the adapter module if FlexRIO is used or the cRIO modules if cRIO device is used
+#define STRINGNAME_RIOADAPTERCORRECT "_IndicatorBool_RIOAdapterCorrect"          //!< Identifies using a boolean variable if the adapter module connected is supported
+#define STRINGNAME_INSERTEDIOMODULESID "_IndicatorArrayU16_InsertedIOModulesID"  //!< Identifies using Array Unsigned-16bits indicator variable if the inserted I/O modules are correct if cRIO device is used
+#define STRINGNAME_CRIOMODULESOK "_IndicatorBool_cRIOModulesOK"                  //!< Identifies using a boolean variable if the cRIO modules inserted are correct
+#define STRINGNAME_SAMPLINGRATE "_ControlU16_SamplingRate"                       //!< Identifies using Unsigned-16bits control variable the I/O sampling rates
 ///@}
 
 /**@name cRIO Module Names
@@ -88,48 +89,17 @@ cRIOmodule cRIOIDs[8] = {
 		{0x736A,"NI9426"},
 		{0x7133,"NI9476"},
 		{0x71CB,"NI9477"}
-};
+};                          //!< Structure to identifie the cRIO modules and their identificator
 ///@}
-
-int initializeLibrary(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int finalizeLibrary(irioDrv_t* p_DrvPvt, TStatus* status);
-
-int configureTarget(irioDrv_t* p_DrvPvt, char* bitFilePath, TStatus* status);
-
-int searchPlatform( irioDrv_t* p_DrvPvt,TStatus* status);
-
-int allocFlexRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int allocCRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int freeXRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchMandatoryResourcesAllPlatforms(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchProfile( irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchDAQResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchIMAQResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-#ifdef IRIO_GPU
-int searchDAQGPUResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int searchIMAQGPUResources(irioDrv_t* p_DrvPvt,TStatus* status);
-#endif
-
-int searchIOResources(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int findIOSamplingRate(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status);
-
-
 
 int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const char *RIODeviceModel,
 					const char *projectName, const char *FPGAversion, int verbosity,
 					const char *headerDir,const char *bitfileDir, irioDrv_t* p_DrvPvt, TStatus* status){
+
+	//The user can provide a pointer to a TStatus variable that is not initialized
+	if (status==NULL){
+    	return IRIO_error;
+    }
 
 	TIRIOStatusCode local_status = IRIO_success;
 	memset(p_DrvPvt,0x00,sizeof(irioDrv_t));
@@ -239,6 +209,8 @@ int irio_closeDriver(irioDrv_t* p_DrvPvt,uint32_t mode, TStatus* status){
 
 	free(p_DrvPvt->appCallID);
 	free(p_DrvPvt->projectName);
+
+	free(status->msg); status->msg = NULL;
 
 	if(local_status<IRIO_error){
 		return local_status;
@@ -433,11 +405,13 @@ int allocCRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	p_DrvPvt->enumAnalogInput = calloc(p_DrvPvt->max_analoginputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanaloginputs = CRIO_MAX_AUXA_IN;
 	p_DrvPvt->enumauxAI = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAI_64 = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort_64));
 	p_DrvPvt->max_analogoutputs = CRIO_MAX_ANALOGS_OUT;
 	p_DrvPvt->enumAnalogOutput= calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->enumAOEnable = calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 	p_DrvPvt->max_auxanalogoutputs = CRIO_MAX_AUXA_OUT;
 	p_DrvPvt->enumauxAO = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort));
+	p_DrvPvt->enumauxAO_64 = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort_64));
 
 	//Digital Limits
 	p_DrvPvt->max_digitalsinputs = CRIO_MAX_DIGITALS;
@@ -481,9 +455,11 @@ int freeXRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	//Analog Limits
 	free(p_DrvPvt->enumAnalogInput);
 	free(p_DrvPvt->enumauxAI);
+	free(p_DrvPvt->enumauxAI_64);
 	free(p_DrvPvt->enumAnalogOutput);
 	free(p_DrvPvt->enumAOEnable);
 	free(p_DrvPvt->enumauxAO);
+	free(p_DrvPvt->enumauxAO_64);
 
 	//Digital Limits
 	free(p_DrvPvt->enumDigitalInput);
@@ -508,9 +484,9 @@ int freeXRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	free(p_DrvPvt->enumSGSignalType);
 	free(p_DrvPvt->enumSGUpdateRate);
 	free(p_DrvPvt->enumSGFref);
+	free(p_DrvPvt->SGfref);
 
 	// DMA for GPU
-
 	free(p_DrvPvt->DMATtoGPUNCh);
 	free(p_DrvPvt->DMATtoGPUChIndex);
 	free(p_DrvPvt->enumDMATtoGPU);
@@ -540,7 +516,7 @@ int searchMandatoryResourcesAllPlatforms( irioDrv_t* p_DrvPvt, TStatus* status){
 		asprintf(&auxVersion,"V%d.%d",p_DrvPvt->FPGAVIversion[0],p_DrvPvt->FPGAVIversion[1]);
 	}
 	if(NiFpga_IsError(fpgaStatus) || strcmp(auxVersion,p_DrvPvt->FPGAVIStringversion)!=0){
-		irio_mergeStatus(status,NIRIO_API_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR VI Version Check Failed. Expected:%s Read:%s .Error Code:%d\n",__func__,__LINE__,p_DrvPvt->appCallID,p_DrvPvt->FPGAVIStringversion,auxVersion,fpgaStatus);
+		irio_mergeStatus(status,NIRIO_API_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR VI Version Check Failed. Read: %s, Expected: %s. Error Code:%d\n",__func__,__LINE__,p_DrvPvt->appCallID,p_DrvPvt->FPGAVIStringversion,auxVersion,fpgaStatus);
 		local_status |= IRIO_error;
 		fpgaStatus=NiFpga_Status_Success;
 	}
@@ -849,15 +825,13 @@ int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status){
 	double auxADC=1;
 	double auxDAC=1;
 	int32_t moduleID;
-	int32_t statuscode;
 	switch (p_DrvPvt->platform)
 	{
 	case IRIO_FlexRIO:
 		//we are not verifying the module in use..
 		//Two options, read using IRIO library the InsetedIOModule (this only can be called if FPGA is running!!!) or using flexRIO functions
 		//Using FlexRIO library here because FPGA is not running
-
-		statuscode=NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
+		NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
 		printf("Module ID found=%x\n", moduleID);
 		//Modules ID for Analog or Digital
 		// NI5761: 0x109374C6, supported by ITER in AC version not DC, 4 analog inputs
@@ -921,6 +895,10 @@ int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status){
 //			p_DrvPvt->minAnalogOut=-0.635;
 
 			break;
+
+		default:
+			printf("No adapter module connected to FlexRIO device\n");
+			break;
 		}
 
 
@@ -957,8 +935,7 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 	int32_t moduleID;
 
 	if (p_DrvPvt->platform == IRIO_FlexRIO){
-		int32_t statuscode;
-		statuscode=NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
+		NiFlexRio_GetAttribute(p_DrvPvt->session, NIFLEXRIO_Attr_InsertedFamID, NIFLEXRIO_ValueType_U32,&moduleID);
 		printf("Module ID found=%x\n", moduleID);
 		switch (moduleID)			{
 			case FlexRIO_Module_IO_NI5761: //only for NI5761
@@ -996,14 +973,24 @@ int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* sta
 			break;
 		}
 	}
-	//else REVIEW: What happens in cRIO?. This applies only to NI9205 analog input module. This module is only DC
+	//TODO: REVIEW, What happens in cRIO?. This applies only to NI9205 analog input module. This module is only DC
 	return IRIO_success;
 }
 
-int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status)
-{
-	*value=p_DrvPvt->couplingMode;
-	return IRIO_success;
+int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status){
+	TIRIOStatusCode local_status = IRIO_success;
+	if (p_DrvPvt->enumPlatform.found){
+		*value=p_DrvPvt->couplingMode;
+	}
+	else {
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can't get adapter module analog input coupling mode  \n",__func__,__LINE__,p_DrvPvt->appCallID);
+		local_status |= IRIO_warning;
+	}
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
 }
 
 int irio_getVersion(char *version,TStatus* status)
@@ -1352,3 +1339,5 @@ int irio_getSamplingRate(irioDrv_t* p_DrvPvt,int n,int32_t* value, TStatus* stat
 		return IRIO_error;
 	}
 }
+
+

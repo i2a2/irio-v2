@@ -8,7 +8,7 @@
  * \brief Analog I/O handler methods for IRIO Driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include "NiFpga.h"
+
 
 #include "stdint.h"
 #include "stdio.h"
@@ -43,13 +43,13 @@
  * Strings for analog FPGA Resources
  */
 ///@{
-#define STRINGNAME_ANALOGINPUT "_IndicatorI32_AI"
-#define STRINGNAME_ANALOGOUTPUT "_ControlI32_AO"
-#define STRINGNAME_AOENABLE "_ControlBool_AOEnable"
-#define STRINGNAME_AUXAI "_IndicatorI32_auxAI"
-#define STRINGNAME_AUX64AI "_IndicatorI64_aux64AI"
-#define STRINGNAME_AUXAO "_ControlI32_auxAO"
-#define STRINGNAME_AUX64AO "_ControlI64_aux64AO"
+#define STRINGNAME_ANALOGINPUT "_IndicatorI32_AI"      //!< Identifies AI registers
+#define STRINGNAME_ANALOGOUTPUT "_ControlI32_AO"       //!< Identifies AO registers
+#define STRINGNAME_AOENABLE "_ControlBool_AOEnable"    //!< Identifies AOEnable registers
+#define STRINGNAME_AUXAI "_IndicatorI32_auxAI"         //!< Identifies auxAI registers
+#define STRINGNAME_AUX64AI "_IndicatorI64_aux64AI"     //!< Identifies aux64AI registers
+#define STRINGNAME_AUXAO "_ControlI32_auxAO"           //!< Identifies auxAO registers
+#define STRINGNAME_AUX64AO "_ControlI64_aux64AO"       //!< Identifies aux64AO registers
 ///@}
 
 int irio_findAnalogs(irioDrv_t* p_DrvPvt, TStatus* status){

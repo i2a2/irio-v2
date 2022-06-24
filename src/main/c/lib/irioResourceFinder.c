@@ -8,7 +8,7 @@
  * \brief Resource finder and error management methods for IRIO driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * \endcond
  *****************************************************************************/
-
 #include "irioResourceFinder.h"
 #include "irioDataTypes.h"
 #include "irioError.h"
@@ -49,30 +48,24 @@
 #ifdef CLOSE_VERSION_NIRIO
 	#define DRV_CALL "lsni -v "
 #else
-
-	#define DRV_CALL "lsrio "
+	#define DRV_CALL "lsrio "        //!< Command with RIO devices information
 #endif
-#define TMP_FILE "/tmp/RIOinfo.txt"
-#define RM_CALL "rm -f "
+#define TMP_FILE "/tmp/RIOinfo.txt"  //!< Path of temporary file
+#define RM_CALL "rm -f "             //!< Command to delete files
 ///@}
 
 /** @name Driver Resource Strings
  * Strings for field search in driver output
  */
 ///@{
-#define STRINGNAME_PORT "RIO"
-#define STRINGNAME_MODEL "Model Name"
-#define STRINGNAME_SERIALNO "Serial Number"
-#define STRINGNAME_DEVICE "Device"
-#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"
-#define STRINGNAME_PORTEND "--" //!<String to search for moving after STRINGNAME_PORT and search for another device
-#define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!<String to move right before resource list in the privative driver
+#define STRINGNAME_PORT "RIO"                                               //!< Device type
+#define STRINGNAME_MODEL "Model Name"                                       //!< RIO device model name
+#define STRINGNAME_SERIALNO "Serial Number"                                 //!< RIO device serial number
+#define STRINGNAME_DEVICE "Device"                                          //!< RIO device identificator
+#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"                           //!< RIO device sub-system device identificator
+#define STRINGNAME_PORTEND "--"                                             //!< String to search for moving after STRINGNAME_PORT and search for another device
+#define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!< String to move right before resource list in the privative driver
 ///@}
-
-
-int parseDriverInfo(irioDrv_t *p_DrvPvt,TStatus* status);
-
-int findDeviceInfo(irioDrv_t *p_DrvPvt, const char* fileContent, const char* toSearch, char* info,TStatus* status);
 
 int irio_findRIO(irioDrv_t *p_DrvPvt,TStatus* status){
 	TIRIOStatusCode local_status = IRIO_success;
@@ -122,11 +115,11 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 		while(!found){//Search while the device has not been found and still no errors
 			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT))!=NULL){//Still devices to search
 				int aux;
-				char * auxLength;
+				// It is supposed that RIO device name is never going to be larger than 40 characters
+				char auxLength[40];
 				sscanf(deviceInfo+3, "%d", &aux);
-				auxLength = (char*) calloc (aux, sizeof(int));
 				sprintf(auxLength, "%d", aux);
-				// TODO: Damos por hecho que todos los dispositivos se llaman RIOX
+				// It is considered that all devices' name are going to be RIOX
 				snprintf(port, strlen(deviceInfo)+strlen(auxLength), "RIO%d", aux);
 			}else{
 				break;
@@ -331,7 +324,6 @@ int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int3
 	}else
 	//Read the port value
 	if(sscanf(aux,"%*s %*s %lX",&port->value)==0){//First, try to read an hexadecimal value
-		//TODO: Review if formats lX and ld support variable uint64_t
 		if (sscanf(aux,"%*s %*s %ld",&port->value)==0){//If failed, try to read a decimal value
 			irio_mergeStatus(status,ResourceValueNotValid_Error,printErrMsg,"[%s,%d]-(%s) ERROR Value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,completeName);
 			local_status = IRIO_error;
@@ -353,10 +345,9 @@ int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int3
 }
 
 int irio_findHeaderString(irioDrv_t *p_DrvPvt, char* fileContent, const char* toSearch, char** str,TStatus* status){
-	char* aux;
-	char *indexcoma1;
-	char *indexcoma2;
-	int length;
+	char* aux = NULL;
+	char* indexcoma1 = NULL;
+	char* indexcoma2 = NULL;
 
 	aux=fileContent;
 	if((aux=strstr(aux,toSearch))==NULL){
@@ -364,16 +355,22 @@ int irio_findHeaderString(irioDrv_t *p_DrvPvt, char* fileContent, const char* to
 		return IRIO_error;
 	}
 	indexcoma1=strstr(aux,"\"");
-	indexcoma2=strstr ((indexcoma1+1),"\"");
-	if(indexcoma1==NULL || indexcoma2==NULL){
+	if(indexcoma1==NULL){
 		irio_mergeStatus(status,ResourceValueNotValid_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR String value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
 		return IRIO_error;
+		}
+	else {
+		int length = 0;
+		indexcoma2=strstr((indexcoma1+1),"\"");
+		if(indexcoma2==NULL){
+			irio_mergeStatus(status,ResourceValueNotValid_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR String value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
+			return IRIO_error;
+		}
+		length=indexcoma2-indexcoma1-1;
+
+		*str=malloc(length+1);
+		strncpy(*str, (indexcoma1+1), length);
+		(*str)[length]='\0';
 	}
-	length=indexcoma2-indexcoma1-1;
-
-	*str=malloc(length+1);
-	strncpy(*str, (indexcoma1+1), length);
-	(*str)[length]='\0';
-
 	return IRIO_success;
 }

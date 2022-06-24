@@ -8,7 +8,7 @@
  * \brief DMA handler methods for IRIO Driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -151,7 +151,7 @@ int irio_cleanDMAsTtoHost(irioDrv_t* p_DrvPvt, TStatus* status);
 /**
  * Clean DMA
  *
- * <bold>Clean the data from specified (n) DMA</bold>. Several read operations will be done over the selected DMA
+ * <b>Clean the data from specified (n) DMA</b>. Several read operations will be done over the selected DMA
  * using the given memory buffer. In order to work properly, DMA writing should be disabled
  * calling irio_setDMATtoHostEnable to set DMATtoHostEnable terminal to false.
  * Errors may occur if the port was not found or while reading from the port.
@@ -174,7 +174,8 @@ int irio_cleanDMATtoHost(irioDrv_t* p_DrvPvt, int n,uint64_t* cleanbuffer, size_
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
  * @param[out] value Value of the overflow bit from DMAsOverflow register. Non-zero value means overflow in at least one DMA.
- * @return Operation status. @see {TStatusCodes}
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_getDMATtoHostOverflow(irioDrv_t* p_DrvPvt,int32_t* value, TStatus* status);
 
@@ -199,7 +200,7 @@ int irio_getDMATtoHostSamplingRate(irioDrv_t* p_DrvPvt, int n,int32_t *value, TS
  * No range check or conversion is performed on the given value.
  * Errors may occur if the port was not found or while writing to the port.
  *
- * @param[in p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
  * @param[in] n  Number of the DMA which sampling rate will be written (DMATtoHOSTSamplingRaten)
  * @param[in] value Sampling rate to set
  * @param[out] status Warning and error messages produced during the execution of this call will be added here.
@@ -250,11 +251,33 @@ int irio_setDMATtoHostEnable(irioDrv_t* p_DrvPvt, int n,int32_t value, TStatus* 
  * @param[in] NBlocks number of data blocks to read.
  * @param[in] n Number of Number of the DMA where data should be read
  * @param[out] data Previously allocated buffer where data read will be stored
- * @param[out elementsRead number of elements read. Can be 0 or NBlocks
+ * @param[out] elementsRead number of elements read. Can be 0 or NBlocks
  * @param[out] status Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, TStatus* status);
+
+/**
+ * Reads data from the DMA using a timeout parameter
+ *
+ * Reads data blocks from the specified data DMA if they are available inside an window timeout time.
+ * If there are less blocks than requested IRIO timeout warning is given. The size in DMA words of a data block depends on
+ * the frame type and block size given by the FPGA registers DMATtoHOSTFrameType and
+ * DMATtoHOSTBlockNWords respectively (read into irioDrv_t::DMATtoHOSTFrameType and
+ * irioDrv_t::DMATtoHOSTBlockNWords at irio_findDAQDMAs()).
+ * Errors may occur if one of the needed ports were not found or while reading from the ports.
+ *
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] NBlocks number of data blocks to read.
+ * @param[in] n Number of Number of the DMA where data should be read
+ * @param[in] timeout Time function waits until FPGA fills DMA buffer
+ * @param[out] data Previously allocated buffer where data read will be stored
+ * @param[out] elementsRead number of elements read. Can be 0 or NBlocks
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getDMATtoHostData_timeout(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *data, int* elementsRead, uint32_t timeout, TStatus* status);
 
 /**
  * Reads image from the DMA
@@ -276,6 +299,28 @@ int irio_getDMATtoHostData(irioDrv_t* p_DrvPvt, int NBlocks, int n, uint64_t *da
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_getDMATtoHostImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t *data, int* elementsRead, TStatus* status);
+
+/**
+ *
+ * Reads size of DMA data blocks in terms of DMA words
+ *
+ * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] Nwords       Numbers of blocks readed
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getDMATtoHOSTBlockNWords(irioDrv_t* p_DrvPvt, uint16_t* Nwords, TStatus* status);
+
+/**
+ * Reads number of Channels per DMA
+ *
+ * @param[in]  p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] NCh          Channel of the FPGA where user wants to read
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getDMATtoHOSTNCh(irioDrv_t* p_DrvPvt, uint16_t* NCh, TStatus* status);
+
 #ifdef __cplusplus
 }
 #endif

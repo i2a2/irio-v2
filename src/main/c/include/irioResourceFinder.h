@@ -8,7 +8,7 @@
  * \brief Resource finder and error management methods for IRIO driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -38,8 +38,8 @@
  * Base Strings for FPGA Resource names
  */
 ///@{
-#define STRINGNAME_PREFIX "NiFpga_"
-#define STRINGNAME_BITFILEEXT ".lvbitx"
+#define STRINGNAME_PREFIX "NiFpga_"      //!< Prefix needed to read bitfile and header files
+#define STRINGNAME_BITFILEEXT ".lvbitx"  //!< Bitfiles extension
 ///@}
 
 #ifdef __cplusplus
@@ -61,6 +61,15 @@ extern "C" {
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_findRIO(irioDrv_t *p_DrvPvt,TStatus* status);
+
+/**
+ * Storage on the irioCore main structure all necessary info about the RIO device
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int parseDriverInfo(irioDrv_t *p_DrvPvt,TStatus* status);
 
 /**
  * Initialize file search resources
@@ -91,6 +100,20 @@ int irio_initFileSearch(irioDrv_t *p_DrvPvt, char* filePath, void** fileContent,
 int irio_closeFileSearch(irioDrv_t *p_DrvPvt, void** fileContent,TStatus* status);
 
 /**
+ * Find all necessary info to identify the RIO device
+ *
+ * Device type, model and serial number are identified
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] fileContent Device type
+ * @param[in] toSearch Identify the device with its serial number
+ * @param[out] info Port to store the device serial number
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int findDeviceInfo(irioDrv_t *p_DrvPvt, const char* fileContent, const char* toSearch, char* info,TStatus* status);
+
+/**
  * Search resource port
  *
  * Search a resource port identified by its name (and number if necessary).
@@ -102,6 +125,7 @@ int irio_closeFileSearch(irioDrv_t *p_DrvPvt, void** fileContent,TStatus* status
  * @param[in] index Number of the resource. Concatenated to resourceName if greater than -1.
  * @param[out] port Resource port
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @param[in] printErrMsg Control variable to print error messag or not
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_findResourceEnum(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t index, TResourcePort* port,TStatus* status,int printErrMsg);
@@ -118,6 +142,7 @@ int irio_findResourceEnum(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t
  * @param[in] index Number of the resource. Concatenated to resourceName if greater than -1.
  * @param[out] port 64 bits Resource port
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @param[in] printErrMsg Control variable to print error messag or not
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_findResourceEnum_64(irioDrv_t *p_DrvPvt, const char* resourceName, int32_t index, TResourcePort_64* port,TStatus* status,int printErrMsg);

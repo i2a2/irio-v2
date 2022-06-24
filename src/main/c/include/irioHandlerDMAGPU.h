@@ -10,7 +10,7 @@
  * \brief GPU DMA handler methods for IRIO driver
  * \date July 2015 (Last Review Sep 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -36,7 +36,7 @@
 
 #include <stdint.h>
 
-#define MAX_DMA_FLEXRIO 16 //Maximun number of DMA used in FlexRIO technology
+#define MAX_DMA_FLEXRIO 16 //!<Maximun number of DMA used in FlexRIO technology
 
 #ifdef __cplusplus
 extern "C" {
@@ -129,8 +129,9 @@ int irio_setUpDMAsTtoGPU(irioDrv_t* p_DrvPvt,int depth, TStatus* status);
  *
  * Stops all DMAs found, freeing the allocated memory for the DMA transfer.
  *
- * @param p_DrvPvt Pointer to the nirioDriver structure
- * @return Operation status. @see {TStatusCodes}
+ * @param[in,out] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out]    status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_closeDMAsTtoGPU(irioDrv_t* p_DrvPvt,TStatus* status);
 
@@ -197,7 +198,7 @@ int irio_getDMATtoGPUSamplingRate(irioDrv_t* p_DrvPvt, int n,int32_t *value,TSta
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
  * @param[in] n Number of the DMA which sampling rate will be read (SamplingRaten)
- * @param[in] Value to be written in the samplingrate terminal
+ * @param[in] value     Value to be written in the samplingrate terminal
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
  *
@@ -211,7 +212,8 @@ int irio_setDMATtoGPUSamplingRate(irioDrv_t* p_DrvPvt, int n,int32_t value,TStat
  * Errors may occur if the port was not found or while reading its value from the device.
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[in] n Number of the DMA which group enable will be read (GroupEnablen)
+ * @param[in] n         Number of the DMA which group enable will be read (GroupEnablen)
+ * @param[out] value    Current value of the DMA to GPU enable
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
@@ -260,9 +262,8 @@ int irio_getDMATtoGPUData(irioDrv_t* p_DrvPvt, int Nelements, int n, uint64_t **
  * @param[out] data double pointer to GPU memory buffer
  * @param[out] elementsRead number of elements available in the buffer
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
- * @return return \ref TIRIOStatusCode
+ * @return \ref TIRIOStatusCode
  */
-
 int irio_getDMATtoGPUImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t **data, int* elementsRead, TStatus* status);
 
 /*
@@ -272,9 +273,8 @@ int irio_getDMATtoGPUImage(irioDrv_t* p_DrvPvt, int imageSize, int n, uint64_t *
  * @param[in] n Identifier of the DMA Buffer (DMA FIFO)
  * @param[in] elementstofree number of elements realeased in the buffer
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
- * @return return \ref TIRIOStatusCode
+ * @return return \ref TIRIOStatusCode result of the execution of this call.
  */
-
 int irio_releaseDMATtoGPUImage(irioDrv_t* p_DrvPvt, int n,int  elementstofree, TStatus* status);
 
 #ifdef __cplusplus

@@ -62,7 +62,7 @@ void msgerr(TIRIOStatusCode code, int nTest, const char* testName, TStatus* stat
 		}else{
 			printf("\n\tCheck previous messages for more detailed information of the error\n");
 		}
-		free(detailStr);
+		free(detailStr); detailStr = NULL;
 		fflush(stdout);
 		irio_resetStatus(status);
 
@@ -88,7 +88,7 @@ int main (int argc, char **argv)
 	irioDrv_t p_DrvPvt;
 	TStatus status;
 	irio_initStatus(&status);
-	int myStatus;
+	int myStatus=0;
 	int verbosity=1;
 
 	char *filePath=NULL;
@@ -172,17 +172,19 @@ int main (int argc, char **argv)
 
 	//*********** Receive UART Message
 	msgtest(6,irio_getCLuart);
-	char* msg = malloc(40*sizeof(char));
 	int len=0;
+	int msg_len = 4;
+	char* msg = malloc(msg_len*sizeof(char));
+
 	printf("Receiving UART Message.\n");
-	myStatus= irio_getCLuart(&p_DrvPvt,msg,&len,&status);
+	myStatus= irio_getCLuart(&p_DrvPvt,msg_len,msg,&len,&status);
 
 	if (len>0){
 		printf("MSG received: %s\n",msg);
 	}else{
 		printf("MSG not received\n");
 	}
-	free(msg);
+	free(msg); msg = NULL;
 	msgerr(myStatus,6,"irio_getCLuart",&status,verbosity,0);
 
 

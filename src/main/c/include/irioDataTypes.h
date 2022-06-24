@@ -8,7 +8,7 @@
  * \brief Typedefs and Macro definitions for IRIO Driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -42,19 +42,19 @@ extern "C" {
  * Definitions of maximum size for channel read, dmas and max timeout in reads
  */
 ///@{
-#define SIZE_HOST_DMAS 2048000
-#define FPGA_READ_BUFFER_TIMEOUT_1ms 1
-#define NUMBEROFU64TOREADPERCHANNEL	4096
+#define SIZE_HOST_DMAS 2048000              //!< DMA size used when configuring FiFo buffer
+#define FPGA_READ_BUFFER_TIMEOUT_1ms 1      //!< Maximum timeout for DMA buffer
+#define NUMBEROFU64TOREADPERCHANNEL	4096    //!< Number of 8-bytes words per DMA channel
 ///@}
 
 /**@name FlexRIO Adapter Modules Identifiers
  *
  */
 ///@{
-#define FlexRIO_Module_IO_NI5761 0x109374C6 // NI5761: 0x109374C6, supported by ITER in AC version not DC, 4 analog inputs
-#define FlexRIO_Module_IO_NI5781 0x1093748A // NI5781: 0x1093748A, not supported by ITER, 2 AI and 2 AO
-#define FlexRIO_Module_IO_NI6581 0x10937418 // NI6581: 0x10937418, supported by ITER, digital I/O module
-#define FlexRIO_Module_IO_NI5734 0x10937595 // NI5734: 0x10937595, not supported by ITER, 4AI + digital I/Os
+#define FlexRIO_Module_IO_NI5761 0x109374C6 //!< NI5761: 0x109374C6, supported by ITER in AC version not DC, 4 analog inputs
+#define FlexRIO_Module_IO_NI5781 0x1093748A //!< NI5781: 0x1093748A, not supported by ITER, 2 AI and 2 AO
+#define FlexRIO_Module_IO_NI6581 0x10937418 //!< NI6581: 0x10937418, supported by ITER, digital I/O module
+#define FlexRIO_Module_IO_NI5734 0x10937595 //!< NI5734: 0x10937595, not supported by ITER, 4AI + digital I/Os
 ///@}
 
 
@@ -62,38 +62,43 @@ extern "C" {
  * Definitions of the maximum number of resources that can be instantiated for FlexRIO platform.
  */
 ///@{
-#define FLEXRIO_MAX_ANALOGS_IN 4
-#define FLEXRIO_MAX_AUXA_IN 16
-#define FLEXRIO_MAX_ANALOGS_OUT 2
-#define FLEXRIO_MAX_AUXA_OUT 16
-#define FLEXRIO_MAX_DIGITALS 90
-#define FLEXRIO_MAX_AUXDIGITALS 16
-#define FLEXRIO_MAX_DMAS 16
-#define FLEXRIO_MAX_SIGNALGENERATOR 2
+#define FLEXRIO_MAX_ANALOGS_IN 4        //!< Max number of analog inputs
+#define FLEXRIO_MAX_AUXA_IN 16          //!< Max number of auxiliary analog inputs
+#define FLEXRIO_MAX_ANALOGS_OUT 2       //!< Max number of analog outputs
+#define FLEXRIO_MAX_AUXA_OUT 16         //!< Max number of auxiliary analog outputs
+#define FLEXRIO_MAX_DIGITALS 90         //!< Max number of digital inputs and outputs
+#define FLEXRIO_MAX_AUXDIGITALS 16      //!< Max number of auxiliary digital inputs and outputs
+#define FLEXRIO_MAX_DMAS 16             //!< Max number of DMAs channels
+#define FLEXRIO_MAX_SIGNALGENERATOR 2   //!< Max number of signal generators
 ///@}
 
 /** @name Maximum cRIO resources
  * Definitions of the maximum number of resources that can be instantiated for cRIO platform.
  */
 ///@{
-#define CRIO_MAX_ANALOGS_IN 256
-#define CRIO_MAX_AUXA_IN 256
-#define CRIO_MAX_ANALOGS_OUT 256
-#define CRIO_MAX_AUXA_OUT 256
-#define CRIO_MAX_DIGITALS 256
-#define CRIO_MAX_AUXDIGITALS 256
-#define CRIO_MAX_DMAS 3
-#define CRIO_MAX_SIGNALGENERATOR 256
-#define CRIO_MAX_MODULES 16
+#define CRIO_MAX_ANALOGS_IN 256         //!< Max number of analog inputs
+#define CRIO_MAX_AUXA_IN 256            //!< Max number of auxiliary analog inputs
+#define CRIO_MAX_ANALOGS_OUT 256        //!< Max number of analog outputs
+#define CRIO_MAX_AUXA_OUT 256           //!< Max number of auxiliary analog outputs
+#define CRIO_MAX_DIGITALS 256           //!< Max number of digital inputs and outputs
+#define CRIO_MAX_AUXDIGITALS 256        //!< Max number of auxiliary digital inputs and outputs
+#define CRIO_MAX_DMAS 3                 //!< Max number of DMAs channels
+#define CRIO_MAX_SIGNALGENERATOR 256    //!< Max number of signal generators
+#define CRIO_MAX_MODULES 16             //!< Max number of CompactRIO modules
 ///@}
 
-
-#define U16BIT 65535
-#define SHORT_CHAR_STRING 10
-#define LONG_CHAR_STRING 40
+/** @name Maximum cRIO resources
+ * Sizes of several ports
+ */
+///@{
+#define U16BIT 65535           //!< Limit for unsigned 16-bits variables
+#define SHORT_CHAR_STRING 10   //!< Size used to IRIO versions like register FPGAVIversion or IRIO number version
+///@}
 
 /**
  * Enum Type for IRIO supported platforms
+ *
+ * Specify the result of a method call
  */
 typedef enum {
 	IRIO_FlexRIO = 0,//!< FlexRIO Devices
@@ -112,8 +117,13 @@ typedef enum  {
 	IRIO_error					//!< error Critical error happened and IRIO should not be used
 }TIRIOStatusCode;
 
-#define NUM_ERRORS 18
+#define NUM_ERRORS 18           //!< Generic error defined in IRIO error messages enumeration
 
+/**
+ * Enum Type for IRIO error messages
+ *
+ * Specify the result of a method call
+ */
 typedef enum {
 	Generic_Error=-NUM_ERRORS,			//!< To be used by upper layers for custom errors in irio_mergeStatus
 	HardwareNotFound_Error, 			//!< Given serial number was not found
@@ -150,6 +160,11 @@ typedef enum {
 	ResourceRelease_Warning				//!< NIRIO error while releasing Fifo elements
 }TErrorDetailCode;
 
+/**
+ * Enum Type for RIO Device coupling mode
+ *
+ * Specify the result of a method call
+ */
 typedef enum {
 	IRIO_coupling_AC=0,
 	IRIO_coupling_DC,
@@ -174,18 +189,18 @@ typedef struct TStatus{
  * Stores whether the resource was found or not and its offset
  */
 typedef struct TResourcePort{
-	uint8_t found;
-	uint32_t value;
+	uint8_t found;      //!< Register that indicates if a resource has been found
+	uint32_t value;     //!< If a resource has been found this register indicates its value
 }TResourcePort;
 
 /**
  * Type for FPGA Resources only for auxiliary analog I/O, 64 bits
  *
- * Stores whether the resource was found or not and its offset
+ * Stores whether the 64-bits resource was found or not and its offset
  */
 typedef struct TResourcePort_64{
-	uint8_t found;
-	uint64_t value;
+	uint8_t found;      //!< Register that indicates if a 64 bits resource has been found
+	uint64_t value;     //!< If a resource has been found this register indicates its value
 }TResourcePort_64;
 
 /**
@@ -354,19 +369,19 @@ typedef struct irioDrv_t
 	TResourcePort enumuartBreakIndicator;	//!< Port for uartBreakIndicator
 	TResourcePort enumuartRxByte;			//!< Port for uartRxByte
 
-	float minSamplingRate;
-	float maxSamplingRate;
+	float minSamplingRate;                  //!< Minumum value needed to set FPGA sampling rate
+	float maxSamplingRate;                  //!< Maximum potential value that FPGA sampling rate can be set
 }irioDrv_t;
 
 /**
- * Type for cRIO modules
+ * Type for cRIO modules on NI9159 chassis
  *
  * Relates cRIO module names and Ids
  */
 typedef struct cRIOmodule
 {
-	uint16_t id;
-	char cmodule[7];
+	uint16_t id;     //!< Identificator of each cRIO MODULE
+	char cmodule[7]; //!< Name of each cRIO module
 } cRIOmodule;
 
 /**

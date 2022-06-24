@@ -8,7 +8,7 @@
  * \brief CameraLink handler methods for IRIO driver.
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -36,6 +36,8 @@
 
 /**
  * Enum Type for CameraLink supported configurations
+ *
+ * Specify the result of a method call
  */
 typedef enum{
 	CL_BASE,  //!< CameraLink Base mode
@@ -48,6 +50,8 @@ typedef enum{
 /**
  * Enum Type for CameraLink supported extended modes
  * Note: Extended mode is not currently supported
+ *
+ * Specify the result of a method call
  */
 typedef enum{
 	CL_STANDARD,     //!< CameraLink Standard Mapping
@@ -96,6 +100,48 @@ extern "C" {
 int irio_findCL(irioDrv_t* p_DrvPvt,TStatus* status);
 
 /**
+ * Search CameraLink UART resources
+ *
+ * Resources checked:
+ * 	\n irioDrv_t::enumuartByteMode
+ * 	\n irioDrv_t::enumuartSetBaudRate
+ * 	\n irioDrv_t::enumuartTransmit
+ * 	\n irioDrv_t::enumuartReceive
+ * 	\n irioDrv_t::enumuartBaudRate
+ * 	\n irioDrv_t::enumuartTxByte
+ * 	\n irioDrv_t::enumuartTxReady
+ * 	\n irioDrv_t::enumuartRxByte
+ * 	\n irioDrv_t::enumuartRxReady
+ * 	\n irioDrv_t::enumuartOverrunError
+ * 	\n irioDrv_t::enumuartFramingError
+ * 	\n irioDrv_t::enumuartBreakIndicator
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_findCLUart(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ *  Search CameraLink configuration resources
+ *
+ *  Resources checked:
+ * 	\n irioDrv_t::enumFVALHigh
+ * 	\n irioDrv_t::enumLVALHigh
+ * 	\n irioDrv_t::enumDVALHigh
+ * 	\n irioDrv_t::enumSpareHigh
+ * 	\n irioDrv_t::enumControlEnable
+ * 	\n irioDrv_t::enumSignalMapping
+ * 	\n irioDrv_t::enumConfiguration
+ * 	\n irioDrv_t::enumLineScan
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_findCLConfig(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
  * Configure CameraLink frame grabber
  *
  * Configure CameraLink frame grabber with the camera parameters.
@@ -141,15 +187,20 @@ int irio_sendCLuart(irioDrv_t* p_DrvPvt, const char *msg, int msg_size,TStatus* 
  * Reads a message from the CameraLink camera
  *
  * Reads a message streamed from the CameraLink camera. This method blocks until a message is read.
+ * User has to define the size of the buffer because of method will truncate message read from CameraLink
+ *    if its size is bigger than number of characters previously allocated
+ * A maximum of data_size characters will be displayed
+ *
  * Errors may occur if any of the necessary ports was not found or while reading/writing from/to the ports.
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] data_size size of previously allocated buffer (data) where message read will be stored
  * @param[out] data Previously allocated buffer where message read will be stored
- * @param[out] msg_size Size of the message read
+ * @param[out] msg_size Size of the message read. Its maximum size is data_size
  * @param[out] status	Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
-int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* status);
+int irio_getCLuart(irioDrv_t* p_DrvPvt, int data_size, char* data, int* msg_size,TStatus* status);
 
 /**
  * Read UART Baud Rate

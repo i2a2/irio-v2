@@ -8,7 +8,7 @@
  * \brief CameraLink handler methods for IRIO driver.
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -32,8 +32,6 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include "NiFpga.h"
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,49 +42,45 @@
  * Strings for CameraLink configuration FPGA Resources
  */
 ///@{
-#define STRINGNAME_UARTBYTEMODE 		"_ControlBool_uartByteMode"
-#define STRINGNAME_UARTSETBAUDRATE 		"_ControlBool_uartSetBaudRate"
-#define STRINGNAME_UARTTRANSMIT 		"_ControlBool_uartTransmit"
-#define STRINGNAME_UARTRECEIVE 			"_ControlBool_uartReceive"
-#define STRINGNAME_UARTBAUDRATE 		"_ControlU8_uartBaudRate"
-#define STRINGNAME_UARTTXBYTE 			"_ControlU8_uartTxByte"
-#define STRINGNAME_FVALHIGH 			"_ControlBool_FVALHigh"
-#define STRINGNAME_LVALHIGH 			"_ControlBool_LVALHigh"
-#define STRINGNAME_DVALHIGH 			"_ControlBool_DVALHigh"
-#define STRINGNAME_SPAREHIGH 			"_ControlBool_SpareHigh"
-#define STRINGNAME_CONTROLENABLE 		"_ControlBool_ControlEnable"
-#define STRINGNAME_LINESCAN 			"_ControlBool_LineScan"
-#define STRINGNAME_SIGNALMAPPING 		"_ControlU8_SignalMapping"
-#define STRINGNAME_CONFIGURATION 		"_ControlU8_Configuration"
-#define STRINGNAME_UARTTXREADY			"_IndicatorBool_uartTxReady"
-#define STRINGNAME_UARTRXREADY			"_IndicatorBool_uartRxReady"
-#define STRINGNAME_UARTOVERRUNERROR 	"_IndicatorBool_uartOverrunError"
-#define STRINGNAME_UARTFRAMINGERROR 	"_IndicatorBool_uartFramingError"
-#define STRINGNAME_UARTBREAKINDICATOR 	"_IndicatorBool_uartBreakIndicator"
-#define STRINGNAME_UARTRXBYTE 			"_IndicatorU8_uartRxByte"
+#define STRINGNAME_UARTBYTEMODE 		"_ControlBool_uartByteMode"         //!< Identifies uartByteMode register
+#define STRINGNAME_UARTSETBAUDRATE 		"_ControlBool_uartSetBaudRate"      //!< Identifies uartSetBaudRate register
+#define STRINGNAME_UARTTRANSMIT 		"_ControlBool_uartTransmit"         //!< Identifies uartTransmit register
+#define STRINGNAME_UARTRECEIVE 			"_ControlBool_uartReceive"          //!< Identifies uartReceive register
+#define STRINGNAME_UARTBAUDRATE 		"_ControlU8_uartBaudRate"           //!< Identifies uartBaudRate register
+#define STRINGNAME_UARTTXBYTE 			"_ControlU8_uartTxByte"             //!< Identifies uartTxByte register
+#define STRINGNAME_FVALHIGH 			"_ControlBool_FVALHigh"             //!< Identifies FVALHigh register
+#define STRINGNAME_LVALHIGH 			"_ControlBool_LVALHigh"             //!< Identifies LVALHigh register
+#define STRINGNAME_DVALHIGH 			"_ControlBool_DVALHigh"             //!< Identifies DVALHigh register
+#define STRINGNAME_SPAREHIGH 			"_ControlBool_SpareHigh"            //!< Identifies SpareHigh register
+#define STRINGNAME_CONTROLENABLE 		"_ControlBool_ControlEnable"        //!< Identifies ControlEnable register
+#define STRINGNAME_LINESCAN 			"_ControlBool_LineScan"             //!< Identifies LineScan register
+#define STRINGNAME_SIGNALMAPPING 		"_ControlU8_SignalMapping"          //!< Identifies SignalMapping register
+#define STRINGNAME_CONFIGURATION 		"_ControlU8_Configuration"          //!< Identifies Configuration register
+#define STRINGNAME_UARTTXREADY			"_IndicatorBool_uartTxReady"        //!< Identifies uartTxReady register
+#define STRINGNAME_UARTRXREADY			"_IndicatorBool_uartRxReady"        //!< Identifies uartRxReady register
+#define STRINGNAME_UARTOVERRUNERROR 	"_IndicatorBool_uartOverrunError"   //!< Identifies uartOverrunError register
+#define STRINGNAME_UARTFRAMINGERROR 	"_IndicatorBool_uartFramingError"   //!< Identifies uartFrammingError register
+#define STRINGNAME_UARTBREAKINDICATOR 	"_IndicatorBool_uartBreakIndicator" //!< Identifies uartBreakIndicator register
+#define STRINGNAME_UARTRXBYTE 			"_IndicatorU8_uartRxByte"           //!< Identifies uartRxByte register
 ///@}
 
 /** @name Acknowledge Values
  * Values of acknowledge and not-acknowledge for serial communications
  */
 ///@{
-#define NACK 0x16
-#define ACK 0x06
+#define NACK 0x16 //!< Not-acknowledge identificator
+#define ACK 0x06  //!< Acknowledge identificator
 ///@}
 
 /** @name CameraLink Parameters Range
  * Definition of range for some CameraLink configuration parameters
  */
 ///@{
-#define CL_CONFIG_LIMIT 2
-#define CL_SIGNALMAPPING_LIMIT 2
-#define UART_BAUDRATE_LIMIT 7
-#define UART_BAUDRATE_USTIMEOUT 1000
+#define CL_CONFIG_LIMIT 2             //!< Maximum number of CameraLink configuration
+#define CL_SIGNALMAPPING_LIMIT 2      //!< Maximum number of signal mapping configuration
+#define UART_BAUDRATE_LIMIT 7         //!< Maximum number of baud rate configuration
+#define UART_BAUDRATE_USTIMEOUT 1000  //!< Maximum timeout in micro-seconds for baud rate configuration
 ///@}
-
-int irio_findCLUart(irioDrv_t* p_DrvPvt,TStatus* status);
-
-int irio_findCLConfig(irioDrv_t* p_DrvPvt,TStatus* status);
 
 int irio_findCL(irioDrv_t* p_DrvPvt, TStatus* status){
 
@@ -199,7 +193,7 @@ int irio_configCL(irioDrv_t* p_DrvPvt,int32_t fvalHigh, int32_t lvalHigh, int32_
 		!p_DrvPvt->enumControlEnable.found || !p_DrvPvt->enumSignalMapping.found||
 		!p_DrvPvt->enumConfiguration.found){
 
-		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"%s[%s,%d]-(%s) WARNING Some of CameraLink mandatory configuration resources were not found. Configuration will be incomplete.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Some of CameraLink mandatory configuration resources were not found. Configuration will be incomplete.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		local_status |= IRIO_warning;
 	}
 
@@ -325,7 +319,7 @@ int irio_sendCLuart(irioDrv_t* p_DrvPvt, const char *msg, int msg_size,TStatus* 
 	NiFpga_Status fpgaStatus;
 
 	if(!p_DrvPvt->enumuartTxReady.found || !p_DrvPvt->enumuartTxByte.found || !p_DrvPvt->enumuartTransmit.found){
-		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"%s[%s,%d]-(%s) WARNING Some of UART mandatory resources for sending messages were not found. Can not send UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		irio_mergeStatus(status,Write_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Some of UART mandatory resources for sending messages were not found. Can not send UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		return IRIO_warning;
 	}
 
@@ -368,7 +362,7 @@ int irio_sendCLuart(irioDrv_t* p_DrvPvt, const char *msg, int msg_size,TStatus* 
 	}
 }
 
-int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* status){
+int irio_getCLuart(irioDrv_t* p_DrvPvt, int data_size, char* data, int* msg_size,TStatus* status){
 	TIRIOStatusCode local_status = IRIO_success;
 	NiFpga_Status fpgaStatus;
 	NiFpga_Bool RxReady;
@@ -378,7 +372,7 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 	int numbytes=0;
 
 	if(!p_DrvPvt->enumuartRxReady.found || !p_DrvPvt->enumuartRxByte.found || !p_DrvPvt->enumuartReceive.found){
-		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"%s[%s,%d]-(%s) WARNING Some of UART mandatory resources for receiving messages were not found. Can not receive UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Some of UART mandatory resources for receiving messages were not found. Can not receive UART messages.\n",__func__,__LINE__,p_DrvPvt->appCallID);
 		return IRIO_warning;
 	}
 
@@ -398,17 +392,15 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 			timeout++;
 		}
 
-		if (timeout==100)
-		{
+		if (timeout==100){
 			irio_mergeStatus(status,CLSLinetimeout_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) CameraLink Serial Line Timeout  . Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,CLSLinetimeout_Warning);
 			local_status |= IRIO_warning;
-
 		}
 
 	}while(local_status==IRIO_success && !RxReady && timeout<3000);
 
 	timeout=0;
-	while (RxReady && local_status==IRIO_success){
+	while (RxReady && local_status==IRIO_success && numbytes<data_size){
 		do{
 			fpgaStatus=NiFpga_ReadBool(p_DrvPvt->session,p_DrvPvt->enumuartRxReady.value, &RxReady);
 			if(NiFpga_IsError(fpgaStatus)){
@@ -418,11 +410,12 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 			if(!RxReady){
 				usleep(1000);
 				timeout++;
+				if (numbytes != 0)
+					data[numbytes] = '\0';
 			}
 		}while(!RxReady && timeout<1000);
 
-		if(RxReady && (local_status==IRIO_success))
-		{
+		if(RxReady && (local_status==IRIO_success)){
 			fpgaStatus= NiFpga_WriteBool(p_DrvPvt->session, p_DrvPvt->enumuartReceive.value, (NiFpga_Bool)1);
 			if(NiFpga_IsError(fpgaStatus)){
 				irio_mergeStatus(status,Write_NIRIO_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING FPGA Error writing %s. Error Code: %d\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_UARTRECEIVE,fpgaStatus);
@@ -445,10 +438,9 @@ int irio_getCLuart(irioDrv_t* p_DrvPvt, char* data, int* msg_size,TStatus* statu
 			data[numbytes]=aux;
 			numbytes++;
 		}
-
 	}
 
-	(*msg_size) =numbytes;
+	*msg_size=numbytes;
 
 	if(local_status<IRIO_error){
 		return local_status;

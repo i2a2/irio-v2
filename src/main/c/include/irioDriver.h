@@ -8,7 +8,7 @@
  * \brief Initialization and common resources access methods for IRIO Driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@
 
 #ifndef IRIODRIVER_H
 #define IRIODRIVER_H
-#define IRIOVERSION "1.2.0"
+#define IRIOVERSION "1.2.0"   //!< Actual IRIO version
 #include "irioDataTypes.h"
 
 #include <stdint.h>
@@ -59,6 +59,10 @@ extern "C" {
  * error codes (if any) in status->msg. The error codes shown this way correspond to NiFpga
  * library error codes.
  *
+ * If any of the mandatory resources are missing the method will return error but its irioDrv_t->session parameter
+ * will remain open, so user should close the session manually because IRIO allows to use its methods
+ * if the session is open.
+ *
  *	Some important fields modified in this call are:
  *		\n irioDrv_t::fpgaRIO
  *		\n irioDrv_t::session
@@ -75,7 +79,7 @@ extern "C" {
  * @param[in] FPGAversion 		Version of the bitfile (e.g. [1,0] for v1.0). Must match with the value of the FPGA register
  * @param[in] verbosity			Indicates whether or not should the driver print trace messages.
  * @param[in] headerDir			Path where to search for the header file corresponding to the bitfile to be downloaded
- * @param[in] bitfile			Path where to search for the bitfile to be downloaded
+ * @param[in] bitfileDir		Path where to search for the bitfile to be downloaded
  * @param[out] p_DrvPvt		Pointer to the driver structure. Will be initialized with the resources found.
  * @param[out] status		Warning and error messages produced during the execution of this call will be added here.
  * @return \ref TIRIOStatusCode result of the execution of this call.
@@ -96,6 +100,190 @@ int irio_initDriver(const char *appCallID,const char *DeviceSerialNumber,const c
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_closeDriver(irioDrv_t* p_DrvPvt, uint32_t mode, TStatus* status);
+
+/**
+ * Find the RIO device, load NiFpga library, download the bitfile to the FPGA and open a session
+ *
+ * Allows to start handling FPGA resources
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] bitFilePath Path to the directory where the bitfiles and the header files are storaged
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int configureTarget(irioDrv_t* p_DrvPvt, char* bitFilePath, TStatus* status);
+
+/**
+ * Loads the NiFpga library
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int initializeLibrary(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Unloads the NiFpga library
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int finalizeLibrary(irioDrv_t* p_DrvPvt, TStatus* status);
+
+/**
+ * Differences between the potential RIO devices to be used
+ *
+ * Reads the value from platform port and allocate the necessary memory
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int searchPlatform( irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Allocates memory for all FlexRIO resources
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int allocFlexRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Allocates memory for all cRIO resources
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int allocCRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Releases memory for the RIO device used
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int freeXRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Checks if all mandatory resources are implemented
+ *
+ * Mandatory resources checked in this call are:
+ *		\n irioDrv_t::FPGAVIversion
+ *		\n irioDrv_t::InitDone
+ *		\n irioDrv_t::InsertedIOModulesID
+ *		\n irioDrv_t::RIOAdapterCorrect
+ *		\n irioDrv_t::cRIOModulesOK (if cRIO device used)
+ *		\n irioDrv_t::Fref
+ *		\n irioDrv_t::DevQualityStatus
+ *		\n irioDrv_t::DeviceTemp
+ *		\n irioDrv_t::DevProfile
+ *		\n irioDrv_t::DAQStartStop
+ *		\n irioDrv_t::DebugMode
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int searchMandatoryResourcesAllPlatforms(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Looks for data acquisition profile implemented
+ *
+ * Data acquisition profiles:
+ *		\n FlexRIO DAQ
+ *		\n FlexRIO IMAQ
+ *		\n FlexRIO DAQ GPU
+ *		\n FlexRIO IMAQ GPU
+ *		\n cRIO DAQ
+ *		\n cRIO IO
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int searchProfile( irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Search for resources if FlexRIO/cRIO DAQ profile is implemented
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int searchDAQResources(irioDrv_t* p_DrvPvt,TStatus* status);
+
+#ifdef IRIO_GPU
+int searchDAQGPUResources(irioDrv_t* p_DrvPvt,TStatus* status);
+#endif
+
+/**
+ * Search for resources if cRIO IO profile is implemented
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int searchIOResources(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Search for Input/Output sampling rate resource for cRIO modules
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int findIOSamplingRate(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Search for resources if FlexRIO IMAQ profile is implemented
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int searchIMAQResources(irioDrv_t* p_DrvPvt,TStatus* status);
+
+#ifdef IRIO_GPU
+int searchIMAQGPUResources(irioDrv_t* p_DrvPvt,TStatus* status);
+#endif
+
+/**
+ * Calculate Analog to Digital Conversion value for the RIO adapter module used
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int calcADCValue(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
+ * Set FlexRIO Adapter module Analog input coupling mode
+ *
+ * Depending on the NI 5761 FlexRIO adapter module (AC or DC) used, this method
+ * must be called according to. NI5761 coupling mode is not configurable and NI provides different part numbers for this
+ * 781287-01 for AC coupled and 781287-02 for DC coupled. ITER HW catalog only has AC coupled version.
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[in] value coupling mode:IRIO_coupling_AC(0) AC, IRIO_coupling_DC(1) DC
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* status);
+
+/**
+ * Get Adapter module Analog input coupling mode value
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] value coupling mode: IRIO_coupling_AC(0) AC, IRIO_coupling_DC(1) DC, IRIO_coupling_NULL (2)
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status);
 
 /**
  * Method to retrieve the version number of IRIO library
@@ -266,31 +454,6 @@ int irio_setSamplingRate(irioDrv_t* p_DrvPvt, int n,int32_t value, TStatus* stat
  * @return \ref TIRIOStatusCode result of the execution of this call.
  */
 int irio_getSamplingRate(irioDrv_t* p_DrvPvt, int n,int32_t* value, TStatus* status);
-
-/**
- * Set FlexRIO Adapter module Analog input coupling mode
- *
- * Depending on the NI 5761 FlexRIO adapter module (AC or DC) used, this method
- * must be called according to. NI5761 coupling mode is not configurable and NI provides different part numbers for this
- * 781287-01 for AC coupled and 781287-02 for DC coupled. ITER HW catalog only has AC coupled version.
- *
- * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[in] value coupling mode:IRIO_coupling_AC(0) AC, IRIO_coupling_DC(1) DC
- * @param[out] status Warning and error messages produced during the execution of this call will be added here.
- * @return \ref TIRIOStatusCode result of the execution of this call.
- */
-int irio_setAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode value, TStatus* status);
-
-/**
- * Get Adapter module Analog input coupling mode value
- *
- * @param[in] p_DrvPvt 	Pointer to the driver session structure
- * @param[out] value coupling mode: IRIO_coupling_AC(0) AC, IRIO_coupling_DC(1) DC, IRIO_coupling_NULL (2)
- * @param[out] status Warning and error messages produced during the execution of this call will be added here.
- * @return \ref TIRIOStatusCode result of the execution of this call.
- */
-int irio_getAICoupling(irioDrv_t* p_DrvPvt,TIRIOCouplingMode* value, TStatus* status);
-
 
 #ifdef __cplusplus
 }

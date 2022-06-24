@@ -24,7 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ******************************************************************************/
-
+#define _GNU_SOURCE //include asprintf, get_current_dir_name
 #include <unistd.h>
 #include <sys/time.h>
 #include <time.h>
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 
 
 	char criomodel[20];
-	char NIcriomodel[20];
+	char NIcriomodel[23];
 	char criomodel_serial[20];
 
 	char *intermediatePath;
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 	sprintf(bitfileName,"cRIODAQDMA_%s",criomodel);
 	sprintf(NIcriomodel,"NI %s",criomodel);
 
-	currPath = get_current_dir_name();
+	currPath = (char*)get_current_dir_name();
 
 	asprintf(&bitFilePath,"%s/resourceTest/%s/",currPath,criomodel);
 	free(currPath);

@@ -8,7 +8,7 @@
  * \brief Waveform generator handler methods for IRIO driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -32,8 +32,6 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include "NiFpga.h"
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,13 +41,14 @@
  * Strings for SG FPGA Resources
  */
 ///@{
-#define STRINGNAME_SGNO "_IndicatorU8_SGNo"
-#define STRINGNAME_SGFREQ "_ControlU32_SGFreq"
-#define STRINGNAME_SGAMP "_ControlU16_SGAmp"
-#define STRINGNAME_SGPHASE "_ControlU32_SGPhase"
-#define STRINGNAME_SGSIGNALTYPE "_ControlU8_SGSignalType"
-#define STRINGNAME_SGUPDATERATE "_ControlU32_SGUpdateRate"
-#define STRINGNAME_SGFREF "_IndicatorU32_SGFref"
+#define STRINGNAME_SGNO "_IndicatorU8_SGNo"                //!< Identifies SGNo register
+#define STRINGNAME_SGFREQ "_ControlU32_SGFreq"             //!< Identifies SGFreq register
+#define STRINGNAME_SGAMP "_ControlU16_SGAmp"               //!< Identifies SGAmp register
+#define STRINGNAME_SGPHASE "_ControlU32_SGPhase"           //!< Identifies SGPhase register
+#define STRINGNAME_SGSIGNALTYPE "_ControlU8_SGSignalType"  //!< Identifies SGSignalType register
+#define STRINGNAME_SGUPDATERATE "_ControlU32_SGUpdateRate" //!< Identifies SGPUpdateRate register
+#define STRINGNAME_SGFREF "_IndicatorU32_SGFref"           //!< Identifies SGFref register
+#define STRINGNAME_FREQREF "_IndicatorU32_Fref"            //!< Identifies Fref register
 ///@}
 
 int irio_findSGs(irioDrv_t* p_DrvPvt, TStatus* status){
@@ -365,6 +364,70 @@ int irio_setSGUpdateRate(irioDrv_t* p_DrvPvt,int n,int32_t value, TStatus* statu
 		local_status |= IRIO_warning;
 	}
 
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_getFref(irioDrv_t* p_DrvPvt,int32_t* value, TStatus* status){
+	TIRIOStatusCode local_status = IRIO_success;
+	if(p_DrvPvt->enumFref.found){
+		*value = (int32_t) p_DrvPvt->Fref;
+	}else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_FREQREF);
+		local_status |= IRIO_warning;
+	}
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_getSGFref(irioDrv_t* p_DrvPvt, int n, uint32_t* value, TStatus* status) {
+	TIRIOStatusCode local_status = IRIO_success;
+	if(p_DrvPvt->enumSGFref!= NULL && p_DrvPvt->enumSGFref[n].found) {
+		*value = (int32_t) p_DrvPvt->SGfref[n];
+	}else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING %s was not found.\n",__func__,__LINE__,p_DrvPvt->appCallID,STRINGNAME_SGFREF);
+		local_status |= IRIO_warning;
+	}
+
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_getSGCVDAC(irioDrv_t* p_DrvPvt, double* SGCVDAC, TStatus* status) {
+	TIRIOStatusCode local_status = IRIO_success;
+	if (p_DrvPvt->CVDAC != 0.0) {
+		*SGCVDAC=p_DrvPvt->CVDAC;
+	}
+	else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can't obtain CVDAC (conversion from Volts for analog outputs) parameter \n",__func__,__LINE__,p_DrvPvt->appCallID);
+		local_status |= IRIO_warning;
+	}
+	if(local_status<IRIO_error){
+		return local_status;
+	}else{
+		return IRIO_error;
+	}
+}
+
+int irio_getSGCVADC(irioDrv_t* p_DrvPvt, double* SGCVADC, TStatus* status) {
+	TIRIOStatusCode local_status = IRIO_success;
+	if (p_DrvPvt->CVADC != 0.0) {
+		*SGCVADC=p_DrvPvt->CVADC;
+	}
+	else{
+		irio_mergeStatus(status,Read_Resource_Warning,p_DrvPvt->verbosity,"[%s,%d]-(%s) WARNING Can't obtain CVADC (conversion to Volts of analog inputs) parameter \n",__func__,__LINE__,p_DrvPvt->appCallID);
+		local_status |= IRIO_warning;
+	}
 	if(local_status<IRIO_error){
 		return local_status;
 	}else{

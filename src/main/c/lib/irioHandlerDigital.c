@@ -8,7 +8,7 @@
  * \brief Digital I/O handler methods for IRIO Driver
  * \date Sept., 2010 (Last Review July 2015)
  * \copyright (C) 2010-2015 Universidad Politécnica de Madrid (UPM)
- * \par License: \b
+ * \par License:
  * 	\n This project is released under the GNU Public License version 2.
  * \cond
  * This program is free software; you can redistribute it and/or
@@ -32,7 +32,7 @@
 #include "irioResourceFinder.h"
 #include "irioError.h"
 
-#include "NiFpga.h"
+
 
 #include "stdint.h"
 #include "stdio.h"
@@ -43,10 +43,10 @@
  * Strings for digital FPGA Resources
  */
 ///@{
-#define STRINGNAME_DIGITALINPUT "_IndicatorBool_DI"
-#define STRINGNAME_DIGITALOUTPUT "_ControlBool_DO"
-#define STRINGNAME_AUXDI "_IndicatorBool_auxDI"
-#define STRINGNAME_AUXDO "_ControlBool_auxDO"
+#define STRINGNAME_DIGITALINPUT "_IndicatorBool_DI"  //!< Identifies DI registers
+#define STRINGNAME_DIGITALOUTPUT "_ControlBool_DO"   //!< Identifies DO registers
+#define STRINGNAME_AUXDI "_IndicatorBool_auxDI"      //!< Identifies auxDI registers
+#define STRINGNAME_AUXDO "_ControlBool_auxDO"        //!< Identifies auxDO registers
 ///@}
 
 int irio_findDigitals(irioDrv_t* p_DrvPvt, TStatus* status){
