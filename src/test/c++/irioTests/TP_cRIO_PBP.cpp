@@ -102,7 +102,7 @@ TEST(TP_cRIO_PBP, functional){
 
 	// This function does not modify status neither myStatus, it is not necessary to check that variables
 	irio_getFPGAStart(&p_DrvPvt,&valueGetter,&status);
-	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
+	cout << "[irio_getFPGAStart function] FPGA State value read: "
 		 << valueGetter << " (0-stopped, 1-running)" << endl;
 
 	/**
@@ -124,7 +124,7 @@ TEST(TP_cRIO_PBP, functional){
 	 * STARTING DATA ACQUISITION
 	 */
 	cout << endl << "TEST 3: Set DAQ Start" << endl << endl;
-	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (0-OFF, 1-ON)" << endl << endl;
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 1 (0-OFF, 1-ON)" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,1,&status); // Data acquisition is started
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
@@ -153,7 +153,7 @@ TEST(TP_cRIO_PBP, functional){
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getDevProfile function] Device Profile configured in the FPGA "
-			"expected is 1. Value read: " << valueGetter << " (0: DAQ DMA, 1: Point by Point)" << endl;
+			"expected is 1. Value read: " << valueGetter << " (0-DAQ DMA, 1-Point by Point)" << endl;
 
 	/**
 	 * TEST 5
@@ -247,7 +247,7 @@ TEST(TP_cRIO_PBP, functional){
 		}
 		EXPECT_EQ(myStatus, IRIO_success);
 		cout << "[irio_getAO function] Value read from AO" << AOchannel << " is :"
-			 << std::setprecision(3) << (float) (valueGetter/CVDAC) << "V" << endl << endl;
+			 << std::setprecision(3) << (float) (valueGetter/CVDAC) << "V" << endl;
 	}
 
 	double CVADC = 0.0;
@@ -267,11 +267,11 @@ TEST(TP_cRIO_PBP, functional){
 		}
 		EXPECT_EQ(myStatus, IRIO_success);
 		cout << "[irio_getAI function] Slot 2 9205. Value read from AI" << AIchannel << " is :"
-			 << std::setprecision(3) << (float) (valueGetter*CVADC) << "V" << endl << endl;
+			 << std::setprecision(3) << (float) (valueGetter*CVADC) << "V" << endl;
 	}
 
 	cout << endl << "Setting DebugMode to ON, values expected from AIs are: "
-					"AI0 = 1.25, AI1 = 3.125 & AI2 = -4.75" << endl << endl;
+					"AI0 = 1.25, AI1 = 3.125 & AI2 = -4.75" << endl;
 
 	cout << endl << "[irio_setDebugMode function] DebugMode set to 1 (0-OFF, 1-ON)" << endl;
 	myStatus = irio_setDebugMode(&p_DrvPvt,1,&status);
@@ -370,7 +370,7 @@ TEST(TP_cRIO_PBP, functional){
 		channel++;
 	}
 
-	cout << endl << "Disabling Analog Outputs" << endl << endl;
+	cout << "Disabling Analog Outputs" << endl << endl;
 	for (int i = 0; i < (int) digitalValues.size(); i++){
 		cout << "[irio_setAOEnable function] AOEnable" << i << " set to 0 (0-DISABLE, 1-ENABLE)" << endl;
 		myStatus = irio_setAOEnable(&p_DrvPvt,i,0,&status);
@@ -393,7 +393,7 @@ TEST(TP_cRIO_PBP, functional){
 	 * DIGITAL I/O PORTS
 	 */
 	cout << "TEST 8: Testing digital I/O ports" << endl << endl;
-	cout << "NI9401 module" << endl;
+	cout << "Connection in NI9401 module" << endl;
 	for (int i = 0; i < 2; i++){
 		cout << "[irio_setDO function] NI9401 DO0 Value is set: " << i << endl;
 		myStatus = irio_setDO(&p_DrvPvt,0,i,&status);
@@ -419,7 +419,7 @@ TEST(TP_cRIO_PBP, functional){
 		cout << "[irio_getDI function] Value read from NI9401 DI0 is: " << valueGetter << endl << endl;
 	}
 
-	cout << endl << "NI9477, NI9426 modules" << endl;
+	cout << "Connection between NI9477, NI9426 modules" << endl;
 	for (int i = 0; i < 2; i++){
 		cout << "[irio_setDO function] NI9477 DO1 Value is set: " << i << endl;
 		myStatus = irio_setDO(&p_DrvPvt,1,i,&status);
@@ -445,7 +445,7 @@ TEST(TP_cRIO_PBP, functional){
 		cout << "[irio_getDI function] Value read from NI9426 DI1 is: " << valueGetter << endl << endl;
 	}
 
-	cout << endl << "NI9476, NI9425 modules" << endl;
+	cout << "Connection between NI9476, NI9425 modules" << endl;
 	for (int i = 0; i < 2; i++){
 		cout << "[irio_setDO function] NI9476 DO2 Value is set: " << i << endl;
 		myStatus = irio_setDO(&p_DrvPvt,2,i,&status);
@@ -540,8 +540,8 @@ TEST(TP_cRIO_PBP, functional){
 	 * TEST 10
 	 * STOP DATA ACQUISITION
 	 */
-	cout << endl << "TEST 10: Stop DAQ Start" << endl << endl;
-	cout << "[irio_setDAQStartStop function] DAQStartStop set to 0 (OFF)" << endl << endl;
+	cout << "TEST 10: Stop DAQ Start" << endl << endl;
+	cout << "[irio_setDAQStartStop function] DAQStartStop set to 0 (0-OFF, 1-ON)" << endl;
 	myStatus = irio_setDAQStartStop(&p_DrvPvt,0,&status); // Data acquisition is stopped
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);

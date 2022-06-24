@@ -86,30 +86,20 @@ TEST(TP_cRIO_DAQ, functional) {
 			                 "\t<Total samples_to_read>: Total number of samples to be read when data acquisition_mode is finite. Min: blocksize implemented in the FPGA\n"
 			                 "\t<Acquisition_mode>: Acquisition mode can be finite (0) or continuous (1). Continuous is is stopped with Ctrl+C\n"
 			        		 "\t<block length>: Number of samples to be read from data acquisition device. Minimun: blocksize\n"
-							 "It returns IRIO driver error if cRIO modules are missing";
+							 "Test returns IRIO driver error if cRIO modules are missing";
 
 	TestUtilsIRIO::displayTitle("\t\tExecuting test: "+testName, FCYN);
 	TestUtilsIRIO::displayTitle(testDescription);
 
 	// Environment variables
-
-	// TODO: Comentado para probar codigo mas rapido.
-	//       Descomentar cuando este terminado definitivamente
 	string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
 	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-//	string debugMode = TestUtilsIRIO::getEnvVar("debugMode");
-//	string CH0Voltage = TestUtilsIRIO::getEnvVar("CH0Voltage");
-//	string CH1Voltage = TestUtilsIRIO::getEnvVar("CH1Voltage");
-//	string Samples = TestUtilsIRIO::getEnvVar("samples");
-//	string acquisitionMode = TestUtilsIRIO::getEnvVar("acquisitionMode");
-//	string blockLength = TestUtilsIRIO::getEnvVar("blockLength");
-
-	string debugMode = "1";
-	string CH0Voltage = "+5.0";
-	string CH1Voltage = "-5.0";
-	string Samples = "128";
-	string acquisitionMode = "0";
-	string blockLength = "128";
+	string debugMode = TestUtilsIRIO::getEnvVar("debugMode");
+	string CH0Voltage = TestUtilsIRIO::getEnvVar("CH0Voltage");
+	string CH1Voltage = TestUtilsIRIO::getEnvVar("CH1Voltage");
+	string Samples = TestUtilsIRIO::getEnvVar("Samples");
+	string acquisitionMode = TestUtilsIRIO::getEnvVar("acquisitionMode");
+	string blockLength = TestUtilsIRIO::getEnvVar("blockLength");
 
 	string appCallID = "functionalcRIODAQDMATest";
 	string NIRIOmodel = "NI 9159";
@@ -126,7 +116,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	//Signal handler registration. It permits stops continuous acquisition with Ctrl+C
 	std::signal(SIGINT,signal_handler);
 
-	/*
+	/**
 	 * TEST 0
 	 * DRIVER INITIALIZATION
 	 */
@@ -182,7 +172,7 @@ TEST(TP_cRIO_DAQ, functional) {
 
 	// This function does not modify status neither myStatus, it is not necessary to check that variables
 	irio_getFPGAStart(&p_DrvPvt,&valueGetter,&status);
-	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
+	cout << "[irio_getFPGAStart function] FPGA State value read: "
 		 << valueGetter << " (0-stopped, 1-running)" << endl;
 
 	/**
@@ -227,7 +217,9 @@ TEST(TP_cRIO_DAQ, functional) {
 			 << valueGetter << ", meaning " << Fref*valueGetter << " Samples/s" << endl;
 	}
 
-	/*
+	float ts = 1/(float)(Fref);
+
+	/**
 	 * TEST 4
 	 * DEVICE PROFILE
 	 */
@@ -451,7 +443,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	 * SG Phase
 	 */
 	cout << endl << "TEST 12: Testing Signal Generator phase" << endl << endl;
-	int phase = 90;
+	int32_t phase = 0;
 	cout << "[irio_setSGPhase function] SGPhase0 set to " << phase << endl;
 	myStatus = irio_setSGPhase(&p_DrvPvt,0,phase,&status);
 	if (myStatus > IRIO_success) {
@@ -501,7 +493,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getSGCVADC function] CVADC (conversion from AO to Volts): "
-		 << std::setw(10) << CVADC << endl;
+		 << std::setprecision(8) << CVADC << endl;
 
 	valueGetter = -1;
 	myStatus = irio_getAI(&p_DrvPvt,0,&valueGetter,&status);
@@ -510,7 +502,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getAI function] AO0 has been configured previously to 5.0V, "
-			"AI0 read: " << valueGetter*CVADC << endl;
+			"AI0 read: " << std::fixed << (double)valueGetter*CVADC << endl;
 
 	valueGetter = -1;
 	myStatus = irio_getAI(&p_DrvPvt,1,&valueGetter,&status);
@@ -519,7 +511,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 	cout << "[irio_getAI function] AO1 has been configured previously to -5.0V, "
-			"AI1 read: " << valueGetter*CVADC << endl;
+			"AI1 read: " << std::fixed << (double)valueGetter*CVADC << endl;
 
 	/**
 	 * TEST 15
@@ -581,7 +573,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	int TotalsamplesToAcq = -1;
 	int samples = std::stoi(Samples);
 	int blocklength = std::stoi(blockLength);
-	int nBlocksPerDMAAcc = -1;
+	int blocksToRead = -1;
 
 	if (samples <= DMATtoHOSTBlockNWords)
 		TotalsamplesToAcq = DMATtoHOSTBlockNWords; //This is the minimum length that can be acquired
@@ -589,10 +581,11 @@ TEST(TP_cRIO_DAQ, functional) {
 		TotalsamplesToAcq = samples;
 
 	//Block length
-	if (blocklength > 0 && blocklength <= SIZE_HOST_DMAS){
-		nBlocksPerDMAAcc = blocklength/DMATtoHOSTBlockNWords; //number if blocks read at once from FIFO (Host) DMA.
-		if (blocklength%DMATtoHOSTBlockNWords > 0)
-			nBlocksPerDMAAcc++;
+	if (blocklength > 0 && (blocklength <= SIZE_HOST_DMAS)){
+		blocksToRead = blocklength/DMATtoHOSTBlockNWords; //number if blocks read at once from FIFO (Host) DMA.
+		if (blocklength%DMATtoHOSTBlockNWords > 0) {
+			blocksToRead++;
+		}
 	}
 
 	int acquisitionmode = std::stoi(acquisitionMode);
@@ -601,67 +594,66 @@ TEST(TP_cRIO_DAQ, functional) {
 	if (acquisitionmode == 1) {
 		continueAcq = 1;
 		cout << "DEBUG: Continuous data acquisition reading buffers of length "
-			 << DMATtoHOSTBlockNWords*nBlocksPerDMAAcc << ", " << nBlocksPerDMAAcc
-			 << " blocks of " << DMATtoHOSTBlockNWords << " samples" << endl;
+			 << DMATtoHOSTBlockNWords*blocksToRead << ", " << blocksToRead
+			 << " blocks of " << DMATtoHOSTBlockNWords << " samples" << endl << endl;
 	}
 	else {
 		continueAcq = 0;
 		cout << "DEBUG: Finite data acquisition reading buffers of length "
-			 << DMATtoHOSTBlockNWords*nBlocksPerDMAAcc << ", " << nBlocksPerDMAAcc
-			 << " blocks of " << DMATtoHOSTBlockNWords << " samples" << endl;
+			 << DMATtoHOSTBlockNWords*blocksToRead << ", " << blocksToRead
+			 << " blocks of " << DMATtoHOSTBlockNWords << " samples" << endl << endl;;
 	}
 
 	cout << "NI9264 AO0 is connected to NI9205 AI0 physically. AO0 is configured with a "
-		 << freqDesired << "Hz Square signal, Vp = " << amplitude << "V" << endl;
+		 << freqDesired << "Hz Square signal, Vp = " << amplitude << "V" << endl << endl;
 
 	cout << "Sampling rate of AI0 is " << samplingRate << "S/s. In AI0 channel "
 			"square signal must be read. Every ~" << samplingRate/freqDesired
-         << "samples 1 square cycle must be checked" << endl;
+         << "samples 1 square cycle must be checked" << endl << endl;
 
 	cout << "AI1 is connected to AO1 physically. In AI1, the value read should be close "
 			"to the 5th parameter introduced when this program has been executed." << endl;
 
 	// Each block: 4096 words * 64 bits/word = 4096 words * 8 bytes/word
-//	uint64_t* data2 = new uint64_t(DMATtoHOSTBlockNWords*nBlocksPerDMAAcc*8);
-	uint64_t* data2 = new uint64_t(DMATtoHOSTBlockNWords*nBlocksPerDMAAcc);
+	uint64_t* dataBuffer = new uint64_t(DMATtoHOSTBlockNWords*blocksToRead*8);
 	int sampleCounter = 0;
-	int elementsRead = -1;
-	int32_t *dmaaivalues = NULL;
+	int elementsRead = 0;
 	int errorFounds = 0;
 	int timeout = 0;
+
 	do {
 		//attempt to read nBlocksPerDMAAcc block
-		myStatus = irio_getDMATtoHostData(&p_DrvPvt,nBlocksPerDMAAcc,0,data2,&elementsRead,&status);
+		myStatus = irio_getDMATtoHostData(&p_DrvPvt,blocksToRead,0,dataBuffer,&elementsRead,&status);
 		//elementsRead should be a block if available otherwise 0
-		dmaaivalues=(int32_t*)data2;
 		if (myStatus > IRIO_success) {
 			errorFounds++;
 			// TODO: Revisar si esto sirve de algo
 			status.code = IRIO_success;
 			myStatus = IRIO_success;
 		}
-		if (elementsRead == nBlocksPerDMAAcc){
+		if (elementsRead == blocksToRead){
+			int32_t* auxDataBuffer = (int32_t*)dataBuffer;
 			timeout = 0;
-			sampleCounter += (nBlocksPerDMAAcc*DMATtoHOSTBlockNWords);
+			sampleCounter += (blocksToRead*DMATtoHOSTBlockNWords);
 			//We count blocks to acquire only in finite acquisition
 			if (continueAcq == 0) {
 				if (sampleCounter >= TotalsamplesToAcq)
 					flagExit=1;
 				// In finite mode printf the samples acquired
-				for (int x = 0; x < DMATtoHOSTBlockNWords*nBlocksPerDMAAcc; x++){
-					cout << "Nº sample [" << std::setw(3) << std::setfill('0') << x
-						 << "] AI0 = " << std::fixed <<	dmaaivalues[(x*2)]*CVADC << ", AI1 = "
-						 << std::fixed << (double)dmaaivalues[(x*2)+1]*CVADC << endl;
+				for (int i = 0; i < DMATtoHOSTBlockNWords*blocksToRead; i++){
+					cout << "Nº sample [" << std::setw(3) << std::setfill('0') << i
+						 << "] AI0 = " << std::fixed <<	(double)auxDataBuffer[(i*2)]*CVADC << ", AI1 = "
+						 << std::fixed << (double)auxDataBuffer[(i*2)+1]*CVADC << endl;
 				}
 			}
-			if ((sampleCounter%(nBlocksPerDMAAcc*DMATtoHOSTBlockNWords))==0)
+			if ((sampleCounter%(blocksToRead*DMATtoHOSTBlockNWords))==0)
 				cout << "----Total Samples per channel acquired: " << sampleCounter
 				     << "; Size of a block: " << DMATtoHOSTBlockNWords << "; Number of "
-				        "blocks per read: " << nBlocksPerDMAAcc << "; Number of channels "
+				        "blocks per read: " << blocksToRead << "; Number of channels "
 					 << DMATtoHOSTNCh << "; Error Founds: " << errorFounds << endl;
 		}
 		else{
-			usleep(500000*((float)(1/Fref))*nBlocksPerDMAAcc*DMATtoHOSTBlockNWords); //half time to get an entire block, then 60ms  multiplied by the number of blocks required
+			usleep(500000*ts*blocksToRead*DMATtoHOSTBlockNWords); //half time to get an entire block, then 60ms  multiplied by the number of blocks required
 			timeout ++;
 			if (timeout==10){
 				flagExit=1;
@@ -673,7 +665,7 @@ TEST(TP_cRIO_DAQ, functional) {
 
 	cout << "\t Total Samples acquired: " << sampleCounter << endl;
 
-	delete [] data2;
+	delete [] dataBuffer;
 
 	/**
 	 * TEST 18
