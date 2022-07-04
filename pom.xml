@@ -85,8 +85,7 @@
                         <package name="examples">
                             <include type="file" source="main/c/examples" target="examples/irio" />
                         </package>
-
-						<!-- Comentado solo para instalar los paquetes en la máquina para usar EPICS. Descomentar cuando se quiera crear documentación  -->
+                        
                         <package name="doc">
                             <include type="doxygen" name="irio" project="${project.name}" version="${project.version}" optimize="c">
                                 <filepattern>*.dox</filepattern>

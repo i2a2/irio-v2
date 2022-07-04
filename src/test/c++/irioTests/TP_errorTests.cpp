@@ -323,19 +323,23 @@ TEST(TP_errorTests, setFPGATwice) {
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-	     << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+	     << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << "[irio_setFPGAStart function] Second start of the FPGA, error/warning expected" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 
 	cout << endl << "TEST 2: Testing an auxiliary analog output port not "
@@ -481,7 +485,7 @@ TEST(TP_errorTests, setFPGAInitError) {
 	int aivalue=0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 	if (aivalue == 0)
 		cout << "IRIO can not initialize the FPGA if there is not a driver's session open" << endl;
 
@@ -545,7 +549,7 @@ TEST(TP_errorTests, failInitDriver5761) {
 	int aivalue=0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode after failure on driver initialization" << endl << endl;
 	int valueReadI32 = 0;
@@ -909,6 +913,8 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 	ASSERT_NE(myStatus, IRIO_error);
 
@@ -916,7 +922,7 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	int aivalue=0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	int valueReadI32 = 0;
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode" << endl << endl;
@@ -1263,7 +1269,7 @@ TEST (TP_errorTests, failInitDriverPerf) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing debug mode configuration, ON mode" << endl << endl;
 	cout << "[irio_setDebugMode function] DebugMode set to 1 (ON)" << endl;
@@ -1478,7 +1484,7 @@ TEST(TP_errorTests, failInitDriver6581) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing auxiliary digital output port 6. "
 				    "It allows to write on whole digital output port 2" << endl << endl;
@@ -1626,7 +1632,7 @@ TEST(TP_errorTests, failInitDriver1483UART) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 5: Setting FPGA UART baud rate" << endl << endl;
 	cout << "[irio_setUARTBaudRate function] Setting FPGA UART BaudRate to 9600" << endl;
@@ -1760,7 +1766,7 @@ TEST(TP_errorTests, missingResources1483UART) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 5: Setting FPGA UART baud rate" << endl << endl;
 	cout << "[irio_setUARTBaudRate function] Setting FPGA UART BaudRate to 9600 (with different "
@@ -1861,7 +1867,7 @@ TEST(TP_errorTests, failInitDriver1483IMAQ) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 3: Acquiring image" << endl << endl;
 	int i=0;
@@ -1983,7 +1989,7 @@ TEST(TP_errorTests, missingResources1483IMAQ) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 3: Acquiring image" << endl << endl;
 	int i=0;
@@ -2086,7 +2092,7 @@ TEST(TP_errorTests, failInitDriverCRIOPBP) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing FPGA VI Version" << endl << endl;
 	char* VIVersion = new char[strlen(FPGAversion.c_str())];

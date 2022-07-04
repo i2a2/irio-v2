@@ -165,6 +165,8 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		// IRIO can manage success or warning after starting the FPGA, not error
 		if (myStatus > IRIO_success) {
 			TestUtilsIRIO::getErrors(status);
+			if (myStatus == IRIO_error)
+				irio_closeDriver(&p_DrvPvt,0,&status);
 		}
 		ASSERT_NE(myStatus, IRIO_error);
 
@@ -340,6 +342,8 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 	ASSERT_NE(myStatus, IRIO_error);
 

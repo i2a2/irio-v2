@@ -1,14 +1,10 @@
 #!/usr/bin python3 
-import os   
-import sys 
+import os    
 import argparse
-
-# It is mandatory to compile the project before execute this script
-os.system("mvn clean compile -D coverage")
 
 os.chdir(os.getcwd()+"/target/test/c++/irioTests/")
 
-shuffleAndBreak = " --gtest_break_on_failure --gtest_shuffle"
+shuffleAndBreak = " --gtest_shuffle"
 
 parser = argparse.ArgumentParser(prog="automatize_GT.py",description='Declare environment variables to automatize GoogleTests execution.')
 
@@ -39,19 +35,13 @@ tests_5761 = "TP_FlexRIO_mod5761.*"
 tests_6581 = "TP_FlexRIO_mod6581.*"
 errorTests = "TP_errorTests.*"
 
-tests = {"ANALOG": commonTests+":"+"tests_5761",
-        "DIG": commonTests+":"+"tests_6581",
+tests = {"ANALOG": commonTests+":"+tests_5761,
+        "DIG": commonTests+":"+tests_6581,
         "0": commonTests}
 
-f = open('ErrorFile', 'w')
 if (int(args.allTests)):
     os.system("env -S RIOSerial="+args.RIOSerial+" env RIODevice="+args.RIODevice+" env Coupling="+args.Coupling+
               " ./driver-irio --gtest_filter="+tests[args.AM]+":"+errorTests+iterations+shuffleAndBreak)
 else:
     os.system("env -S RIOSerial="+args.RIOSerial+" env RIODevice="+args.RIODevice+" env Coupling="+args.Coupling+
               " ./driver-irio --gtest_filter="+tests[args.AM]+iterations+shuffleAndBreak)
-
-f.close()
-
-os.system('mv ErrorFile ../../../../')
-print("See file ErrorFile on that directory to check if a test has failed")
