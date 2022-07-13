@@ -149,45 +149,5 @@ int main (std::int32_t argc, char **argv)
 	}
 
 
-	//-----------------GPUDAQ Test
-//	msgtest(4,GPUDAQ Test);
-//	printf("Test 4: GPUDAQ.Should Found:\n");
-//	asprintf(&bitfileName,"FlexRIO_GPUDAQ_%s",argv[2]);
-//	printf("2 GPUDMAs\n");
-//	printf("2 AI\n");
-//	printf("2 AO\n");
-//	printf("2 auxAI\n");
-//	printf("2 auxAO\n");
-//	printf("2 DI\n");
-//	printf("2 DO\n");
-//	printf("2 auxDI\n");
-//	printf("2 auxDO\n");
-//	printf("2 SG\n");
-//	printf("This test must be skipped. GPUDAQ is not supported yet.\n");
-//	myStatus=irio_initDriver("testGPUDAQ",argv[1],NIriomodel,bitfileName,"V1.0",verbosity,filePath,filePath,&p_DrvPvt,&status);
-//	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
-//	msgerr(myStatus,4,"GPUDAQ Test",&status,verbosity,0);
-//
-
-//	//-----------------GPUIMAQ Test
-//	msgtest(5,GPUIMAQ Test);
-//	asprintf(&bitfileName,"FlexRIO_GPUIMAQ_%s",riomodel_folder);
-//	printf("Test 5: GPUIMAQ.Should Found:\n");
-//	printf("1 GPUDMAs\n");
-//	printf("1 CLConfig");
-//	printf("1 CLUART");
-//	printf("2 auxAI\n");
-//	printf("2 auxAO\n");
-//	printf("2 DI\n");
-//	printf("2 DO\n");
-//	printf("2 auxDI\n");
-//	printf("2 auxDO\n");
-//	printf("This test must be skipped. GPUIMAQ is not supported yet.\n");
-//	myStatus=irio_initDriver("testGPUIMAQ",argv[1],NIriomodel,bitfileName,"V1.0",verbosity,filePath,filePath,&p_DrvPvt,&status);
-//	myStatus|=irio_closeDriver(&p_DrvPvt,0, &status);
-//	msgerr(myStatus,5,"GPUIMAQ Test",&status,verbosity,0);
-
-
-
 	return 0;
 }

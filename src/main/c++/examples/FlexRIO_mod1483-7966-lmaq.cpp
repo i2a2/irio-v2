@@ -57,6 +57,14 @@ int main (std::int32_t argc, char **argv)
 
 		irio FlexRIO (argv1, argv2, "FlexRIOMod1483_","V1.1");
 
+		std::int32_t i=0;
+		std::uint16_t fc=0;
+		std::uint16_t *fc2;
+		std::int32_t firstImage=0;
+		std::int32_t count=0;
+
+		std::uint64_t* dataBuffer= NULL;
+
 		cout << "*****************IRIO IMAQ Profile Example*****************\n";
 		cout << "*****************Image Acquisition Example*****************\n";
 
@@ -85,11 +93,10 @@ int main (std::int32_t argc, char **argv)
 		//*********** Acquire Images
 		//Acquire 1000 Images and check FrameCounter
 		FlexRIO.nextTest("Acquiring images" );
-		std::int32_t i=0;
-		std::uint16_t fc=0;
-		std::uint16_t *fc2;
-		std::int32_t firstImage=1;
-		std::int32_t count=0;
+		i=0;
+		fc=0;
+		firstImage=1;
+		count=0;
 
 		//Allocate Memory for image
 		std::uint64_t* dataBuffer= NULL;

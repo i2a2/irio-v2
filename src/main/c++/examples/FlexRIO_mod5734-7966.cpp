@@ -62,6 +62,16 @@ int main (std::int32_t argc, char **argv)
 
 		std::uint64_t *dataBuffer=NULL;
 		std::int_least16_t *auxDataBuffer;
+		std::int32_t DMA_SR =0;
+		std::int32_t coupling = 0;
+		std::int32_t samplingrate = 0;
+		std::int32_t DMATtoHOSTBlockNWords = 0;
+		std::int32_t DMATtoHOSTNCh = 0;
+
+		std::int32_t sampleCounter = 0;
+		std::int32_t elementsRead = 0;
+
+		std::int32_t numOfSamplesToShow = 0;
 
 		// initialize the RIO device calling the irio_initDriver
 		FlexRIO.nextTest("irio_initDriver");
@@ -164,7 +174,7 @@ int main (std::int32_t argc, char **argv)
 
 		FlexRIO.nextTest("irio_setDMATtoHostSamplingRate & irio_getDMATtoHostSamplingRate");
 		cout << "FPGA Clock reference (Fref value) is: " <<FlexRIO.p_DrvPvt.Fref << " Hz\n";
-		std::int32_t DMA_SR = 120000000;
+		DMA_SR = 120000000;
 
 		//sampling rate desired 1.2MS/s
 		FlexRIO.setDMATtoHostSamplingRate(0, DMA_SR);
@@ -183,7 +193,7 @@ int main (std::int32_t argc, char **argv)
 		//FlexRIO.setExitOnFailure(0);
 
 		// setting DC mode directly.
-		std::int32_t coupling = std::atoi(argv3.c_str());
+		coupling = std::atoi(argv3.c_str());
 
 		// This part is setting the DC coupling for channel 0 only
 		FlexRIO.setA0(1, 6, 3);	//3 is the command to change the DC coupling
@@ -195,7 +205,7 @@ int main (std::int32_t argc, char **argv)
 		/**
 		 * DMA ENABLE
 		 */
-		std::int32_t samplingrate=FlexRIO.p_DrvPvt.Fref/DMA_SR;
+		samplingrate=FlexRIO.p_DrvPvt.Fref/DMA_SR;
 
 		FlexRIO.nextTest("irio_setDMATtoHostEnable & irio_getDMATtoHostEnable");
 		FlexRIO.setDMATtoHostEnable(0,1);//DMA data transfer to Host is activated
@@ -218,13 +228,11 @@ int main (std::int32_t argc, char **argv)
 		/**
 		 * LOOP FOR ACQUIRING ONLY 1 BLOCK AND ONLY SHOW 51 SAMPLES
 		 */
-
-		std::int32_t DMATtoHOSTBlockNWords=FlexRIO.p_DrvPvt.DMATtoHOSTBlockNWords[0];
-		std::int32_t DMATtoHOSTNCh=FlexRIO.p_DrvPvt.DMATtoHOSTNCh[0];
-		std::int32_t sampleCounter = 0;
-		std::int32_t elementsRead = 0;
-		std::int32_t numOfSamplesToShow = 0;
-
+		DMATtoHOSTBlockNWords=FlexRIO.p_DrvPvt.DMATtoHOSTBlockNWords[0];
+		DMATtoHOSTNCh=FlexRIO.p_DrvPvt.DMATtoHOSTNCh[0];
+		sampleCounter = 0;
+		elementsRead = 0;
+		numOfSamplesToShow = 0;
 
 		do{
 			FlexRIO.getDMATtoHostData(1, 0, dataBuffer, &elementsRead);

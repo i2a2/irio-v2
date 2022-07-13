@@ -76,7 +76,7 @@ void irio::checkError(std::int32_t exitOnFailure){
 
 	if(myStatus==IRIO_success){
 			cout << "IRIO test " << numberTest << " "<< nameTest << " function\\s successful execution [OK] \n\n";
-			fflush(stdout);
+			cout.flush();
 	}else{
 
 		std::string::pointer detailStr;
@@ -91,7 +91,7 @@ void irio::checkError(std::int32_t exitOnFailure){
 
 		delete detailStr;
 
-		fflush(stdout);
+		cout.flush();
 		irio_resetStatus(&status);
 
 		if(exitOnFailure){
@@ -149,12 +149,57 @@ void irio::clearAttributes(){
 
 // Esta funcion se implementa sin static ya que se ha indicado en el header que es estatica
 void irio::usage(std::string name){
-	cout << "\nThis example checks the terminals in the FPGA design\n"
-			"This example requires a FlexRIO device\n"
-			"Use lsrio.py to identify the RIO devices included in the fast controller\n"
-			"\n"
-			"Usage: " + name + " <SERIAL_NUMBER> <RIOMODEL> \n"
-			"Example: " + name + " 0x01666C59 7965 \n";
+
+	cout.flush();
+
+	if (name.compare("./FlexRIO_mod5761-7966") == 0)
+	{
+		cout << "\nThis example checks the data acquisition profile in the FlexRIO device. \nNo external "
+				"signal generator is needed because the example uses the internal signal generator implemented in the FPGA\n"
+				"This example requires a 796x FlexRIO device with a NI5761 adapter module\n"
+				"Use lsrio.py to identify the RIO devices included in the fast controller\n\n"
+
+				"Usage: " + name + " <SERIAL_NUMBER> <RIOMODEL> <NI5761 Coupling AC=0,DC=1>\n"
+				"Example: " + name + " 0x0177A2AD 7966 0\n";
+	}
+	else if (name.compare("./FlexRIO_mod5734-7966") == 0){
+		cout << "\nThis example checks the data acquisition profile in the FlexRIO device.\n"
+                "This example requires a 7966 FlexRIO device with a NI5734 adapter module\n"
+        		"Connect the analog signal to CH0\n"
+        		"Sampling rate is 120MS/s\n"
+                "Use lsrio.py to identify the RIO devices included in the fast controller\n"
+        		"\n"
+				"Usage: " + name + " <SERIAL_NUMBER> <RIOMODEL> <NI5734 Coupling AC=0,DC=1>\n"
+				"Example: " + name + " 0x0177A2AD 7966 0\n";
+
+	}
+	else if (name.compare("./FlexRIO_mod1483-7966-lmaq") ==0 ){
+		cout << "\nThis example checks the image acquisition from a cameralink compatible device\n"
+				"This example requires a FlexRIO device 7966 with a NI1483\n"
+				"Use lsrio.py to identify the RIO devices included in the fast controller\n"
+				"\n"
+				"Usage: " + name + " <SERIAL_NUMBER> <RIOMODEL> \n"
+				"Example: " + name + " 0x01A34CC7 7966 \n";
+
+	}
+	else if (name.compare("./FlexRIO_mod6581-7965") ==0 ){
+		cout << "This example checks the use of digital lines in the NI6581\n"
+                "This example requires a FlexRIO device with a NI6581 adapter module\n"
+                "Use lsrio.py to identify the RIO devices included in the fast controller\n"
+        		"\n"
+				"Usage: " + name + " <SERIAL_NUMBER> <RIOMODEL> \n"
+				"Example: " + name + " 0x01666C59 7965 \n";
+
+	}
+	else {
+		cout << "\nThis example checks the terminals in the FPGA design\n"
+				"This example requires a FlexRIO device\n"
+				"Use lsrio.py to identify the RIO devices included in the fast controller\n"
+				"\n"
+				"Usage: " + name + " <SERIAL_NUMBER> <RIOMODEL> \n"
+				"Example: " + name + " 0x01666C59 7965 \n";
+	}
+	cout.flush();
 }
 
 int irio::startSetFPGA(std::int32_t value){

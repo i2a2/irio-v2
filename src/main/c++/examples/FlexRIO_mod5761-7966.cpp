@@ -61,6 +61,20 @@ int main (std::int32_t argc, char **argv)
 
 		std::uint64_t *dataBuffer;
 		std::int_least16_t *auxDataBuffer;
+		std::int32_t DMA_SR = 0;
+		std::int32_t coupling = 0;
+		std::int32_t samplingrate = 0;
+		std::int32_t DMATtoHOSTBlockNWords = 0;
+		std::int32_t DMATtoHOSTNCh = 0;
+
+		std::int32_t positiveTest = 0;
+		std::int32_t negativeTest = 0;
+		std::int32_t sampleCounter = 0;
+		std::int32_t elementsRead = 0;
+
+		std::int32_t accIncr = 0;
+
+		std::int32_t numOfSamplesToShow = 0;
 
 		dataBuffer=(std::uint64_t *)malloc(4096*8);//4096 data block size
 
@@ -160,7 +174,7 @@ int main (std::int32_t argc, char **argv)
 		 */
 		FlexRIO.nextTest("irio_setDMATtoHostSamplingRate & irio_getDMATtoHostSamplingRate");
 		cout << "FPGA Clock reference (Fref value) is: " <<FlexRIO.p_DrvPvt.Fref << " Hz\n";
-		std::int32_t DMA_SR = 500000;
+		DMA_SR = 500000;
 		FlexRIO.setDMATtoHostSamplingRate(0, DMA_SR);
 		// equation applied to set DMATtoHostSamplingRate: Fref/samplingRate=DecimationFactor
 		// Where - Fref is p_DrvPvt.Fref, this value is read from FPGA by irioDriver initialization
@@ -173,7 +187,7 @@ int main (std::int32_t argc, char **argv)
 
 		//Coupling configuration for NI5761
 		FlexRIO.nextTest("irio_setAICoupling & irio_getAICoupling");
-		std::int32_t coupling = std::atoi(argv3.c_str());
+		coupling = std::atoi(argv3.c_str());
 
 		FlexRIO.setAICoupling(coupling);
 		FlexRIO.getAICoupling();
@@ -182,7 +196,7 @@ int main (std::int32_t argc, char **argv)
 		/**
 		 * DMA ENABLE
 		 */
-		std::int32_t samplingrate=FlexRIO.p_DrvPvt.Fref/DMA_SR;
+		samplingrate=FlexRIO.p_DrvPvt.Fref/DMA_SR;
 
 		FlexRIO.nextTest("irio_setDMATtoHostEnable & irio_getDMATtoHostEnable");
 
@@ -201,8 +215,8 @@ int main (std::int32_t argc, char **argv)
 		FlexRIO.getDAQStartStop();
 		FlexRIO.checkError(1);
 
-		std::int32_t DMATtoHOSTBlockNWords=FlexRIO.p_DrvPvt.DMATtoHOSTBlockNWords[0];
-		std::int32_t DMATtoHOSTNCh=FlexRIO.p_DrvPvt.DMATtoHOSTNCh[0];
+		DMATtoHOSTBlockNWords=FlexRIO.p_DrvPvt.DMATtoHOSTBlockNWords[0];
+		DMATtoHOSTNCh=FlexRIO.p_DrvPvt.DMATtoHOSTNCh[0];
 
 		FlexRIO.irioSleep(1000);
 
@@ -284,7 +298,7 @@ int main (std::int32_t argc, char **argv)
 
 		// we want program signal generator with 10kHz periodic signal
 		// equation to apply to obtain freq_desired is: SGFreq=freq_desired*( (2to32) / ( SGFref/(S/s)) )
-		std::int32_t accIncr = 0;
+
 		accIncr=10000*(UINT_MAX/(10000000)); // Frequency desired 10kHz
 
 		FlexRIO.nextTest("irio_setSGFreq & irio_getSGFreq");

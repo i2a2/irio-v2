@@ -54,7 +54,7 @@ public:
 	/**
 	 * Constructor of an object of class irio.
 	 *
-	 * An object of the irio class allows us to initialize a driver.
+	 * An object of the irio class allows to initialize a driver.
 	 *
 	 * When this object is created, this contains next variables with default values:
 	 * 		myStatus
