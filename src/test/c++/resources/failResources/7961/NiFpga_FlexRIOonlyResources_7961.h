@@ -24,7 +24,7 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_FlexRIOonlyResources_7961_Signature = "DBC33EF5DCABAD28433EABE3EE9AF17E";
+static const char* const NiFpga_FlexRIOonlyResources_7961_Signature = "BBECC795EC0946F8AADB5EFD4AB41C82";
 
 typedef enum
 {
@@ -145,8 +145,8 @@ typedef enum
    NiFpga_FlexRIOonlyResources_7961_IndicatorU32_ExpectedIOModuleID = 0x3B8,
    NiFpga_FlexRIOonlyResources_7961_IndicatorU32_Fref = 0x3A8,
    NiFpga_FlexRIOonlyResources_7961_IndicatorU32_InsertedIOModuleID = 0x3B4,
-   NiFpga_FlexRIOonlyResources_7961_IndicatorU32_SGFref0 = 0xBC,
    NiFpga_FlexRIOonlyResources_7961_IndicatorU32_SGFref1 = 0x54,
+   NiFpga_FlexRIOonlyResources_7961_IndicatorU32_WrongSGFref0 = 0xBC,
 } NiFpga_FlexRIOonlyResources_7961_IndicatorU32;
 
 typedef enum
@@ -171,7 +171,6 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FlexRIOonlyResources_7961_ControlBool_AOEnable0 = 0x2,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_AOEnable1 = 0x1E,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_DAQStartStop = 0x46,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_DMATtoHOSTEnable0 = 0x3A,
@@ -230,6 +229,7 @@ typedef enum
    NiFpga_FlexRIOonlyResources_7961_ControlBool_DO8 = 0x1A6,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_DO9 = 0x19A,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_DebugMode = 0x4A,
+   NiFpga_FlexRIOonlyResources_7961_ControlBool_WrongAOEnable0 = 0x2,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_auxDO0 = 0x8A,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_auxDO1 = 0x86,
    NiFpga_FlexRIOonlyResources_7961_ControlBool_auxDO10 = 0xD2,
@@ -251,14 +251,14 @@ typedef enum
 typedef enum
 {
    NiFpga_FlexRIOonlyResources_7961_ControlU8_SGSignalType0 = 0xA,
-   NiFpga_FlexRIOonlyResources_7961_ControlU8_SGSignalType1 = 0x26,
+   NiFpga_FlexRIOonlyResources_7961_ControlU8_WrongSGSignalType1 = 0x26,
 } NiFpga_FlexRIOonlyResources_7961_ControlU8;
 
 typedef enum
 {
-   NiFpga_FlexRIOonlyResources_7961_ControlU16_DMATtoHOSTSamplingRate0 = 0x3E,
    NiFpga_FlexRIOonlyResources_7961_ControlU16_SGAmp0 = 0x1A,
    NiFpga_FlexRIOonlyResources_7961_ControlU16_SGAmp1 = 0x36,
+   NiFpga_FlexRIOonlyResources_7961_ControlU16_WrongDMATtoHostSamplingRate0 = 0x3E,
 } NiFpga_FlexRIOonlyResources_7961_ControlU16;
 
 typedef enum
