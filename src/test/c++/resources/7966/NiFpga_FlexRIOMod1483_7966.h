@@ -1,13 +1,13 @@
 /*
- * Generated with the FPGA Interface C API Generator 13.0.0
- * for NI-RIO 13.0.0 or later.
+ * Generated with the FPGA Interface C API Generator 17.0.0
+ * for NI-RIO 17.0.0 or later.
  */
 
 #ifndef __NiFpga_FlexRIOMod1483_7966_h__
 #define __NiFpga_FlexRIOMod1483_7966_h__
 
 #ifndef NiFpga_Version
-   #define NiFpga_Version 1300
+   #define NiFpga_Version 1700
 #endif
 
 #include "NiFpga.h"
@@ -24,7 +24,7 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_FlexRIOMod1483_7966_Signature = "97EAA658696E09D943D33B1319DD3579";
+static const char* const NiFpga_FlexRIOMod1483_7966_Signature = "54C9DD9156E1880B26E8344634332ECE";
 
 typedef enum
 {
