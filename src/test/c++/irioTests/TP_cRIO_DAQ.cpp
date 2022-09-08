@@ -55,7 +55,7 @@ TEST(TP_cRIO_DAQ, functional) {
 	string appCallID = "functionalcRIODAQTest";
 	string NIRIOmodel = "NI 9159";
 	string bitfileName = "cRIO_DAQ";
-	string FPGAversion = "V1.0";// User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2";// User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
@@ -135,11 +135,16 @@ TEST(TP_cRIO_DAQ, cRIO_DAQDMA) {
 	ASSERT_TRUE(RIODevice=="9159") << "Use the correct model of your FlexRIO device";
 
 	// User don't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "NI 9159";
 
+
+
 	// Original bitfile. Check that all cRIO modules are connected to avoid errors
-	string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+//	string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	string filePath = "../resources/"+RIODevice+"/";
+
+
 	string bitfileName = "cRIODAQDMA_"+RIODevice;
 
 	int myStatus = 0;
@@ -168,6 +173,9 @@ TEST(TP_cRIO_DAQ, cRIO_DAQDMA) {
 	}
 	ASSERT_EQ(myStatus, IRIO_success);
 
+	// Storage getter methods values
+	int valueGetter = -1;
+
 	/**
 	 * TEST 1
 	 * FPGA START
@@ -180,13 +188,12 @@ TEST(TP_cRIO_DAQ, cRIO_DAQDMA) {
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
 	}
-	EXPECT_NE(myStatus, IRIO_success);
+	EXPECT_EQ(myStatus, IRIO_success);
 
 	// This function does not modify status neither myStatus, it is not necessary to check that variables
-	int aivalue=0;
-	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
+	irio_getFPGAStart(&p_DrvPvt,&valueGetter,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << valueGetter << " (0-stopped, 1-running)" << endl;
 
 	/**
 	 * TEST 2

@@ -69,7 +69,7 @@ TEST(TP_FlexRIO_mod1483, functionalUART){
 		string appCallID = "functionalMod1483UartTest";
 		string NIRIOmodel = "PXIe-"+RIODevice+"R";
 		string bitfileName = "FlexRIOMod1483_"+RIODevice;
-		string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+		string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 		string filePath = "../resources/"+RIODevice+"/";
 
 		int myStatus = 0;
@@ -287,7 +287,7 @@ TEST(TP_FlexRIO_mod1483, functionalIMAQ) {
 	string appCallID = "functionalMod1483ImaqTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string bitfileName = "FlexRIOMod1483_"+RIODevice;
-	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;

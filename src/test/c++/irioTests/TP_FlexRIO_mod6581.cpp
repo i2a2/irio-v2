@@ -52,7 +52,7 @@ TEST(TP_FlexRIO_mod6581, functional) {
 	string appCallID = "functionalMod6581Test";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string bitfileName = "FlexRIOMod6581_"+RIODevice;
-	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
