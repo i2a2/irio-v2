@@ -1,13 +1,13 @@
 /*
- * Generated with the FPGA Interface C API Generator 13.0.0
- * for NI-RIO 13.0.0 or later.
+ * Generated with the FPGA Interface C API Generator 17.0.0
+ * for NI-RIO 17.0.0 or later.
  */
 
 #ifndef __NiFpga_FlexRIOMod6581_7965_h__
 #define __NiFpga_FlexRIOMod6581_7965_h__
 
 #ifndef NiFpga_Version
-   #define NiFpga_Version 1300
+   #define NiFpga_Version 1700
 #endif
 
 #include "NiFpga.h"
@@ -24,7 +24,7 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_FlexRIOMod6581_7965_Signature = "FEC614AF7775A7211ADF8BC6EBB96918";
+static const char* const NiFpga_FlexRIOMod6581_7965_Signature = "F4260066493C1A987442C0C984A8B0B3";
 
 typedef enum
 {
@@ -48,7 +48,7 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FlexRIOMod6581_7965_IndicatorU8_DevProfile = 0x126,
+   NiFpga_FlexRIOMod6581_7965_IndicatorU8_DevProfile = 0x122,
    NiFpga_FlexRIOMod6581_7965_IndicatorU8_DevQualityStatus = 0x5E,
    NiFpga_FlexRIOMod6581_7965_IndicatorU8_Platform = 0x13E,
    NiFpga_FlexRIOMod6581_7965_IndicatorU8_SGNo = 0x66,
@@ -80,7 +80,7 @@ typedef enum
 typedef enum
 {
    NiFpga_FlexRIOMod6581_7965_IndicatorU32_ExpectedIOModuleID = 0x138,
-   NiFpga_FlexRIOMod6581_7965_IndicatorU32_Fref = 0x60,
+   NiFpga_FlexRIOMod6581_7965_IndicatorU32_Fref = 0x128,
    NiFpga_FlexRIOMod6581_7965_IndicatorU32_InsertedIOModuleID = 0x134,
    NiFpga_FlexRIOMod6581_7965_IndicatorU32_SGFref0 = 0xC8,
    NiFpga_FlexRIOMod6581_7965_IndicatorU32_SGFref1 = 0xCC,
@@ -148,9 +148,9 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU8_DMATtoHOSTFrameType = 0x11A,
-   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU8_DMATtoHOSTSampleSize = 0x11E,
-   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU8_FPGAVIversion = 0x12A,
+   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU8_DMATtoHOSTFrameType = 0x116,
+   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU8_DMATtoHOSTSampleSize = 0x11A,
+   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU8_FPGAVIversion = 0x126,
 } NiFpga_FlexRIOMod6581_7965_IndicatorArrayU8;
 
 typedef enum
@@ -162,8 +162,8 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU16_DMATtoHOSTBlockNWords = 0x122,
-   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU16_DMATtoHOSTNCh = 0x116,
+   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU16_DMATtoHOSTBlockNWords = 0x11E,
+   NiFpga_FlexRIOMod6581_7965_IndicatorArrayU16_DMATtoHOSTNCh = 0x62,
 } NiFpga_FlexRIOMod6581_7965_IndicatorArrayU16;
 
 typedef enum
