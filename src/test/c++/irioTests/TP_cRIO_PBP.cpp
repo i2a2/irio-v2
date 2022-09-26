@@ -53,7 +53,7 @@ TEST(TP_cRIO_PBP, noModules) {
 	string appCallID = "functionalcRIOPBPTest";
 	string NIRIOmodel = "NI 9159";
 	string bitfileName = "cRIO_PBP";
-	string FPGAversion = "V1.0"; // User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
@@ -212,9 +212,13 @@ TEST(TP_cRIO_PBP, cRIO_IO){
 	string appCallID = "functionalcRIOIOTest";
 	string NIRIOmodel = "NI 9159";
 	string bitfileName = "cRIOIO_"+RIODevice;
-	string FPGAversion = "V1.1"; // User don't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User don't have to know what FPGA Version is used
 	// Original bitfile. Check that all cRIO modules are connected to avoid errors
-	string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+
+
+	//	string filePath = "../../../main/c/examples/resourceTest/"+RIODevice+"/";
+	string filePath = "../resources/"+RIODevice+"/";
+
 
 	int myStatus = 0;
 	irioDrv_t p_DrvPvt;

@@ -100,7 +100,7 @@ TEST(TP_errorTests, wrongRIOSerial)
 	// No RIOSerial as a environment variable because it is passed as a wrong parameter to irio_initDriver
 
 	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
@@ -148,10 +148,9 @@ TEST(TP_errorTests, differentModelSerial)
 	string RIODevice = "7966";
 
 	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
-
 	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
 
 	int myStatus = 0;
@@ -194,8 +193,7 @@ TEST(TP_errorTests, wrongBitfileName)
 	string RIODevice = "7966";
 	string RIOSerial = "0x0177A2AD";
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "VX.Y"; // Do not matter the FPGA version because of the bitfile will not be found
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 
@@ -240,7 +238,7 @@ TEST(TP_errorTests, wrongRIODevice)
 	string RIOSerial = "0x0177A2AD";
 
 	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
@@ -289,7 +287,7 @@ TEST(TP_errorTests, setFPGATwice) {
 	string RIOSerial = "0x0177A2AD";
 
 	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOnoModule_"+RIODevice;
@@ -323,19 +321,23 @@ TEST(TP_errorTests, setFPGATwice) {
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 	EXPECT_EQ(myStatus, IRIO_success);
 
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-	     << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+	     << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << "[irio_setFPGAStart function] Second start of the FPGA, error/warning expected" << endl;
 	myStatus = irio_setFPGAStart(&p_DrvPvt,1,&status);
 
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 
 	cout << endl << "TEST 2: Testing an auxiliary analog output port not "
@@ -444,8 +446,7 @@ TEST(TP_errorTests, setFPGAInitError) {
 	string RIODevice = "7966";
 	string RIOSerial = "0x0177A2AD";
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "VX.Y"; // Do not matter the FPGA version because of the bitfile will not be found
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOnoModule_"+RIODevice;
@@ -481,7 +482,7 @@ TEST(TP_errorTests, setFPGAInitError) {
 	int aivalue=0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 	if (aivalue == 0)
 		cout << "IRIO can not initialize the FPGA if there is not a driver's session open" << endl;
 
@@ -506,8 +507,7 @@ TEST(TP_errorTests, failInitDriver5761) {
 	string RIOSerial = "0x0177A2AD";
 	string Coupling  = "0";
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "VX.Y"; // Do not matter the FPGA version because of the bitfile will not be found
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod5761_"+RIODevice;
@@ -545,7 +545,7 @@ TEST(TP_errorTests, failInitDriver5761) {
 	int aivalue=0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode after failure on driver initialization" << endl << endl;
 	int valueReadI32 = 0;
@@ -874,7 +874,7 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	string Coupling  = "0";
 
 	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod5761_"+RIODevice;
@@ -909,6 +909,8 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 	ASSERT_NE(myStatus, IRIO_error);
 
@@ -916,7 +918,7 @@ TEST(TP_errorTests, getDMADataTimeout5761) {
 	int aivalue=0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	int valueReadI32 = 0;
 	cout << endl << "TEST 2: Testing debug mode configuration, OFF mode" << endl << endl;
@@ -1223,8 +1225,7 @@ TEST (TP_errorTests, failInitDriverPerf) {
 	string RIODevice = "7966";
 	string RIOSerial = "0x0177A2AD";
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "VX.Y"; // Do not matter the FPGA version because of the bitfile will not be found
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIO_perf_"+RIODevice;
@@ -1263,7 +1264,7 @@ TEST (TP_errorTests, failInitDriverPerf) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing debug mode configuration, ON mode" << endl << endl;
 	cout << "[irio_setDebugMode function] DebugMode set to 1 (ON)" << endl;
@@ -1439,8 +1440,7 @@ TEST(TP_errorTests, failInitDriver6581) {
 	string RIODevice = "7965";
 	string RIOSerial = "0x01666C59";
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "VX.Y"; // Do not matter the FPGA version because of the bitfile will not be found
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "wrongPath";
 	string bitfileName = "FlexRIOMod6581_"+RIODevice;
@@ -1478,7 +1478,7 @@ TEST(TP_errorTests, failInitDriver6581) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing auxiliary digital output port 6. "
 				    "It allows to write on whole digital output port 2" << endl << endl;
@@ -1545,8 +1545,7 @@ TEST(TP_errorTests, failInitDriver1483UART) {
 	string RIODevice = "7966";
 	string RIOSerial = "0x01A34CC7";
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "VX.Y"; // Do not matter the FPGA version because of the bitfile will not be found
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod1483_"+RIODevice;
@@ -1626,7 +1625,7 @@ TEST(TP_errorTests, failInitDriver1483UART) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 5: Setting FPGA UART baud rate" << endl << endl;
 	cout << "[irio_setUARTBaudRate function] Setting FPGA UART BaudRate to 9600" << endl;
@@ -1682,7 +1681,7 @@ TEST(TP_errorTests, missingResources1483UART) {
 	string RIOSerial = "0x01A34CC7";
 
 	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/failResources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod1483_"+RIODevice;
@@ -1760,7 +1759,7 @@ TEST(TP_errorTests, missingResources1483UART) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 5: Setting FPGA UART baud rate" << endl << endl;
 	cout << "[irio_setUARTBaudRate function] Setting FPGA UART BaudRate to 9600 (with different "
@@ -1815,8 +1814,7 @@ TEST(TP_errorTests, failInitDriver1483IMAQ) {
 	string RIODevice = "7966";
 	string RIOSerial = "0x01A34CC7";
 
-	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "VX.Y"; // Do not matter the FPGA version because of the bitfile will not be found
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod1483_"+RIODevice;
@@ -1861,7 +1859,7 @@ TEST(TP_errorTests, failInitDriver1483IMAQ) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 3: Acquiring image" << endl << endl;
 	int i=0;
@@ -1938,7 +1936,7 @@ TEST(TP_errorTests, missingResources1483IMAQ) {
 	string RIOSerial = "0x01A34CC7";
 
 	// User doesn't have to know what FPGA Version is used
-	string FPGAversion = "V1.1";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string filePath = "../resources/failResources/"+RIODevice+"/";
 	string bitfileName = "FlexRIOMod1483_"+RIODevice;
@@ -1983,7 +1981,7 @@ TEST(TP_errorTests, missingResources1483IMAQ) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt, &aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 3: Acquiring image" << endl << endl;
 	int i=0;
@@ -2049,7 +2047,7 @@ TEST(TP_errorTests, failInitDriverCRIOPBP) {
 	string RIOSerial = "0x01C10FAC";
 
 	// User don't have to know what FPGA Version is used
-	string FPGAversion = "V1.0";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "NI 9159";
 	string filePath = "../resources/"+RIODevice+"/";
 	string bitfileName = "cRIO_PBP";
@@ -2086,7 +2084,7 @@ TEST(TP_errorTests, failInitDriverCRIOPBP) {
 	int aivalue = 0;
 	irio_getFPGAStart(&p_DrvPvt,&aivalue,&status);
 	cout << "[irio_getFPGAStart function] Getting FPGA state. FPGA State is: "
-		 << aivalue << ". 1-->\"running\", 0-->\"stopped\"" << endl;
+		 << aivalue << " (0-stopped, 1-running)" << endl;
 
 	cout << endl << "TEST 2: Testing FPGA VI Version" << endl << endl;
 	char* VIVersion = new char[strlen(FPGAversion.c_str())];
@@ -2200,7 +2198,7 @@ TEST(TP_errorTests, missingResourcesCRIOPBP) {
 	string RIOSerial = "0x01C10FAC";
 
 	// User don't have to know what FPGA Version is used
-	string FPGAversion = "V1.0";
+	string FPGAversion = "V1.2";
 	string NIRIOmodel = "NI 9159";
 	string filePath = "../resources/failResources/"+RIODevice+"/";
 	string bitfileName = "cRIO_PBP";

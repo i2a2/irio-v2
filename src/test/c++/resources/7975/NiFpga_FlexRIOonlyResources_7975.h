@@ -24,7 +24,7 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_FlexRIOonlyResources_7975_Signature = "217EB452CF9F745FEFCBC400D0F978D3";
+static const char* const NiFpga_FlexRIOonlyResources_7975_Signature = "E2C5791058E3D24FEDF1104354CD0AC0";
 
 typedef enum
 {
@@ -298,7 +298,6 @@ typedef enum
 {
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO0 = 0x10378,
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO1 = 0x1037C,
-   NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO10 = 0x10364,
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO11 = 0x10360,
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO12 = 0x1035C,
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO13 = 0x10358,
@@ -312,6 +311,7 @@ typedef enum
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO7 = 0x10370,
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO8 = 0x1036C,
    NiFpga_FlexRIOonlyResources_7975_ControlI64_aux64AO9 = 0x10368,
+   NiFpga_FlexRIOonlyResources_7975_ControlI64_aux65AO10 = 0x10364,
 } NiFpga_FlexRIOonlyResources_7975_ControlI64;
 
 typedef enum

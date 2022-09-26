@@ -1,13 +1,13 @@
 /*
- * Generated with the FPGA Interface C API Generator 13.0.0
- * for NI-RIO 13.0.0 or later.
+ * Generated with the FPGA Interface C API Generator 17.0.0
+ * for NI-RIO 17.0.0 or later.
  */
 
 #ifndef __NiFpga_FlexRIOnoModule_7961_h__
 #define __NiFpga_FlexRIOnoModule_7961_h__
 
 #ifndef NiFpga_Version
-   #define NiFpga_Version 1300
+   #define NiFpga_Version 1700
 #endif
 
 #include "NiFpga.h"
@@ -24,12 +24,12 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_FlexRIOnoModule_7961_Signature = "C1530BD92BAA759B0A9F7FE4EDAFB486";
+static const char* const NiFpga_FlexRIOnoModule_7961_Signature = "FAA08CF48EFE3AF4AFC9374F6795B249";
 
 typedef enum
 {
-   NiFpga_FlexRIOnoModule_7961_IndicatorBool_InitDone = 0xCE,
-   NiFpga_FlexRIOnoModule_7961_IndicatorBool_RIOAdapterCorrect = 0xD2,
+   NiFpga_FlexRIOnoModule_7961_IndicatorBool_InitDone = 0xFE,
+   NiFpga_FlexRIOnoModule_7961_IndicatorBool_RIOAdapterCorrect = 0x102,
    NiFpga_FlexRIOnoModule_7961_IndicatorBool_auxDI0 = 0x66,
    NiFpga_FlexRIOnoModule_7961_IndicatorBool_auxDI1 = 0x62,
    NiFpga_FlexRIOnoModule_7961_IndicatorBool_auxDI2 = 0x5E,
@@ -40,9 +40,9 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FlexRIOnoModule_7961_IndicatorU8_DevProfile = 0xC2,
+   NiFpga_FlexRIOnoModule_7961_IndicatorU8_DevProfile = 0xF2,
    NiFpga_FlexRIOnoModule_7961_IndicatorU8_DevQualityStatus = 0x46,
-   NiFpga_FlexRIOnoModule_7961_IndicatorU8_Platform = 0xDE,
+   NiFpga_FlexRIOnoModule_7961_IndicatorU8_Platform = 0x10E,
    NiFpga_FlexRIOnoModule_7961_IndicatorU8_SGNo = 0x4E,
 } NiFpga_FlexRIOnoModule_7961_IndicatorU8;
 
@@ -72,11 +72,21 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FlexRIOnoModule_7961_IndicatorU32_ExpectedIOModuleID = 0xD8,
-   NiFpga_FlexRIOnoModule_7961_IndicatorU32_Fref = 0xC8,
-   NiFpga_FlexRIOnoModule_7961_IndicatorU32_InsertedIOModuleID = 0xD4,
-   NiFpga_FlexRIOnoModule_7961_IndicatorU32_SGFref0 = 0xB0,
+   NiFpga_FlexRIOnoModule_7961_IndicatorU32_ExpectedIOModuleID = 0x108,
+   NiFpga_FlexRIOnoModule_7961_IndicatorU32_Fref = 0xF8,
+   NiFpga_FlexRIOnoModule_7961_IndicatorU32_InsertedIOModuleID = 0x104,
+   NiFpga_FlexRIOnoModule_7961_IndicatorU32_SGFref0 = 0x48,
 } NiFpga_FlexRIOnoModule_7961_IndicatorU32;
+
+typedef enum
+{
+   NiFpga_FlexRIOnoModule_7961_IndicatorI64_aux64AI0 = 0xC8,
+   NiFpga_FlexRIOnoModule_7961_IndicatorI64_aux64AI1 = 0xCC,
+   NiFpga_FlexRIOnoModule_7961_IndicatorI64_aux64AI2 = 0xD0,
+   NiFpga_FlexRIOnoModule_7961_IndicatorI64_aux64AI3 = 0xD4,
+   NiFpga_FlexRIOnoModule_7961_IndicatorI64_aux64AI4 = 0xD8,
+   NiFpga_FlexRIOnoModule_7961_IndicatorI64_aux64AI5 = 0xDC,
+} NiFpga_FlexRIOnoModule_7961_IndicatorI64;
 
 typedef enum
 {
@@ -119,14 +129,24 @@ typedef enum
    NiFpga_FlexRIOnoModule_7961_ControlU32_SGFreq0 = 0x14,
    NiFpga_FlexRIOnoModule_7961_ControlU32_SGPhase0 = 0x10,
    NiFpga_FlexRIOnoModule_7961_ControlU32_SGUpdateRate0 = 0x4,
-   NiFpga_FlexRIOnoModule_7961_ControlU32_TabControl = 0xE4,
+   NiFpga_FlexRIOnoModule_7961_ControlU32_TabControl = 0x114,
 } NiFpga_FlexRIOnoModule_7961_ControlU32;
 
 typedef enum
 {
-   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU8_DMATtoHOSTFrameType = 0xB6,
-   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU8_DMATtoHOSTSampleSize = 0xBA,
-   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU8_FPGAVIversion = 0xC6,
+   NiFpga_FlexRIOnoModule_7961_ControlI64_aux64AO0 = 0xB0,
+   NiFpga_FlexRIOnoModule_7961_ControlI64_aux64AO1 = 0xB4,
+   NiFpga_FlexRIOnoModule_7961_ControlI64_aux64AO2 = 0xB8,
+   NiFpga_FlexRIOnoModule_7961_ControlI64_aux64AO3 = 0xBC,
+   NiFpga_FlexRIOnoModule_7961_ControlI64_aux64AO4 = 0xC0,
+   NiFpga_FlexRIOnoModule_7961_ControlI64_aux64AO5 = 0xC4,
+} NiFpga_FlexRIOnoModule_7961_ControlI64;
+
+typedef enum
+{
+   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU8_DMATtoHOSTFrameType = 0xE6,
+   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU8_DMATtoHOSTSampleSize = 0xEA,
+   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU8_FPGAVIversion = 0xF6,
 } NiFpga_FlexRIOnoModule_7961_IndicatorArrayU8;
 
 typedef enum
@@ -138,8 +158,8 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU16_DMATtoHOSTBlockNWords = 0xBE,
-   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU16_DMATtoHOSTNCh = 0x4A,
+   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU16_DMATtoHOSTBlockNWords = 0xEE,
+   NiFpga_FlexRIOnoModule_7961_IndicatorArrayU16_DMATtoHOSTNCh = 0xE2,
 } NiFpga_FlexRIOnoModule_7961_IndicatorArrayU16;
 
 typedef enum

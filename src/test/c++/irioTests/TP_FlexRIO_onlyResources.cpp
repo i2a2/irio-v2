@@ -49,7 +49,7 @@ TEST(TP_FlexRIO_onlyResources, CPUDAQ)
 	string appCallID = "functionalCPUDAQTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string bitfileName = "FlexRIO_CPUDAQ_"+RIODevice;
-	string FPGAversion = "V1.0"; // User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
@@ -119,7 +119,7 @@ TEST(TP_FlexRIO_onlyResources, CPUIMAQ)
 	string appCallID = "functionalCPUIMAQTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string bitfileName = "FlexRIO_CPUIMAQ_"+RIODevice;
-	string FPGAversion = "V1.0"; // User don't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User don't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice;
 
 	int myStatus = 0;
@@ -188,7 +188,7 @@ TEST(TP_FlexRIO_onlyResources, onlyResources)
 	string appCallID = "functionalOnlyResourcesTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
-	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
@@ -261,7 +261,7 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	string appCallID = "wrongBitfileResourcesTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string bitfileName = "FlexRIOonlyResources_"+RIODevice;
-	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/failResources/"+RIODevice+"/";
 
 	int myStatus = 0;
@@ -273,13 +273,21 @@ TEST(TP_FlexRIO_onlyResources, wrongBitfileResources)
 	 * TEST 0
 	 * IRIO DRIVER INITIALIZATION
 	 */
+
+
+	// TODO: REVISAR!!!!!!
+
+
+
 	cout << "TEST 0: Testing driver initialization and resources when there are "
 			"missing resources on the bitfile" << endl << endl;
 	cout << "[Bug7516] This tests checks the correct order in error messages when verbosity=1" << endl;
 	cout << "Resources user should found:" << endl;
-	cout << "1 AO + Error finding AO1Enable" << endl;
-	cout << "16 auxAI" << endl;
-	cout << "16 auxAO" << endl;
+	cout << "2 AO + Error finding AO1Enable" << endl;
+	cout << "16 32bits-auxAI" << endl;
+	cout << "16 32bits-auxAO" << endl;
+	cout << "16 64bits-auxAI" << endl;
+	cout << "16 64bits-auxAO" << endl;
 	cout << "16 auxDI" << endl;
 	cout << "16 auxDO" << endl;
 	cout << "54 DI" << endl;

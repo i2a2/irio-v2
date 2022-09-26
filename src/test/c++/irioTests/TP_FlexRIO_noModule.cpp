@@ -48,7 +48,7 @@ TEST(TP_FlexRIO_noModule, functional) {
 	string appCallID = "functionalNoModuleTest";
 	string NIRIOmodel = "PXIe-"+RIODevice+"R";
 	string bitfileName = "FlexRIOnoModule_"+RIODevice;
-	string FPGAversion = "V1.1"; // User doesn't have to know what FPGA Version is used
+	string FPGAversion = "V1.2"; // User doesn't have to know what FPGA Version is used
 	string filePath = "../resources/"+RIODevice+"/";
 
 	int myStatus = 0;
@@ -89,6 +89,8 @@ TEST(TP_FlexRIO_noModule, functional) {
 	// IRIO can manage success or warning after starting the FPGA, not error
 	if (myStatus > IRIO_success) {
 		TestUtilsIRIO::getErrors(status);
+		if (myStatus == IRIO_error)
+			irio_closeDriver(&p_DrvPvt,0,&status);
 	}
 	ASSERT_NE(myStatus, IRIO_error);
 
