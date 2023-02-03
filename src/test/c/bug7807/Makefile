@@ -24,8 +24,12 @@ PROGNAME=cRIO_DAQDMA
 TARGET=../../../../target
 
 LIBRARIES=m rt irioCore NiFpga niflexrio
-LIBRARY_DIRS=$(TARGET)/lib
-INCLUDE_DIRS=$(CODAC_ROOT)/include $(TARGET)/main/c/include
+LIBRARY_DIRS=$(TARGET)/lib 
+ifndef CODAC_ROOT
+	LIBRARY_DIRS+=/usr/lib
+	LIBRARY_DIRS+=/usr/lib/x86_64-linux-gnu
+endif
+INCLUDE_DIRS=$(CODAC_ROOT)/include $(TARGET)/main/c/include ../../../../src/main/c/include
 
 BINARY_DIR=.
 SOURCE_DIR=.

@@ -19,20 +19,26 @@
 # of the distribution package.
 #
 #-======================================================================
-
+# The makefile is intended for supportig two different NI RIO Linux device drivers
+# The "closed" version-> Version download from NI website
+# The "open" version that is specic for ITER CODAC Core System
+NIRIO=/usr
 LIBNAME=irioCore
 CC=gcc
 CFLAGS=-c -Wall -fPIC -D_GNU_SOURCE
 LDFLAGS= -shared
 
-LIBRARIES=NiFpga niflexrio
+#LIBRARIES=NiFpga niflexrio
+LIBRARIES= NiFpga niflexrioapi
 ifdef CODAC_ROOT
 	LIBRARY_DIRS=$(CODAC_ROOT)/lib
 	INCLUDE_DIRS=$(CODAC_ROOT)/include ../include
 else
-    NIRIO=
-	LIBRARY_DIRS=$(NIRIO)/lib
+	#The location of NI libraries and headers is dependent of the NI-RIO Linux device driver version
+	LIBRARY_DIRS=/usr/lib/x86_64-linux-gnu
 	INCLUDE_DIRS=$(NIRIO)/include ../include
+	#The NiFpga.c file is needed by the closed version
+	SOURCES=../support/NiFpga.c
 endif
 
 ifeq ($(COVERAGE),true)
@@ -50,12 +56,22 @@ OBJECT_DIR = $(SOURCE_DIR)/.obj
 SHAREDLIBRARY=$(LIBRARY_DIR)/lib$(LIBNAME).so
 STATICLIBRARY=$(LIBRARY_DIR)/lib$(LIBNAME).a
 INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
-LDLIBS=-L$(LIBRARY_DIRS) $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
-SOURCES=$(wildcard $(SOURCE_DIR)/*.c)
+LDLIBS=-L$(LIBRARY_DIRS) $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs)) -L/usr/lib
+#SOURCES=$(wildcard $(SOURCE_DIR)/*.c)
+SOURCES+=irioDriver.c irioResourceFinder.c irioHandlerAnalog.c irioHandlerDigital.c irioHandlerDMA.c irioHandlerSG.c irioHandlerImage.c irioError.c
+
+
+ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
+IRIO_GPU = 1
+CFLAGS += -DIRIO_GPU
+endif
+
+ifdef IRIO_GPU
+SOURCES+=irioHandlerDMAGPU.c
+endif
+
 OBJECTS=$(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(notdir $(SOURCES))))
-
 .PHONY: all clean run 
-
 
 all:  $(SOURCES) $(SHAREDLIBRARY) $(STATICLIBRARY)
 $(TARGET)/include/%.h: %.h

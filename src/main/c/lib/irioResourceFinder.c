@@ -48,7 +48,7 @@
 #ifdef CLOSE_VERSION_NIRIO
 	#define DRV_CALL "lsni -v "
 #else
-	#define DRV_CALL "lsrio "        //!< Command with RIO devices information
+	#define DRV_CALL "lsni -v "        //!< Command with RIO devices information
 #endif
 #define TMP_FILE "/tmp/RIOinfo.txt"  //!< Path of temporary file
 #define RM_CALL "rm -f "             //!< Command to delete files
@@ -58,7 +58,7 @@
  * Strings for field search in driver output
  */
 ///@{
-#define STRINGNAME_PORT "RIO"                                               //!< Device type
+#define STRINGNAME_PORT "PXI1Slot"                                               //!< Device type
 #define STRINGNAME_MODEL "Model Name"                                       //!< RIO device model name
 #define STRINGNAME_SERIALNO "Serial Number"                                 //!< RIO device serial number
 #define STRINGNAME_DEVICE "Device"                                          //!< RIO device identificator

@@ -28,7 +28,11 @@
 #-======================================================================
 
 CFLAGS = -Wall -g -I $(CODAC_ROOT)/include -I ../../../main/c/include
-LDFLAGS = -L../../../lib -Wl,-rpath=../../../lib -L$(CODAC_ROOT)/lib -Wl,-rpath=$(CODAC_ROOT)/lib
+ifdef CODAC_ROOT
+	LDFLAGS = -L../../../lib -Wl,-rpath=../../../lib -L$(CODAC_ROOT)/lib -Wl,-rpath=$(CODAC_ROOT)/lib
+else
+	LDFLAGS = -L../../../../target/lib -Wl,-rpath=../../../../target/lib -L/usr/lib -Wl,-rpath=/usr/lib -L/usr/lib/x86_64-linux-gnu -Wl,-rpath=/usr/lib/x86_64-linux-gnu
+endif	
 LDFLAGS += -lirioCore -lNiFpga -lniflexrio -lm -lrt
 
 SOURCES=$(wildcard *.c)
