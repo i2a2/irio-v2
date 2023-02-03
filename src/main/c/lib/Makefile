@@ -27,18 +27,20 @@ LIBNAME=irioCore
 CC=gcc
 CFLAGS=-c -Wall -fPIC -D_GNU_SOURCE
 LDFLAGS= -shared
-
+COVERAGE=true
 #LIBRARIES=NiFpga niflexrio
 LIBRARIES= NiFpga niflexrioapi
 ifdef CODAC_ROOT
 	LIBRARY_DIRS=$(CODAC_ROOT)/lib
 	INCLUDE_DIRS=$(CODAC_ROOT)/include ../include
+	CFLAGS += -DOPEN_VERSION_NIRIO
 else
 	#The location of NI libraries and headers is dependent of the NI-RIO Linux device driver version
 	LIBRARY_DIRS=/usr/lib/x86_64-linux-gnu
 	INCLUDE_DIRS=$(NIRIO)/include ../include
 	#The NiFpga.c file is needed by the closed version
 	SOURCES=../support/NiFpga.c
+	CFLAGS += -DCLOSE_VERSION_NIRIO -g
 endif
 
 ifeq ($(COVERAGE),true)

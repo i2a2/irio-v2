@@ -35,6 +35,7 @@ EXAMPLES += FlexRIO_noModule.c
 EXAMPLES += FlexRIO_mod5761-7966.c FlexRIO_onlyResources.c
 EXAMPLES += FlexRIO_mod5761-7966-perf.c  FlexRIO_mod6581-7965.c FlexRIO_mod1483-7966-Imaq.c FlexRIO_mod1483-7966-uart.c
 EXAMPLES += FlexRIO_mod5734-7966.c
+EXAMPLES  += Rseries_onlyResources.c
 LIBRARIES := m rt irioCore NiFpga niflexrio
 
 ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
@@ -53,14 +54,14 @@ IRIOCORE_DIR := $(realpath ../../../../target/lib)
 
 ifndef CODAC_ROOT
 #INCLUDE_DIRS += ../support
-	CFLAGS += -DCLOSE_VERSION_NIRIO -fPIC -Wall -D_GNU_SOURCE
+	CFLAGS += -DCLOSE_VERSION_NIRIO -fPIC -Wall -D_GNU_SOURCE -g
 	LDFLAGS += -Wall -Wl,-rpath=$(IRIOCORE_DIR) -Wl,-rpath=/usr/lib/x86_64-linux-gnu
 	INCLUDE_DIRS += $(NIRIO)/include 
 #	LIBRARY_DIRS =  $(NIRIO)/lib $(IRIOCORE_DIR)
 	LIBRARY_DIRS =  /usr/lib /usr/lib/x86_64-linux-gnu $(IRIOCORE_DIR)
 
 else
-	CFLAGS += -DOPEN_VERSION_NIRIO -fPIC -Wall -O3 -D_GNU_SOURCE
+	CFLAGS += -DOPEN_VERSION_NIRIO -fPIC -Wall -O3 -D_GNU_SOURCE -g
 	LDFLAGS += -Wall -Wl,-rpath=$(IRIOCORE_DIR) 
 	INCLUDE_DIRS += $(CODAC_ROOT)/include
 	LIBRARY_DIRS =  $(CODAC_ROOT)/lib $(IRIOCORE_DIR)

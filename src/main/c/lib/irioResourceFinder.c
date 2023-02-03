@@ -48,7 +48,7 @@
 #ifdef CLOSE_VERSION_NIRIO
 	#define DRV_CALL "lsni -v "
 #else
-	#define DRV_CALL "lsni -v "        //!< Command with RIO devices information
+	#define DRV_CALL "lsrio.py"        //!< Command with RIO devices information
 #endif
 #define TMP_FILE "/tmp/RIOinfo.txt"  //!< Path of temporary file
 #define RM_CALL "rm -f "             //!< Command to delete files
@@ -58,12 +58,14 @@
  * Strings for field search in driver output
  */
 ///@{
-#define STRINGNAME_PORT "PXI1Slot"                                               //!< Device type
+#define STRINGNAME_PORT_OPEN "RIO"
+#define STRINGNAME_PORT_CLOSED "PXI"                                               //!< Device type
 #define STRINGNAME_MODEL "Model Name"                                       //!< RIO device model name
 #define STRINGNAME_SERIALNO "Serial Number"                                 //!< RIO device serial number
 #define STRINGNAME_DEVICE "Device"                                          //!< RIO device identificator
 #define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"                           //!< RIO device sub-system device identificator
-#define STRINGNAME_PORTEND "--"                                             //!< String to search for moving after STRINGNAME_PORT and search for another device
+#define STRINGNAME_PORTEND_CLOSED "Bus/Dev/Func:"
+#define STRINGNAME_PORTEND_OPEN "RIO"                                             //!< String to search for moving after STRINGNAME_PORT and search for another device
 #define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!< String to move right before resource list in the privative driver
 ///@}
 
@@ -102,26 +104,49 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 		char* deviceInfo=NULL;
 		char* port=NULL;
 		char serialNo[20];
-		asprintf(&port,"%s","RIOxxxx");
+
 		//In privative version need to move the initial pointer
 		#ifdef CLOSE_VERSION_NIRIO
-		if((deviceInfo=strstr(fileContent,STRINGNAME_RESOURCEINIT))==NULL){
-			irio_mergeStatus(status,HardwareNotFound_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR No hardware found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
-			local_status |= IRIO_error;
-		}
+			/**
+			* The close source driver identifies the devices in new versions as
+			* PXI<n>Slot<k>
+			* PXI1Slot2
+			*/
+			asprintf(&port,"%s","PXIxxxx");
+			if((deviceInfo=strstr(fileContent,STRINGNAME_RESOURCEINIT))==NULL){
+				irio_mergeStatus(status,HardwareNotFound_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR No hardware found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+				local_status |= IRIO_error;
+				//end=1;
+			}
 		#else
+			/**
+			 * The open source driver used by ITER identifies the devices as RIO<x>
+			 */
+			asprintf(&port,"%s","RIOxxxx");
 			deviceInfo=fileContent;
 		#endif
+/*
+#ifdef CLOSE_VERSION_NIRIO
+			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_CLOSED))!=NULL){//Still devices to search
+				sscanf(deviceInfo,"%s",port);
+			}
+#else
+			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_OPEN))!=NULL){//Still devices to search
+				sscanf(deviceInfo,"%s",port);
+			}
+#endif
+*/
 		while(!found){//Search while the device has not been found and still no errors
-			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT))!=NULL){//Still devices to search
-				int aux;
-				// It is supposed that RIO device name is never going to be larger than 40 characters
-				char auxLength[40];
-				sscanf(deviceInfo+3, "%d", &aux);
-				sprintf(auxLength, "%d", aux);
-				// It is considered that all devices' name are going to be RIOX
-				snprintf(port, strlen(deviceInfo)+strlen(auxLength), "RIO%d", aux);
-			}else{
+#ifdef CLOSE_VERSION_NIRIO
+			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_CLOSED))!=NULL){//Still devices to search
+				sscanf(deviceInfo,"%s",port);
+			}
+#else
+			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_OPEN))!=NULL){//Still devices to search
+				sscanf(deviceInfo,"%s",port);
+			}
+#endif
+			else{
 				break;
 			}
 			//Search fields values
@@ -130,7 +155,7 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 			if(strcmp(serialNo,p_DrvPvt->DeviceSerialNumber)==0){
 				found=1;
 			}else{
-				deviceInfo=strstr(deviceInfo,STRINGNAME_PORTEND);//Move forward and search in another port
+				deviceInfo=strstr(deviceInfo,STRINGNAME_PORTEND_CLOSED);//Move forward and search in another port
 			}
 		}
 
@@ -209,16 +234,9 @@ int findDeviceInfo(irioDrv_t *p_DrvPvt, const char* fileContent, const char* toS
 		irio_mergeStatus(status,ListRIODevicesParsing_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Finding %s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
 		local_status |= IRIO_error;
 	}else{
-		int auxLength;
-		//If found pattern move pointer before hexadecimal value and scan the value
-		aux=strstr(aux,"0x");
-		char* findNL = strchr(aux, '\n');
-		if(findNL == NULL){
-			return IRIO_error;
-		}
-		auxLength = (int)(findNL - aux);
-
-		if (snprintf(info, auxLength+1, "%s", aux) <= 0) {
+		//If found pattern move pointer before colon and scan the value
+		aux=strstr(aux,":");
+		if(sscanf(aux,"%*s %s",info)==0){
 			irio_mergeStatus(status,ListRIODevicesParsing_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Value not found for:%s.\n",__func__,__LINE__,p_DrvPvt->appCallID,toSearch);
 			local_status|= IRIO_error;
 		}

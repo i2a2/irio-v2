@@ -324,8 +324,12 @@ int searchPlatform( irioDrv_t* p_DrvPvt,TStatus* status){
 		local_status |= allocCRIOEnums(p_DrvPvt,status);
 		break;
 	case IRIO_RSeries:
-		irio_mergeStatus(status,FeatureNotImplemented_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Platform RSeries Not Supported\n",__func__,__LINE__,p_DrvPvt->appCallID);
-		local_status |= IRIO_error;
+		//irio_mergeStatus(status,FeatureNotImplemented_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR Platform RSeries Not Supported\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		//local_status |= IRIO_error;
+		if(p_DrvPvt->verbosity && status->code!=IRIO_error){
+			printf("[%s,%d]-(%s) TRACE Detected platform RSERIES.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+		}
+		local_status |= allocRseriesRIOEnums(p_DrvPvt,status);
 		break;
 	}
 
@@ -446,6 +450,64 @@ int allocCRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	return IRIO_success;
 }
 
+int allocRseriesRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status){
+	//Analog Limits
+		p_DrvPvt->max_analoginputs = FLEXRIO_MAX_ANALOGS_IN;
+		p_DrvPvt->enumAnalogInput = calloc(p_DrvPvt->max_analoginputs,sizeof(TResourcePort));
+		p_DrvPvt->max_auxanaloginputs = FLEXRIO_MAX_AUXA_IN;
+		p_DrvPvt->enumauxAI = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort));
+		p_DrvPvt->enumauxAI_64 = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort_64));
+		p_DrvPvt->max_analogoutputs = FLEXRIO_MAX_ANALOGS_OUT;
+		p_DrvPvt->enumAnalogOutput= calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
+		p_DrvPvt->enumAOEnable = calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
+		p_DrvPvt->max_auxanalogoutputs = FLEXRIO_MAX_AUXA_OUT;
+		p_DrvPvt->enumauxAO = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort));
+		p_DrvPvt->enumauxAO_64 = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort_64));
+
+		//Digital Limits
+		p_DrvPvt->max_digitalsinputs = FLEXRIO_MAX_DIGITALS;
+		p_DrvPvt->enumDigitalInput = calloc(p_DrvPvt->max_digitalsinputs,sizeof(TResourcePort));
+		p_DrvPvt->max_auxdigitalsinputs = FLEXRIO_MAX_AUXDIGITALS;
+		p_DrvPvt->enumauxDI = calloc(p_DrvPvt->max_auxdigitalsinputs,sizeof(TResourcePort));
+		p_DrvPvt->max_digitalsoutputs = FLEXRIO_MAX_DIGITALS;
+		p_DrvPvt->enumDigitalOutput= calloc(p_DrvPvt->max_digitalsoutputs,sizeof(TResourcePort));
+		p_DrvPvt->max_auxdigitalsoutputs = FLEXRIO_MAX_AUXDIGITALS;
+		p_DrvPvt->enumauxDO= calloc(p_DrvPvt->max_auxdigitalsoutputs,sizeof(TResourcePort));
+
+		//DMA Limits
+		p_DrvPvt->max_dmas = FLEXRIO_MAX_DMAS;
+		p_DrvPvt->DMATtoHOSTNCh = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
+		p_DrvPvt->DMATtoHOSTChIndex = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
+		p_DrvPvt->enumDMATtoHOST = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));
+		p_DrvPvt->enumDMATtoHOSTEnable = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));
+		p_DrvPvt->enumDMATtoHOSTSamplingRate = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));
+		p_DrvPvt->DMATtoHOSTFrameType = calloc(p_DrvPvt->max_dmas,sizeof(uint8_t));
+		p_DrvPvt->DMATtoHOSTSampleSize = calloc(p_DrvPvt->max_dmas,sizeof(uint8_t));
+		p_DrvPvt->DMATtoHOSTBlockNWords = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
+
+		//Signal Generator Limits
+		p_DrvPvt->max_numberofSG = FLEXRIO_MAX_SIGNALGENERATOR;
+		p_DrvPvt->enumSGFreq = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
+		p_DrvPvt->enumSGAmp = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
+		p_DrvPvt->enumSGPhase= calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
+		p_DrvPvt->enumSGSignalType = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
+		p_DrvPvt->enumSGUpdateRate = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
+		p_DrvPvt->enumSGFref = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
+		p_DrvPvt->SGfref = calloc(p_DrvPvt->max_numberofSG,sizeof(uint32_t));
+
+		//DMA for GPU  limits
+		p_DrvPvt->DMATtoGPUNCh = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
+		p_DrvPvt->DMATtoGPUChIndex = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
+		p_DrvPvt->enumDMATtoGPU = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));
+		p_DrvPvt->enumDMATtoGPUEnable = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));
+		p_DrvPvt->enumDMATtoGPUSamplingRate = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));
+		p_DrvPvt->DMATtoGPUFrameType = calloc(p_DrvPvt->max_dmas,sizeof(uint8_t));
+		p_DrvPvt->DMATtoGPUSampleSize = calloc(p_DrvPvt->max_dmas,sizeof(uint8_t));
+		p_DrvPvt->DMATtoGPUBlockNWords = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
+
+		return IRIO_success;
+}
+
 int freeXRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 	//cRIO only
 	free(p_DrvPvt->enumSamplingRate);
@@ -545,6 +607,7 @@ int searchMandatoryResourcesAllPlatforms( irioDrv_t* p_DrvPvt, TStatus* status){
 
 		case IRIO_RSeries:
 			//TO BE DETERMINED, NOT CURRENTLY SUPPORTED
+			//not needed
 		break;
 	}
 
@@ -651,7 +714,13 @@ int searchProfile(irioDrv_t* p_DrvPvt,TStatus* status){
 			break;
 			case IRIO_RSeries:
 				switch (p_DrvPvt->devProfile) {
+					case 0:
+						if(p_DrvPvt->verbosity){
+							printf("[%s,%d]-(%s) RSERIES DAQ profile detected.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+						}
+						local_status |= searchDAQResources(p_DrvPvt,status);
 
+						break;
 					default:
 						irio_mergeStatus(status,FeatureNotImplemented_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR RSeries profile (%d) not defined.\n",__func__,__LINE__,p_DrvPvt->appCallID,p_DrvPvt->devProfile);
 						local_status |= IRIO_error;
