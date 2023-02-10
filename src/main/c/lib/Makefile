@@ -20,11 +20,26 @@
 #
 #-======================================================================
 
+#ifdef CODAC_ROOT
+#
+#else
+#
+#endif
+
+NIRIO=/usr/
+
 LIBNAME=irioCore
 
 LIBRARIES=NiFpga niflexrio
-LIBRARY_DIRS=/usr/lib/x86_64-linux-gnu
-INCLUDE_DIRS=../include ../support
+
+INCLUDE_DIRS=../include
+ifdef CODAC_ROOT
+	LIBRARY_DIRS=$(CODAC_ROOT)/lib
+	INCLUDE_DIRS+=$(CODAC_ROOT)/include
+else
+	LIBRARY_DIRS=$(NIRIO)/lib/x86_64-linux-gnu
+	INCLUDE_DIRS+=../support
+endif
 
 TARGET=../../../../target
 LIBRARY_DIR=$(TARGET)/lib
@@ -38,14 +53,35 @@ STATICLIBRARY=$(LIBRARY_DIR)/lib$(LIBNAME).a
 INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 LDLIBS=$(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
 
-SOURCES=$(filter-out $(SOURCE_DIR)/irioHandlerDMAGPU.c, $(wildcard $(SOURCE_DIR)/*.c)) $(wildcard ../support/*.c)
+# If no support for DMA to GPU, do not compile irioHandlerDMAGPU.c
+SOURCES=$(filter-out $(SOURCE_DIR)/irioHandlerDMAGPU.c, $(wildcard $(SOURCE_DIR)/*.c))
 OBJECTS=$(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(notdir $(SOURCES))))
+
+ifndef CODAC_ROOT
+	SOURCES+=$(wildcard ../support/*.c)
+endif
+
+ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
+	SOURCES+=$(SOURCE_DIR)/irioHandlerDMAGPU.c
+endif
+	
+	
 #HFILES=$(wildcard ../include/*.h) $(wildcard ../support/*.h)
 #HTARGETS=$(addprefix $(TARGET)/include/, $(HFILES))
 
 C=gcc
-CFLAGS=-c -Wall -fPIC -DCLOSE_VERSION_NIRIO
+CFLAGS=-c -Wall -fPIC
 LDFLAGS=-shared
+
+ifdef CODAC_ROOT
+	CFLAGS+=-DOPEN_VERSION_NIRIO
+else
+	CFLAGS+=-DCLOSE_VERSION_NIRIO
+endif
+
+ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
+	CFLAGS+=-DIRIO_GPU
+endif
 
 ifeq ($(COVERAGE),true)
 	CFLAGS+= -O0 -g --coverage
