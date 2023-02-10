@@ -34,7 +34,6 @@ LIBRARIES=NiFpga niflexrio
 
 INCLUDE_DIRS=../include
 ifdef CODAC_ROOT
-	LIBRARY_DIRS=$(CODAC_ROOT)/lib
 	INCLUDE_DIRS+=$(CODAC_ROOT)/include
 else
 	LIBRARY_DIRS=$(NIRIO)/lib/x86_64-linux-gnu
@@ -51,7 +50,11 @@ SHAREDLIBRARY=$(LIBRARY_DIR)/lib$(LIBNAME).so
 STATICLIBRARY=$(LIBRARY_DIR)/lib$(LIBNAME).a
 
 INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
-LDLIBS=$(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
+ifdef CODAC_ROOT
+	LDLIBS=-L$(CODAC_ROOT)/lib
+endif
+LDLIBS+=$(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
+
 
 # If no support for DMA to GPU, do not compile irioHandlerDMAGPU.c
 SOURCES=$(filter-out $(SOURCE_DIR)/irioHandlerDMAGPU.c, $(wildcard $(SOURCE_DIR)/*.c))
@@ -70,7 +73,7 @@ endif
 #HTARGETS=$(addprefix $(TARGET)/include/, $(HFILES))
 
 C=gcc
-CFLAGS=-c -Wall -fPIC
+CFLAGS=-c -Wall -fPIC -D_GNU_SOURCE
 LDFLAGS=-shared
 
 ifdef CODAC_ROOT
