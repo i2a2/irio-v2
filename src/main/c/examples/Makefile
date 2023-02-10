@@ -56,7 +56,7 @@ ifndef CODAC_ROOT
 #INCLUDE_DIRS += ../support
 	CFLAGS += -DCLOSE_VERSION_NIRIO -fPIC -Wall -D_GNU_SOURCE -g
 	LDFLAGS += -Wall -Wl,-rpath=$(IRIOCORE_DIR) -Wl,-rpath=/usr/lib/x86_64-linux-gnu
-	INCLUDE_DIRS += $(NIRIO)/include 
+	INCLUDE_DIRS += $(NIRIO)/include ../support/
 #	LIBRARY_DIRS =  $(NIRIO)/lib $(IRIOCORE_DIR)
 	LIBRARY_DIRS =  /usr/lib /usr/lib/x86_64-linux-gnu $(IRIOCORE_DIR)
 

@@ -27,7 +27,7 @@
 #
 #-======================================================================
 
-SUBDIRS:= src/main/c src/test/c
+SUBDIRS:= src/main/c src/test/c src/test/c++
 
 BOLD=\e[1m
 NC=\e[0m
