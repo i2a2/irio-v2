@@ -48,7 +48,7 @@
 #ifdef CLOSE_VERSION_NIRIO
 	#define DRV_CALL "lsni -v "
 #else
-	#define DRV_CALL "lsrio.py"        //!< Command with RIO devices information
+	#define DRV_CALL "lsrio"        //!< Command with RIO devices information
 #endif
 #define TMP_FILE "/tmp/RIOinfo.txt"  //!< Path of temporary file
 #define RM_CALL "rm -f "             //!< Command to delete files
