@@ -27,13 +27,37 @@
 #
 #-======================================================================
 
-CFLAGS = -Wall -g -I $(CODAC_ROOT)/include -I ../../../main/c/include
+NIRIO = /usr
+
+TARGET=../../..
+SRC=../../..
+COVERAGE=true
+
+LIBRARIES=NiFpga niflexrio irioCore pthread gtest 
+LIBRARY_DIRS=$(TARGET)/lib
+INCLUDE_DIRS=$(SRC)/main/c/include
+
 ifdef CODAC_ROOT
-	LDFLAGS = -L../../../lib -Wl,-rpath=../../../lib -L$(CODAC_ROOT)/lib -Wl,-rpath=$(CODAC_ROOT)/lib
+	INCLUDE_DIRS+=$(CODAC_ROOT)/include
 else
-	LDFLAGS = -L../../../../target/lib -Wl,-rpath=../../../../target/lib -L/usr/lib -Wl,-rpath=/usr/lib -L/usr/lib/x86_64-linux-gnu -Wl,-rpath=/usr/lib/x86_64-linux-gnu
-endif	
-LDFLAGS += -lirioCore -lNiFpga -lniflexrio -lm -lrt
+	LIBRARY_DIRS+=$(NIRIO)/lib/x86_64-linux-gnu
+	INCLUDE_DIRS+=$(SRC)/main/c/support
+endif
+
+INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
+LDLIBS=$(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
+
+C=gcc
+CC=g++
+CFLAGS=-c -Wall
+CCFLAGS=-c -Wall -std=c++11
+LDFLAGS=
+
+ifeq ($(COVERAGE),true)
+	CFLAGS+=-O0 -g
+	CCFLAGS+=-O0 -g
+	LDFLAGS+=--coverage
+endif
 
 SOURCES=$(wildcard *.c)
 TESTS=$(SOURCES:.c=)
@@ -51,8 +75,8 @@ clean:
 
 # How to build the test runner
 runner: irioCorelib-test.cpp
-	g++ $(CFLAGS) -lgtest_main -lgtest $(LDFLAGS) -o $@ $^
+	$(CC) $(CCFLAGS) $(LDFLAGS) $(LDLIBS) $(INCLUDES) -o $@ $^
 
 %: %.c
-	gcc $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(C) $(CFLAGS) $(LDFLAGS) $(INCLUDES) -o $@ $<
 

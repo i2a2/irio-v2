@@ -38,7 +38,6 @@ else
 	INCLUDE_DIRS+=$(SRC)/main/c/support
 endif
 
-
 BINARY_DIR=.
 SOURCE_DIR=.
 OBJECT_DIR=$(SOURCE_DIR)/.obj
@@ -60,11 +59,10 @@ CCFLAGS=-c -Wall -std=c++11
 LDFLAGS=
 
 ifeq ($(COVERAGE),true)
-	CFLAGS+= -O0 -g --coverage
-	CCFLAGS+= -O0 -g --coverage
-	LDFLAGS+= --coverage
+	CFLAGS+=-O0 -g
+	CCFLAGS+=-O0 -g
+	LDFLAGS+=--coverage
 endif
-
 
 .PHONY: all clean run
 
@@ -87,3 +85,4 @@ $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c
 	mkdir -p $(OBJECT_DIR)
 	$(C) $(CFLAGS) $(INCLUDES) $< -o $@
+	
