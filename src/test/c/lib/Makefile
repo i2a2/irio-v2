@@ -38,6 +38,7 @@ LIBRARY_DIRS=$(TARGET)/lib
 INCLUDE_DIRS=$(SRC)/main/c/include
 
 ifdef CODAC_ROOT
+	LIBRARY_DIRS+=$(CODAC_ROOT)/lib
 	INCLUDE_DIRS+=$(CODAC_ROOT)/include
 else
 	LIBRARY_DIRS+=$(NIRIO)/lib/x86_64-linux-gnu

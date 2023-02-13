@@ -32,6 +32,7 @@ LIBRARY_DIRS=$(TARGET)/lib
 INCLUDE_DIRS=$(SRC)/main/c/include ../include
 
 ifdef CODAC_ROOT
+	LIBRARY_DIRS+=$(CODAC_ROOT)/lib
 	INCLUDE_DIRS+=$(CODAC_ROOT)/include
 else
 	LIBRARY_DIRS+=$(NIRIO)/lib/x86_64-linux-gnu
@@ -45,9 +46,6 @@ OBJECT_DIR=$(SOURCE_DIR)/.obj
 EXECUTABLE=$(BINARY_DIR)/$(PROGNAME)
 INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 LDLIBS=$(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
-ifdef CODAC_ROOT
-	LDLIBS+=-L$(CODAC_ROOT)/lib
-endif
 # to build executable from all sources in the program directory:
 SOURCES=$(wildcard $(SOURCE_DIR)/*.cpp $(SOURCE_DIR)/*.c)
 OBJECTS=$(addprefix $(OBJECT_DIR)/,$(patsubst %.cpp,%.o,$(notdir $(SOURCES))))
