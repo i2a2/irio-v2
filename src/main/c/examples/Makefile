@@ -38,6 +38,8 @@ EXAMPLES += FlexRIO_mod5734-7966.c
 #EXAMPLES  += Rseries_onlyResources.c
 LIBRARIES := m rt irioCore NiFpga niflexrio
 
+COVERAGE=true
+
 ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
 	IRIO_GPU = 1
 	CFLAGS += -DIRIO_GPU

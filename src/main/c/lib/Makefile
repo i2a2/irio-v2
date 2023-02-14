@@ -30,6 +30,10 @@ NIRIO=/usr/
 
 LIBNAME=irioCore
 
+TARGET=../../../../target
+SRC=../../../../src
+COVERAGE=true
+
 LIBRARIES=NiFpga niflexrio
 
 INCLUDE_DIRS=../include
@@ -37,10 +41,9 @@ ifdef CODAC_ROOT
 	INCLUDE_DIRS+=$(CODAC_ROOT)/include
 else
 	LIBRARY_DIRS=$(NIRIO)/lib/x86_64-linux-gnu
-	INCLUDE_DIRS+=../support
+	INCLUDE_DIRS+=$(SRC)/main/c/support
 endif
 
-TARGET=../../../../target
 LIBRARY_DIR=$(TARGET)/lib
 SOURCE_DIR=.
 OBJECT_DIR=$(SOURCE_DIR)/.obj
@@ -68,10 +71,6 @@ ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
 	SOURCES+=$(SOURCE_DIR)/irioHandlerDMAGPU.c
 endif
 	
-	
-#HFILES=$(wildcard ../include/*.h) $(wildcard ../support/*.h)
-#HTARGETS=$(addprefix $(TARGET)/include/, $(HFILES))
-
 C=gcc
 CFLAGS=-c -Wall -fPIC -D_GNU_SOURCE
 LDFLAGS=-shared
@@ -87,8 +86,8 @@ ifeq ($(CONFIG_NIRIO_DMA_TO_GPU),1)
 endif
 
 ifeq ($(COVERAGE),true)
-	CFLAGS+= -O0 -g --coverage
-	LDFLAGS+= --coverage
+	CFLAGS+=-O0 -g --coverage
+	LDFLAGS+=--coverage
 endif
 
 .PHONY: all clean run 

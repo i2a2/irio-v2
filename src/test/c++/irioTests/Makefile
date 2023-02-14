@@ -57,8 +57,8 @@ CCFLAGS=-c -Wall -std=c++11
 LDFLAGS=
 
 ifeq ($(COVERAGE),true)
-	CFLAGS+=-O0 -g
-	CCFLAGS+=-O0 -g
+	CFLAGS+=-O0 -g --coverage
+	CCFLAGS+=-O0 -g --coverage
 	LDFLAGS+=--coverage
 endif
 
