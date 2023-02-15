@@ -64,16 +64,17 @@
 
 // Necessary only for ITER open version
 #define STRINGNAME_PORT_OPEN "RIO"
+#define STRINGNAME_PORT_END_OPEN "SubSystemDevice" //!< RIO device sub-system device identificator
 //#define STRINGNAME_PORTEND_OPEN "RIO"            //!< String to search for moving after STRINGNAME_PORT and search for another device
 #define STRINGNAME_DEVICE "Device"                 //!< RIO device identificator
-#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"  //!< RIO device sub-system device identificator
+//#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"
 
 // Necessary only for closed version
 #define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!< String to move right before resource list in the privative driver
 
 #define STRINGNAME_PORT_CLOSED_RSERIES_FLEXRIO "PXI"
 #define STRINGNAME_PORT_CLOSED_COMPACTRIO "MXI"
-#define STRINGNAME_PORTEND_CLOSED "Bus/Dev/Func:"
+#define STRINGNAME_PORT_END_CLOSED "Bus/Dev/Func:"
 ///@}
 
 int irio_findRIO(irioDrv_t *p_DrvPvt,TStatus* status){
@@ -173,7 +174,11 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 			if(strcmp(serialNo,p_DrvPvt->DeviceSerialNumber)==0){
 				found=1;
 			}else{
-				deviceInfo=strstr(deviceInfo,STRINGNAME_PORTEND_CLOSED);//Move forward and search in another port
+#ifdef CLOSE_VERSION_NIRIO
+				deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_END_CLOSED);//Move forward and search in another port
+#else
+				deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_END_OPEN);//Move forward and search in another port
+#endif
 			}
 		}
 
