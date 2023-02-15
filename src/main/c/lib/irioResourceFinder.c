@@ -46,7 +46,7 @@
  */
 ///@{
 #ifdef CLOSE_VERSION_NIRIO
-	#define DRV_CALL "lsni -v "
+	#define DRV_CALL "lsni -v"
 #else
 	#define DRV_CALL "lsrio"        //!< Command with RIO devices information
 #endif
@@ -58,15 +58,22 @@
  * Strings for field search in driver output
  */
 ///@{
+// Necessary for both open and closed version
+#define STRINGNAME_MODEL "Model Name"              //!< RIO device model name
+#define STRINGNAME_SERIALNO "Serial Number"        //!< RIO device serial number
+
+// Necessary only for ITER open version
 #define STRINGNAME_PORT_OPEN "RIO"
-#define STRINGNAME_PORT_CLOSED "PXI"                                               //!< Device type
-#define STRINGNAME_MODEL "Model Name"                                       //!< RIO device model name
-#define STRINGNAME_SERIALNO "Serial Number"                                 //!< RIO device serial number
-#define STRINGNAME_DEVICE "Device"                                          //!< RIO device identificator
-#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"                           //!< RIO device sub-system device identificator
-#define STRINGNAME_PORTEND_CLOSED "Bus/Dev/Func:"
-#define STRINGNAME_PORTEND_OPEN "RIO"                                             //!< String to search for moving after STRINGNAME_PORT and search for another device
+//#define STRINGNAME_PORTEND_OPEN "RIO"            //!< String to search for moving after STRINGNAME_PORT and search for another device
+#define STRINGNAME_DEVICE "Device"                 //!< RIO device identificator
+#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"  //!< RIO device sub-system device identificator
+
+// Necessary only for closed version
 #define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!< String to move right before resource list in the privative driver
+
+#define STRINGNAME_PORT_CLOSED_RSERIES_FLEXRIO "PXI"
+#define STRINGNAME_PORT_CLOSED_COMPACTRIO "MXI"
+#define STRINGNAME_PORTEND_CLOSED "Bus/Dev/Func:"
 ///@}
 
 int irio_findRIO(irioDrv_t *p_DrvPvt,TStatus* status){
@@ -106,46 +113,57 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 		char serialNo[20];
 
 		//In privative version need to move the initial pointer
-		#ifdef CLOSE_VERSION_NIRIO
-			/**
-			* The close source driver identifies the devices in new versions as
-			* PXI<n>Slot<k>
-			* PXI1Slot2
-			*/
-			asprintf(&port,"%s","PXIxxxx");
-			if((deviceInfo=strstr(fileContent,STRINGNAME_RESOURCEINIT))==NULL){
-				irio_mergeStatus(status,HardwareNotFound_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR No hardware found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
-				local_status |= IRIO_error;
-				//end=1;
-			}
-		#else
-			/**
-			 * The open source driver used by ITER identifies the devices as RIO<x>
-			 */
-			asprintf(&port,"%s","RIOxxxx");
-			deviceInfo=fileContent;
-		#endif
-/*
 #ifdef CLOSE_VERSION_NIRIO
-			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_CLOSED))!=NULL){//Still devices to search
-				sscanf(deviceInfo,"%s",port);
-			}
+		/**
+		* The close source driver identifies RIO devices in the following way:
+		* For R Series and FlexRIO:
+		* 	PXI<n>Slot<k>
+		* 	Example: PXI1Slot2
+		* 	         -- Model Name:      NI PXI-7854R
+		* 	         -- Serial Number:   01508B74
+		* 	Example: PXISlot3
+		* 	         -- Model Name:      NI PXIe-7965R
+		* 	         -- Serial Number:   01666C59
+		*
+		* For compactRIO:
+		*   MXI<n>Port<k>Dev<j>
+		*   Example: MXI2Port1Dev1
+		*            -- Model Name:      NI 9159
+		* 	         -- Serial Number:   01C10FAC
+		*/
+		if((deviceInfo=strstr(fileContent,STRINGNAME_RESOURCEINIT))==NULL){
+			irio_mergeStatus(status,HardwareNotFound_Error,p_DrvPvt->verbosity,"[%s,%d]-(%s) ERROR No hardware found.\n",__func__,__LINE__,p_DrvPvt->appCallID);
+			local_status |= IRIO_error;
+		}
 #else
-			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_OPEN))!=NULL){//Still devices to search
-				sscanf(deviceInfo,"%s",port);
-			}
+		/**
+		 * The open source driver used by ITER identifies the devices as RIO<x>
+		 */
+		asprintf(&port,"%s","RIOxxxxx");
+		deviceInfo=fileContent;
 #endif
-*/
 		while(!found){//Search while the device has not been found and still no errors
 #ifdef CLOSE_VERSION_NIRIO
-			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_CLOSED))!=NULL){//Still devices to search
+		// First check if the board is R Series or FlexRIO type
+		if (strstr(p_DrvPvt->RIODeviceModel,"PXI-") || strstr(p_DrvPvt->RIODeviceModel,"PXIe-")) {
+			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_CLOSED_RSERIES_FLEXRIO))!=NULL){ //Still R Series or FlexRIO devices to search
+				asprintf(&port,"%s","PXIxxxxx");
 				sscanf(deviceInfo,"%s",port);
+			}
+		}
+		// If not, it has to be compactRIO
+		else if (strstr(p_DrvPvt->RIODeviceModel,"NI ")) {
+				if ((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_CLOSED_COMPACTRIO))!=NULL){ //Still compactRIO devices to search
+					asprintf(&port,"%s","MXIxxxxx");
+					sscanf(deviceInfo,"%s",port);
+				}
 			}
 #else
 			if((deviceInfo=strstr(deviceInfo,STRINGNAME_PORT_OPEN))!=NULL){//Still devices to search
 				sscanf(deviceInfo,"%s",port);
 			}
 #endif
+
 			else{
 				break;
 			}
