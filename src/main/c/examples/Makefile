@@ -35,7 +35,7 @@ EXAMPLES += FlexRIO_noModule.c
 EXAMPLES += FlexRIO_mod5761-7966.c FlexRIO_onlyResources.c
 EXAMPLES += FlexRIO_mod5761-7966-perf.c  FlexRIO_mod6581-7965.c FlexRIO_mod1483-7966-Imaq.c FlexRIO_mod1483-7966-uart.c
 EXAMPLES += FlexRIO_mod5734-7966.c
-#EXAMPLES  += Rseries_onlyResources.c
+EXAMPLES  += Rseries_onlyResources.c
 LIBRARIES := m rt irioCore NiFpga niflexrio
 
 COVERAGE=true
