@@ -452,30 +452,30 @@ int allocCRIOEnums(irioDrv_t* p_DrvPvt, TStatus* status){
 
 int allocRseriesRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status){
 	//Analog Limits
-		p_DrvPvt->max_analoginputs = FLEXRIO_MAX_ANALOGS_IN;
+		p_DrvPvt->max_analoginputs = RSERIES_MAX_ANALOGS_IN;
 		p_DrvPvt->enumAnalogInput = calloc(p_DrvPvt->max_analoginputs,sizeof(TResourcePort));
-		p_DrvPvt->max_auxanaloginputs = FLEXRIO_MAX_AUXA_IN;
+		p_DrvPvt->max_auxanaloginputs = RSERIES_MAX_AUXA_IN;
 		p_DrvPvt->enumauxAI = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort));
 		p_DrvPvt->enumauxAI_64 = calloc(p_DrvPvt->max_auxanaloginputs,sizeof(TResourcePort_64));
-		p_DrvPvt->max_analogoutputs = FLEXRIO_MAX_ANALOGS_OUT;
+		p_DrvPvt->max_analogoutputs = RSERIES_MAX_ANALOGS_OUT;
 		p_DrvPvt->enumAnalogOutput= calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
 		p_DrvPvt->enumAOEnable = calloc(p_DrvPvt->max_analogoutputs,sizeof(TResourcePort));
-		p_DrvPvt->max_auxanalogoutputs = FLEXRIO_MAX_AUXA_OUT;
+		p_DrvPvt->max_auxanalogoutputs = RSERIES_MAX_AUXA_OUT;
 		p_DrvPvt->enumauxAO = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort));
 		p_DrvPvt->enumauxAO_64 = calloc(p_DrvPvt->max_auxanalogoutputs,sizeof(TResourcePort_64));
 
 		//Digital Limits
-		p_DrvPvt->max_digitalsinputs = FLEXRIO_MAX_DIGITALS;
+		p_DrvPvt->max_digitalsinputs = RSERIES_MAX_DIGITALS;
 		p_DrvPvt->enumDigitalInput = calloc(p_DrvPvt->max_digitalsinputs,sizeof(TResourcePort));
-		p_DrvPvt->max_auxdigitalsinputs = FLEXRIO_MAX_AUXDIGITALS;
+		p_DrvPvt->max_auxdigitalsinputs = RSERIES_MAX_AUXDIGITALS;
 		p_DrvPvt->enumauxDI = calloc(p_DrvPvt->max_auxdigitalsinputs,sizeof(TResourcePort));
-		p_DrvPvt->max_digitalsoutputs = FLEXRIO_MAX_DIGITALS;
+		p_DrvPvt->max_digitalsoutputs = RSERIES_MAX_DIGITALS;
 		p_DrvPvt->enumDigitalOutput= calloc(p_DrvPvt->max_digitalsoutputs,sizeof(TResourcePort));
 		p_DrvPvt->max_auxdigitalsoutputs = FLEXRIO_MAX_AUXDIGITALS;
 		p_DrvPvt->enumauxDO= calloc(p_DrvPvt->max_auxdigitalsoutputs,sizeof(TResourcePort));
 
 		//DMA Limits
-		p_DrvPvt->max_dmas = FLEXRIO_MAX_DMAS;
+		p_DrvPvt->max_dmas = RSERIES_MAX_DMAS;
 		p_DrvPvt->DMATtoHOSTNCh = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
 		p_DrvPvt->DMATtoHOSTChIndex = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
 		p_DrvPvt->enumDMATtoHOST = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));
@@ -486,7 +486,7 @@ int allocRseriesRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status){
 		p_DrvPvt->DMATtoHOSTBlockNWords = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
 
 		//Signal Generator Limits
-		p_DrvPvt->max_numberofSG = FLEXRIO_MAX_SIGNALGENERATOR;
+		p_DrvPvt->max_numberofSG = RSERIES_MAX_SIGNALGENERATOR;
 		p_DrvPvt->enumSGFreq = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
 		p_DrvPvt->enumSGAmp = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
 		p_DrvPvt->enumSGPhase= calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
@@ -495,7 +495,11 @@ int allocRseriesRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status){
 		p_DrvPvt->enumSGFref = calloc(p_DrvPvt->max_numberofSG,sizeof(TResourcePort));
 		p_DrvPvt->SGfref = calloc(p_DrvPvt->max_numberofSG,sizeof(uint32_t));
 
+		/*
+		 * R Series cannot support GPU
+		 */
 		//DMA for GPU  limits
+		//TODO: Remove this or manage adequately!!!!!!
 		p_DrvPvt->DMATtoGPUNCh = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
 		p_DrvPvt->DMATtoGPUChIndex = calloc(p_DrvPvt->max_dmas,sizeof(uint16_t));
 		p_DrvPvt->enumDMATtoGPU = calloc(p_DrvPvt->max_dmas,sizeof(TResourcePort));

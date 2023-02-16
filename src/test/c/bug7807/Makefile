@@ -21,35 +21,44 @@
 #-======================================================================
 
 PROGNAME=cRIO_DAQDMA
-TARGET=../../../../target
 
-LIBRARIES=m rt irioCore NiFpga niflexrio
+NIRIO = /usr
+TARGET=../../../../target
+SRC=../../../../src
+COVERAGE=true
+
+LIBRARIES=NiFpga niflexrio irioCore m rt
 LIBRARY_DIRS=$(TARGET)/lib 
-ifndef CODAC_ROOT
-	LIBRARY_DIRS+=/usr/lib
-	LIBRARY_DIRS+=/usr/lib/x86_64-linux-gnu
+INCLUDE_DIRS=$(SRC)/main/c/include
+
+ifdef CODAC_ROOT
+	LIBRARY_DIRS+=$(CODAC_ROOT)/lib
+	INCLUDE_DIRS+=$(CODAC_ROOT)/include
+else
+	LIBRARY_DIRS+=$(NIRIO)/lib/x86_64-linux-gnu
+	INCLUDE_DIRS+=$(SRC)/main/c/support
 endif
-INCLUDE_DIRS=$(CODAC_ROOT)/include $(TARGET)/main/c/include ../../../../src/main/c/include
 
 BINARY_DIR=.
 SOURCE_DIR=.
-OBJECT_DIR = $(SOURCE_DIR)/.obj
+OBJECT_DIR=$(SOURCE_DIR)/.obj
 
 EXECUTABLE=$(BINARY_DIR)/$(PROGNAME)
 INCLUDES=$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
-LDLIBS=-L$(CODAC_ROOT)/lib -L$(EPICS_BASE)/lib/$(EPICS_HOST_ARCH) $(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
+LDLIBS=$(foreach libs,$(LIBRARY_DIRS),-L$(libs) -Wl,-rpath,$(libs)) $(foreach libs,$(LIBRARIES),-l$(libs))
 SOURCES=cRIO_DAQDMA.c
 # to build executable from all sources in the program directory:
 #SOURCES=$(wildcard $(SOURCE_DIR)/*.c)
-OBJECTS=$(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(notdir $(SOURCES))))
+#OBJECTS=$(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(notdir $(SOURCES))))
+OBJECTS=./.obj/cRIO_DAQDMA.o
 
 C=gcc
 CFLAGS=-c -Wall
 LDFLAGS=
 
 ifeq ($(COVERAGE),true)
-	CFLAGS+= -O0 -g --coverage
-	LDFLAGS+= --coverage
+	CFLAGS+=-O0 -g
+	LDFLAGS+=--coverage
 endif
 
 .PHONY: all clean run

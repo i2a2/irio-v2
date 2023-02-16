@@ -152,6 +152,15 @@ int searchPlatform( irioDrv_t* p_DrvPvt,TStatus* status);
 int allocFlexRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
 
 /**
+ * Allocates memory for all R Series resources
+ *
+ * @param[in] p_DrvPvt 	Pointer to the driver session structure
+ * @param[out] status Warning and error messages produced during the execution of this call will be added here.
+ * @return \ref TIRIOStatusCode result of the execution of this call.
+ */
+int allocRseriesRIOEnums(irioDrv_t* p_DrvPvt,TStatus* status);
+
+/**
  * Allocates memory for all cRIO resources
  *
  * @param[in] p_DrvPvt 	Pointer to the driver session structure
