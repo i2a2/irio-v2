@@ -46,9 +46,9 @@
  */
 ///@{
 #ifdef CLOSE_VERSION_NIRIO
-	#define DRV_CALL "lsni -v"
+	#define DRV_CALL "lsni -v"       //!< Command with RIO devices information in closed version
 #else
-	#define DRV_CALL "lsrio"        //!< Command with RIO devices information
+	#define DRV_CALL "lsrio"         //!< Command with RIO devices information in open version
 #endif
 #define TMP_FILE "/tmp/RIOinfo.txt"  //!< Path of temporary file
 #define RM_CALL "rm -f "             //!< Command to delete files
@@ -59,22 +59,17 @@
  */
 ///@{
 // Necessary for both open and closed version
-#define STRINGNAME_MODEL "Model Name"              //!< RIO device model name
 #define STRINGNAME_SERIALNO "Serial Number"        //!< RIO device serial number
 
 // Necessary only for ITER open version
-#define STRINGNAME_PORT_OPEN "RIO"
-#define STRINGNAME_PORT_END_OPEN "SubSystemDevice" //!< RIO device sub-system device identificator
-//#define STRINGNAME_PORTEND_OPEN "RIO"            //!< String to search for moving after STRINGNAME_PORT and search for another device
-#define STRINGNAME_DEVICE "Device"                 //!< RIO device identificator
-//#define STRINGNAME_SUBSYSDEVICE "SubSystemDevice"
+#define STRINGNAME_PORT_OPEN "RIO"                 //!< String to move right before resource list in the open version
+#define STRINGNAME_PORT_END_OPEN "SubSystemDevice" //!< RIO device sub-system device identificator in the open version
 
 // Necessary only for closed version
 #define STRINGNAME_RESOURCEINIT "System Configuration API resources found:" //!< String to move right before resource list in the privative driver
-
-#define STRINGNAME_PORT_CLOSED_RSERIES_FLEXRIO "PXI"
-#define STRINGNAME_PORT_CLOSED_COMPACTRIO "MXI"
-#define STRINGNAME_PORT_END_CLOSED "Bus/Dev/Func:"
+#define STRINGNAME_PORT_CLOSED_RSERIES_FLEXRIO "PXI"                        //!< FlexRIO and RSeries devices identificator in the privative driver
+#define STRINGNAME_PORT_CLOSED_COMPACTRIO "MXI"                             //!< compactRIO device identificator in the privative driver
+#define STRINGNAME_PORT_END_CLOSED "Bus/Dev/Func"                           //!< String to move if the desired board has not been identified to search the following one in the privative driver
 ///@}
 
 int irio_findRIO(irioDrv_t *p_DrvPvt,TStatus* status){
@@ -116,7 +111,7 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 		//In privative version need to move the initial pointer
 #ifdef CLOSE_VERSION_NIRIO
 		/**
-		* The close source driver identifies RIO devices in the following way:
+		* The close source driver identifies the RIO devices in the following way:
 		* For R Series and FlexRIO:
 		* 	PXI<n>Slot<k>
 		* 	Example: PXI1Slot2
@@ -138,8 +133,14 @@ int parseDriverInfo(irioDrv_t *p_DrvPvt, TStatus* status){
 		}
 #else
 		/**
-		 * The open source driver used by ITER identifies the devices as RIO<x>
+		 * The open source driver used by ITER identifies the RIO devices as RIO<x>
+		 * Example: RIO0
+		 *          	-- Model Name:      PXIe-7966R
+		 * 	        	-- Serial Number:   0x01A34CC7
+		 * 	        	-- Device:			0xc4c4
+		 * 	        	-- SubSystemDevice: 0x75ce
 		 */
+		// TODO: Define behavior if no hardware is detected
 		asprintf(&port,"%s","RIOxxxxx");
 		deviceInfo=fileContent;
 #endif
