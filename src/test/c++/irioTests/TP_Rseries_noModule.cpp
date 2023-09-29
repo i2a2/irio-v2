@@ -26,12 +26,22 @@ using std::string; using std::cerr;
  * between auxiliar I/O analog/digital FPGA registers.
  * This test is related to the following requirements:
  *
- * PXI-7854R
+ * PXI-7831R, PXI-7833R, PXI-7841R, PXI-7842R, PXI-7851R, PXI-7852R, PXI-7853R, PXI-7854R
+ * 7831R/7833R/7841R/7842R/7851R/7852R/7853R/7854R
  *
  * The execution of this test requires to have an environment variable indicating the
- * serial number of the RIO board to be used. Execute in a command shell the lsrio/lsni -v command
- * execute export RIOSerial=0x..........
- * execute export RIODevice=xxxx, where xxxx = 7854R
+ * serial number of the RIO board to be used. Execute in a command shell the lsrio/lsni -v command,
+ * the first for the ITER open version and the second one for the closed version
+ *
+ * In the ITER open version:
+ * 		execute "$ export RIOSerial=0x.........."
+ * In the closed version:
+ * 		execute "$ export RIOSerial=.........."
+ *
+ * It is also necessary another environment variable to indicate the RIO board to be used
+ *
+ * For both version:
+ * 		execute "$ export RIODevice=xxxx", where xxxx = 7831, 7833, 7841, 7842, 7851, 7852, 7853, 7854
  */
 
 TEST(TP_Rseries_noModule, functional) {

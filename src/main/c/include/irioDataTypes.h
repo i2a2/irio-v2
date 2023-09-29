@@ -73,22 +73,23 @@ extern "C" {
 ///@}
 
 /** @name Maximum R-Series resources
- * Definitions of the maximum number of resources that can be instantiated for FlexRIO platform.
+ * Definitions of the maximum number of resources that can be instantiated for R Series platform.
  */
 ///@{
 /***
- * NI 7831R/7833R/7841R/7842R/7851R/7852R/7853R/7854R:
+ * NI PXIe 7820R/7821R Digital IO only: 128 I/O
+ * NI PXI 7831R/7833R/7841R/7842R/7851R/7852R/7853R/7854R:
  * Specifications document
- * NI 7830R only has 4 analog in channels. IRIO supports ot but the LabVIEW design cannot include more than 4 physical ADC channels
- * PXIe 7820R/7821R Digital IO only: 128 I/O
+ * NI 7830R only has 4 analog in channels. IRIO supports it but the LabVIEW design cannot include more than 4 physical ADC channels
+
  */
 #define RSERIES_MAX_ANALOGS_IN 8        //!< Max number of analog inputs
 #define RSERIES_MAX_AUXA_IN 16          //!< Max number of auxiliary analog inputs
 #define RSERIES_MAX_ANALOGS_OUT 8       //!< Max number of analog outputs
 #define RSERIES_MAX_AUXA_OUT 16         //!< Max number of auxiliary analog outputs
-#define RSERIES_MAX_DIGITALS 128         //!< Max number of digital inputs and outputs
+#define RSERIES_MAX_DIGITALS 128        //!< Max number of digital inputs and outputs
 #define RSERIES_MAX_AUXDIGITALS 16      //!< Max number of auxiliary digital inputs and outputs
-#define RSERIES_MAX_DMAS 3             //!< Max number of DMAs channels
+#define RSERIES_MAX_DMAS 3              //!< Max number of DMAs channels
 #define RSERIES_MAX_SIGNALGENERATOR 2   //!< Max number of signal generators
 ///@}
 
