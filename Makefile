@@ -36,3 +36,12 @@ all:
 
 %:
 	@$(foreach dir, $(SUBDIRS), echo -e "$(BOLD)Building $(dir:/=)...$(NC)" && $(MAKE) -C $(dir) $@ &&) :
+
+# TODO: Remove this, only test
+test:
+	@mvn compile
+	@python automatize_GT.py --RIODevice 7966 --RIOSerial 0x01A34CC7
+
+testv:
+	@mvn compile
+	@python automatize_GT.py -v --RIODevice 7966 --RIOSerial 0x01A34CC7
