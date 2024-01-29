@@ -24,7 +24,11 @@ void logErrors(const int ret_status, const TStatus& out_status);
 void initDriver(string bitfile_prefix, irioDrv_t* drv);
 void closeDriver(irioDrv_t* drv);
 
-int getResourceCount(TResourcePort* arr, int max);
+typedef struct {
+    int AI, AO, auxAI, auxAO, DI, DO, auxDI, auxDO, SG, DMA, CLConfig, CLUART;
+} irioResources_t;
+
+void getResources(irioDrv_t* drv, irioResources_t* res);
 
 }  // namespace TestUtilsIRIO
 

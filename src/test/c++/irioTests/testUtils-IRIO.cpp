@@ -21,6 +21,8 @@ using std::cout;
 using std::endl;
 using std::string;
 
+static int getResourceCount(TResourcePort* arr, int max);
+
 void TestUtilsIRIO::displayTitle(const string& msg, const string& forecolor,
                                  const string& backcolor) {
     cout << forecolor << backcolor
@@ -104,8 +106,29 @@ void TestUtilsIRIO::closeDriver(irioDrv_t* drv) {
     if (verbose_test) cout << "[TEST] Driver closed " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
 }
 
-int TestUtilsIRIO::getResourceCount(TResourcePort* arr, int max) {
-    int i = 0;
-    while (i < max && arr[i].found) i++;
-    return i;
+static int getResourceCount(TResourcePort* arr, int max) {
+    int cnt = 0;
+    for (int i = 0; i < max; i++) 
+        if (arr[i].found)
+            cnt++;
+
+    return cnt;
+}
+
+void TestUtilsIRIO::getResources(irioDrv_t* drv, irioResources_t* res) {
+	res->AI = getResourceCount(drv->enumAnalogInput, drv->max_analoginputs);
+	res->AO = getResourceCount(drv->enumAnalogOutput, drv->max_analogoutputs);
+	res->auxAI = getResourceCount(drv->enumauxAI, drv->max_auxanaloginputs);
+	res->auxAO = getResourceCount(drv->enumauxAO, drv->max_auxanalogoutputs);
+
+	res->DI = getResourceCount(drv->enumDigitalInput, drv->max_digitalsinputs);
+	res->DO = getResourceCount(drv->enumDigitalOutput, drv->max_digitalsoutputs);
+	res->auxDI = getResourceCount(drv->enumauxDI, drv->max_auxdigitalsinputs);
+	res->auxDO = getResourceCount(drv->enumauxDO, drv->max_auxdigitalsoutputs);
+
+	res->SG = drv->NoOfSG;
+    res->DMA = (drv->DMATtoHOSTNo.found ? drv->DMATtoHOSTNo.value : 0) + (drv->DMATtoGPUNo.found ? drv->DMATtoGPUNo.value : 0);
+
+	res->CLConfig = drv->enumConfiguration.found;
+	res->CLUART = drv->enumuartByteMode.found;
 }
