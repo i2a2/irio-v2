@@ -2,42 +2,30 @@
 #define TESTUTILS_H_
 
 #include <gtest/gtest.h>
+#include <irioDataTypes.h>
 
-#define FWHT   "\x1b[37m"	//Foreground color, White
-#define BBLA   "\x1b[40m"	//Background color, Black
-#define RST    "\x1B[0m"	//Foreground color, Reset
-#define FCYN   "\x1b[36m"	//Foreground color, Cyan
+using std::string;
 
-using std::cout; using std::endl;
-using std::string; using std::cerr;
+namespace TestUtilsIRIO {
 
-class TestUtilsIRIO
-{
-public:
-	static void displayTitle(const string& msg, const string& forecolor=FWHT, const string& backcolor=BBLA) {
-		cout<<forecolor<<backcolor<<"+-----------------------------------------------------------------------------"<<endl;
-		cout<<msg<<endl;
-		cout<<"+-----------------------------------------------------------------------------"<<endl<<RST<<endl;
-	}
+const string FWHT = "\x1b[37m";  // Foreground color, White
+const string BBLA = "\x1b[40m";  // Background color, Black
+const string RST = "\x1B[0m";    // Foreground color, Reset
+const string FCYN = "\x1b[36m";  // Foreground color, Cyan
+const string FRED = "\x1b[31m";  // Foreground color, Red
 
-	static string getEnvVar(const string& shellVarName) {
-		string shellVarValue;
-		try {
-			shellVarValue=string(std::getenv(shellVarName.c_str()));
-		}
-		catch(...) {
-			throw std::logic_error("Shell variables not defined. Please define "+shellVarName+" variable before run this test.");
-		}
+void displayTitle(const string& msg, const string& forecolor = FWHT,
+                  const string& backcolor = BBLA);
 
-		return shellVarValue;
-	}
+string getEnvVar(const string& shellVarName);
 
-	static void getErrors(const TStatus& status) {
-		char* detailStr = nullptr;
-		irio_getErrorString(status.detailCode, &detailStr);
-		cerr << "Runtime error/warning detail code: " << status.detailCode << ", " << detailStr << endl << endl;
-		free(detailStr); detailStr = nullptr;
-	}
-};
+void logErrors(const int ret_status, const TStatus& out_status);
+
+void initDriver(string bitfile_prefix, irioDrv_t* drv);
+void closeDriver(irioDrv_t* drv);
+
+int getResourceCount(TResourcePort* arr, int max);
+
+}  // namespace TestUtilsIRIO
 
 #endif /* TESTUTILS_H_ */
