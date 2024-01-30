@@ -126,8 +126,9 @@ void TestUtilsIRIO::getResources(irioDrv_t* drv, irioResources_t* res) {
 	res->auxDI = getResourceCount(drv->enumauxDI, drv->max_auxdigitalsinputs);
 	res->auxDO = getResourceCount(drv->enumauxDO, drv->max_auxdigitalsoutputs);
 
+    res->DMA = getResourceCount(drv->enumDMATtoHOST, drv->max_dmas) + getResourceCount(drv->enumDMATtoGPU, drv->max_dmas_gpu);
+
 	res->SG = drv->NoOfSG;
-    res->DMA = (drv->DMATtoHOSTNo.found ? drv->DMATtoHOSTNo.value : 0) + (drv->DMATtoGPUNo.found ? drv->DMATtoGPUNo.value : 0);
 
 	res->CLConfig = drv->enumConfiguration.found;
 	res->CLUART = drv->enumuartByteMode.found;
