@@ -49,9 +49,6 @@ string TestUtilsIRIO::getEnvVar(const string& shellVarName) {
     return shellVarValue;
 }
 
-// void TestUtilsIRIO::logErrors(const int ret_status, const TStatus&
-// out_status) {
-
 void TestUtilsIRIO::logErrors(const int ret_status, const TStatus& out_status) {
     if (ret_status == IRIO_success) return;
 
@@ -132,4 +129,26 @@ void TestUtilsIRIO::getResources(irioDrv_t* drv, irioResources_t* res) {
 
 	res->CLConfig = drv->enumConfiguration.found;
 	res->CLUART = drv->enumuartByteMode.found;
+}
+
+int TestUtilsIRIO::loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* status) {
+	char* headerPath=NULL;
+    int local_status = IRIO_success;
+
+	if (file_path[file_path.length() - 1] != '/')
+		asprintf(&headerPath,"%s/%s%s%s",file_path.c_str(),STRINGNAME_PREFIX,drv->projectName,".h");
+	else
+		asprintf(&headerPath,"%s%s%s%s",file_path.c_str(),STRINGNAME_PREFIX,drv->projectName,".h");
+
+	//Call for file init
+	local_status |= irio_initFileSearch(drv,headerPath,(void**)&drv->headerFile,status);
+	if(status->detailCode==FileNotFound_Error){
+		status->detailCode=HeaderNotFound_Error;
+	}
+	free(headerPath);
+    return local_status;
+}
+
+void TestUtilsIRIO::freeHeaderFile(irioDrv_t* drv) {
+    irio_closeFileSearch(drv, (void**)&drv->headerFile, NULL);
 }

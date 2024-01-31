@@ -196,14 +196,55 @@ TEST(FlexRIO, ResourcesMissing) {
     if (verbose_test) cout << "[TEST] Driver initialized " << ((st == IRIO_success) ? "successfully (Error)" : "unsuccessfully (Expected)") << endl;
     EXPECT_NE(st, IRIO_success);
 
-	// Test for errors:
+	// Test for errors: Load header file again to avoid Segmentation Fault
+	TResourcePort tmpPort;
+	if (verbose_test) cout << "[TEST] Loading header file into driver" << endl;
+	st = loadHeaderFile(&drv, filePath, &status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) {
+		if (st == IRIO_success) {
+			cout << "[TEST] Header file loaded successfully" << endl;
+		} else {
+			cout << "[TEST] Header file loaded unsuccessfully" << endl;
+			logErrors(st, status);
+		}
+	}
+	TStatus local_status; 
+	irio_initStatus(&local_status);
 	// Error finding AO1Enable
+	int AO1Found  = irio_findResourceEnum(&drv, "_ControlI32_AO", 0, &tmpPort,&local_status, 0);
+	int AO1Enable = irio_findResourceEnum(&drv, "_ControlBool_AOEnable", 0, &tmpPort, &local_status, 0);
+	if (verbose_test) cout << "[TEST] AO1Found = " << (AO1Found ? "Error" : "Success") << endl << "[TEST] AO1Enable = " << (AO1Enable ? "Error" : "Success") << endl;
+	EXPECT_EQ(AO1Found, IRIO_success); 
+	EXPECT_NE(AO1Found, AO1Enable);
+	irio_resetStatus(&local_status);
 
+	// Error finding SGFref0 and 
+	irio_findResourceEnum(&drv,"_IndicatorU32_SGFref",0,&tmpPort,&local_status,0);
+	if (verbose_test) cout << "[TEST] SGFref0 status code = " << (local_status.code ? "Error" : "Success") << endl;
+	EXPECT_NE(local_status.code, IRIO_success);
+	irio_resetStatus(&local_status);
+
+	// Error finding SGSignalType1
+	irio_findResourceEnum(&drv,"_ControlU8_SGSignalType",1,&tmpPort,&local_status,0);
+	if (verbose_test) cout << "[TEST] SGSignalType status code = " << (local_status.code ? "Error" : "Success") << endl;
+	EXPECT_NE(local_status.code, IRIO_success);
+	irio_resetStatus(&local_status);
+
+	// Error finding DMATtoHOSTSamplingRate0
+	irio_findResourceEnum(&drv, "_ControlU16_DMATtoHOSTSamplingRate", 0, &tmpPort, &local_status, 0);
+	if (verbose_test) cout << "[TEST] DMAtoHOSTSamplingRate0 status code = " << (local_status.code ? "Error" : "Success") << endl;
+	EXPECT_NE(local_status.code, IRIO_success);
+	irio_resetStatus(&local_status);
+
+	freeHeaderFile(&drv);
+
+	// Test for resources
 	irioResources_t res;
 	getResources(&drv, &res);
 
     // Expected resources:
-    // 1 AO + TODO: Error finding AO1Enable : ResourceNotFoundWarning
+    // 1 AO
 	if (verbose_test) cout << "[TEST] Found " << res.AO << " AOs. Expected 1" << endl;
 	EXPECT_EQ(res.AO, 1);
     // 16 auxAI
@@ -224,10 +265,10 @@ TEST(FlexRIO, ResourcesMissing) {
     // 54 DO
 	if (verbose_test) cout << "[TEST] Found " << res.DO << " DOs. Expected 54" << endl;
 	EXPECT_EQ(res.DO, 54);
-    // 0 SG + TODO: Error finding SGFref0 and SGSignalType1
+    // 0 SG 
 	if (verbose_test) cout << "[TEST] Found " << res.SG << " SGs. Expected 0" << endl;
 	EXPECT_EQ(res.SG, 2);
-    // 0 DMAs + TODO: Error finding DMATtoHOSTSamplingRate0
+    // 0 DMAs 
     if (verbose_test) cout << "[TEST] Found " << res.DMA << " DMAs. Expected 0" << endl;
     EXPECT_EQ(res.DMA , 0);
 

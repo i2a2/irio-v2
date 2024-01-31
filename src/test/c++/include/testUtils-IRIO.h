@@ -23,6 +23,8 @@ void logErrors(const int ret_status, const TStatus& out_status);
 
 void initDriver(string bitfile_prefix, irioDrv_t* drv);
 void closeDriver(irioDrv_t* drv);
+int loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* status);
+void freeHeaderFile(irioDrv_t* drv);
 
 typedef struct {
     int AI, AO, auxAI, auxAO, DI, DO, auxDI, auxDO, SG, DMA, CLConfig, CLUART;
