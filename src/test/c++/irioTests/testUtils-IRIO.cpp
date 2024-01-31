@@ -152,3 +152,14 @@ int TestUtilsIRIO::loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* sta
 void TestUtilsIRIO::freeHeaderFile(irioDrv_t* drv) {
     irio_closeFileSearch(drv, (void**)&drv->headerFile, NULL);
 }
+
+void TestUtilsIRIO::startFPGA(irioDrv_t* drv) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    if (verbose_test) cout << "[TEST] Starting FPGA" << endl;
+	TStatus status;
+	irio_initStatus(&status);
+	int startStatus = irio_setFPGAStart(drv,1,&status);
+	TestUtilsIRIO::logErrors(startStatus, status);
+    if (verbose_test) cout << "[TEST] FPGA started " << (startStatus ? "unsuccessfully" : "successfully") << endl;
+	EXPECT_EQ(startStatus, IRIO_success);
+}

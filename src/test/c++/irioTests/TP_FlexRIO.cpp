@@ -33,6 +33,7 @@ TEST(FlexRIO, InitClose) {
 
 /**
  * TP-IRL-3000 Checking for FlexRIO basic initialization and close functions.
+ * 
  * This test checks the IRIO library functions: irio_initDriver and
  * irio_closeDriver in the FlexRIO platform. The objective is to check that
  * all terminals are identified correctly by the irio_initDriver. This test uses
@@ -272,5 +273,31 @@ TEST(FlexRIO, ResourcesMissing) {
     if (verbose_test) cout << "[TEST] Found " << res.DMA << " DMAs. Expected 0" << endl;
     EXPECT_EQ(res.DMA , 0);
 
+    closeDriver(&drv);
+}
+
+/**
+ * TP-IRL-3001 Checking for FlexRIO the irio_setAuxAO, irio_getAuxAI, irio_setAuxDO, 
+ * irio_getAuxDI, irio_getDevTemp functions
+ * 
+ * This test checks the iRIO library functions: irio_initDriver,
+ * irio_setFPGAStart, irio_setAuxAO, irio_getAuxAO, irio_getAuxAI,
+ * irio_setAuxDO, irio_getAuxDO, irio_getAuxDI, irio_getDevTemp,
+ * and irio_closeDriver in the FlexRIO platform. The bitfile used is
+ * described in the FlexRIO template FlexRIOnoModule
+ * 
+ * Implemented in tests:
+ * - StartFPGA
+ * - GetSetAIO
+ * - GetSetAuxAIO
+ * - GetSetDIO
+ * - GetSetAuxDIO
+ * - GetDevTemp
+*/
+TEST(FlexRIO, StartFPGA) {
+    irioDrv_t drv;
+
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
+	startFPGA(&drv);
     closeDriver(&drv);
 }
