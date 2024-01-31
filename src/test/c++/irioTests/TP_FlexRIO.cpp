@@ -454,3 +454,37 @@ TEST(FlexRIO, GetDevTemp) {
 
 	closeDriver(&drv);
 }
+
+/**
+ * TP-IRL-3002 Checking for FlexRIO PXIe7966/NI5761 analog data acquisition using FlexRIOModule5761 template
+ * 
+ * This test checks the iRIO library functions: irio_cleanDMAsTtoHost, irio_setUpDMAsTtoHost,
+ * irio_setDMATtoHostEnable, irio_setDMATtoHostSamplingRate, irio_setDAQStartStop,
+ * irio_getDMATtoHostData, irio_setDebugMode, irio_getDMATtoHostOverflow.
+ * 
+ * Implemented in:
+ * - GetSetDebugMode
+*/
+TEST(FlexRIO, GetSetDebugMode) {
+	int st = 0;
+    irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+
+	// Setting debug mode
+	setDebugMode(&drv, 0);
+
+	// Reading debug mode 
+	int mode_read = -1;
+	st = irio_getDebugMode(&drv, &mode_read, &status);
+	if (verbose_test) cout << "[TEST] Debug mode read = " << mode_read << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(mode_read, 0);
+
+	closeDriver(&drv);
+}

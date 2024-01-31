@@ -26,6 +26,7 @@ void closeDriver(irioDrv_t* drv);
 int loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* status);
 void freeHeaderFile(irioDrv_t* drv);
 void startFPGA(irioDrv_t* drv);
+void setDebugMode(irioDrv_t* drv, int debug_mode);
 
 typedef struct {
     int AI, AO, auxAI, auxAO, DI, DO, auxDI, auxDO, SG, DMA, CLConfig, CLUART;

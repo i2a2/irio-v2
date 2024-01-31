@@ -163,3 +163,15 @@ void TestUtilsIRIO::startFPGA(irioDrv_t* drv) {
     if (verbose_test) cout << "[TEST] FPGA started " << (startStatus ? "unsuccessfully" : "successfully") << endl;
 	EXPECT_EQ(startStatus, IRIO_success);
 }
+
+void TestUtilsIRIO::setDebugMode(irioDrv_t* drv, int debug_mode) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+	TStatus status;
+	irio_initStatus(&status);
+
+	if (verbose_test) cout << "[TEST] Setting debug mode to 0" << endl;
+	int st = irio_setDebugMode(drv, 0, &status);
+	if (verbose_test) cout << "[TEST] Debug mode set " << (st ? "unsuccessfully" : "successfully") << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+}
