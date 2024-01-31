@@ -465,6 +465,7 @@ TEST(FlexRIO, GetDevTemp) {
  * Implemented in:
  * - GetSetDebugMode
  * - GetSetSGSignalType
+ * - GetSetEnableAO0
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -489,7 +490,6 @@ TEST(FlexRIO, GetSetDebugMode) {
 
 	closeDriver(&drv);
 }
-
 TEST(FlexRIO, GetSetSGSignalType) {
 	int st = 0;
     irioDrv_t drv;
@@ -513,6 +513,32 @@ TEST(FlexRIO, GetSetSGSignalType) {
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(read, 0);
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, GetSetEnableAO0) {
+	int st = 0;
+    irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+
+	if (verbose_test) cout << "[TEST] Setting EnableAO0 to 1" << endl;
+	st = irio_setAOEnable(&drv, 0, 1, &status);
+	if (verbose_test) cout << "[TEST] EnableAO0 set" << (st ? " unsuccessfully" : " successfully") << endl;
+	logErrors(st, status);
+	ASSERT_EQ(st, IRIO_success);
+
+	int read = -1;
+	if (verbose_test) cout << "[TEST] Reading EnableAO0" << endl;
+	st = irio_getAOEnable(&drv, 0, &read, &status);
+	if (verbose_test) cout << "[TEST] EnableAO0 = " << read << endl;
+	logErrors(st, status);
+	ASSERT_EQ(st, IRIO_success);
+	ASSERT_EQ(read, 1);
 
 	closeDriver(&drv);
 }
