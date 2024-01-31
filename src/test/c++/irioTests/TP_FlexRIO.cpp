@@ -292,7 +292,6 @@ TEST(FlexRIO, ResourcesMissing) {
  * - StartFPGA
  * - GetSetAuxAIO32
  * - GetSetAuxAIO64
- * - GetSetDIO
  * - GetSetAuxDIO
  * - GetDevTemp
 */
@@ -392,6 +391,44 @@ TEST(FlexRIO, GetSetAuxAIO64) {
 			// Read value from input
 			int64_t read = -1;
 			st = irio_getAuxAI_64(&drv, i, &read, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			if (verbose_test) cout << "Read " << v << " from AuxAI" << i << endl;
+			EXPECT_EQ(read, v);
+		}
+	}
+
+    closeDriver(&drv);
+}
+
+TEST(FlexRIO, GetSetAuxDIO) {
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
+	startFPGA(&drv);
+
+	for (int i = 0; i < 6; ++i) {
+		for (int v: {0, 1}) {
+			if (verbose_test) cout << "Writing " << v << " to AuxDO" << i << endl;
+			// Write value 
+			st = irio_setAuxDO(&drv, i, v, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+
+			// Read written value
+			int written = -1;
+			st = irio_getAuxDO(&drv, i, &written, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			EXPECT_EQ(written, v);
+
+			// Read value from input
+			int read = -1;
+			st = irio_getAuxDI(&drv, i, &read, &status);
 			logErrors(st, status);
 			EXPECT_EQ(st, IRIO_success);
 			if (verbose_test) cout << "Read " << v << " from AuxAI" << i << endl;
