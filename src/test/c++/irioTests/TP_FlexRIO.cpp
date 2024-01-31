@@ -466,6 +466,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetSetDebugMode
  * - GetSetSGSignalType
  * - GetSetEnableAO0
+ * - GetSetAO0
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -539,6 +540,57 @@ TEST(FlexRIO, GetSetEnableAO0) {
 	logErrors(st, status);
 	ASSERT_EQ(st, IRIO_success);
 	ASSERT_EQ(read, 1);
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, GetSetAO0) {
+	int st = 0;
+    irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	// Initialize random engine
+	int min = 0, max = 2048;
+	std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+	std::uniform_int_distribution<int32_t> dist(min + 1, max - 1);
+
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	// Enable AO0
+	if (verbose_test) cout << "[TEST] Setting EnableAO0 to 1" << endl;
+	st = irio_setAOEnable(&drv, 0, 1, &status);
+	if (verbose_test) cout << "[TEST] EnableAO0 set" << (st ? " unsuccessfully" : " successfully") << endl;
+	logErrors(st, status);
+	ASSERT_EQ(st, IRIO_success);
+
+	// Write and read min, max and 5 random values in-between
+	for (int32_t v: {min, dist(gen), dist(gen), dist(gen), dist(gen), dist(gen), max}) {
+		// Write
+		if (verbose_test) cout << "[TEST] Writing " << v << " to AO0" << endl;
+		st = irio_setAO(&drv, 0, v, &status);
+		logErrors(st, status);
+		EXPECT_EQ(st, IRIO_success);
+
+		// Check
+		int32_t check = -1;
+		st = irio_getAO(&drv, 0, &check, &status);
+		if (verbose_test) cout << "[TEST] Written " << check << " to AO0" << endl;
+		logErrors(st, status);
+		EXPECT_EQ(st, IRIO_success);
+		EXPECT_EQ(check, v);
+
+		// The value can be read on auxAI9
+		if (verbose_test) cout << "[TEST] Reading from auxAI9" << endl;
+		int32_t read = -1;
+		st = irio_getAuxAI(&drv, 9, &read, &status);
+		if (verbose_test) cout << "[TEST] Read " << read << " from auxAI9" << endl;
+		logErrors(st, status);
+		EXPECT_EQ(st, IRIO_success);
+		EXPECT_EQ(read, v);
+	}
 
 	closeDriver(&drv);
 }
