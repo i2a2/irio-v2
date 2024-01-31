@@ -2,6 +2,8 @@
 
 #include <cstdlib>
 #include <string>
+#include <random>
+#include <chrono>
 
 // IRIO Library
 extern "C" {
@@ -288,8 +290,8 @@ TEST(FlexRIO, ResourcesMissing) {
  * 
  * Implemented in tests:
  * - StartFPGA
- * - GetSetAIO
- * - GetSetAuxAIO
+ * - GetSetAuxAIO32
+ * - GetSetAuxAIO64
  * - GetSetDIO
  * - GetSetAuxDIO
  * - GetDevTemp
@@ -306,6 +308,96 @@ TEST(FlexRIO, StartFPGA) {
 	int st = irio_getFPGAStart(&drv, &running, &status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(running, 1);
+
+    closeDriver(&drv);
+}
+
+TEST(FlexRIO, GetSetAuxAIO32) {
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
+	startFPGA(&drv);
+
+	// Initialize random engine
+	int min = 0, max = 100;
+	std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+	std::uniform_int_distribution<int32_t> dist(min + 1, max - 1);
+
+	// For each device and value, write value, read from output and read and compare from input
+	for (int i = 0; i < 6; ++i) {
+		std::vector<int32_t> values = {min, dist(gen), dist(gen), dist(gen), max};
+		for (auto v: values) {
+			if (verbose_test) cout << "Writing " << v << " to AuxAO" << i << endl;
+			// Write value 
+			st = irio_setAuxAO(&drv, i, v, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+
+			// Read written value
+			int32_t written = -1;
+			st = irio_getAuxAO(&drv, i, &written, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			EXPECT_EQ(written, v);
+
+			// Read value from input
+			int32_t read = -1;
+			st = irio_getAuxAI(&drv, i, &read, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			if (verbose_test) cout << "Read " << v << " from AuxAI" << i << endl;
+			EXPECT_EQ(read, v);
+		}
+	}
+
+    closeDriver(&drv);
+}
+
+TEST(FlexRIO, GetSetAuxAIO64) {
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
+	startFPGA(&drv);
+
+	// Initialize random engine
+	int min = 0, max = 100;
+	std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
+	std::uniform_int_distribution<int64_t> dist(min + 1, max - 1);
+
+	// For each device and value, write value, read from output and read and compare from input
+	for (int i = 0; i < 6; ++i) {
+		std::vector<int64_t> values = {min, dist(gen), dist(gen), dist(gen), max};
+		for (auto v: values) {
+			if (verbose_test) cout << "Writing " << v << " to AuxAO" << i << endl;
+			// Write value 
+			st = irio_setAuxAO_64(&drv, i, v, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+
+			// Read written value
+			int64_t written = -1;
+			st = irio_getAuxAO_64(&drv, i, &written, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			EXPECT_EQ(written, v);
+
+			// Read value from input
+			int64_t read = -1;
+			st = irio_getAuxAI_64(&drv, i, &read, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			if (verbose_test) cout << "Read " << v << " from AuxAI" << i << endl;
+			EXPECT_EQ(read, v);
+		}
+	}
 
     closeDriver(&drv);
 }
