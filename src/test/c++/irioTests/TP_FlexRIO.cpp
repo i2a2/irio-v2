@@ -299,5 +299,13 @@ TEST(FlexRIO, StartFPGA) {
 
     initDriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
+
+	TStatus status;
+	irio_initStatus(&status);
+	int running = 0;
+	int st = irio_getFPGAStart(&drv, &running, &status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(running, 1);
+
     closeDriver(&drv);
 }
