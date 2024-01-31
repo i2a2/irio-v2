@@ -464,6 +464,7 @@ TEST(FlexRIO, GetDevTemp) {
  * 
  * Implemented in:
  * - GetSetDebugMode
+ * - GetSetSGSignalType
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -485,6 +486,33 @@ TEST(FlexRIO, GetSetDebugMode) {
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(mode_read, 0);
+
+	closeDriver(&drv);
+}
+
+TEST(FlexRIO, GetSetSGSignalType) {
+	int st = 0;
+    irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	if (verbose_test) cout << "[TEST] Settings SGSignalType0 to 0 (DC)" << endl;
+	st = irio_setSGSignalType(&drv,0,0,&status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) cout << "[TEST] SGSignalType0 set " << (st ? "unsuccessfully" : "successfully") << endl;
+
+	int read = -1;
+	st = irio_getSGSignalType(&drv,0,&read,&status);
+	if (verbose_test) cout << "[TEST] SGSignalType0 read = " << read << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(read, 0);
 
 	closeDriver(&drv);
 }
