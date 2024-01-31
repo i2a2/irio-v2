@@ -310,7 +310,6 @@ TEST(FlexRIO, StartFPGA) {
 
     closeDriver(&drv);
 }
-
 TEST(FlexRIO, GetSetAuxAIO32) {
     irioDrv_t drv;
 	int st = 0;
@@ -355,7 +354,6 @@ TEST(FlexRIO, GetSetAuxAIO32) {
 
     closeDriver(&drv);
 }
-
 TEST(FlexRIO, GetSetAuxAIO64) {
     irioDrv_t drv;
 	int st = 0;
@@ -400,7 +398,6 @@ TEST(FlexRIO, GetSetAuxAIO64) {
 
     closeDriver(&drv);
 }
-
 TEST(FlexRIO, GetSetAuxDIO) {
     irioDrv_t drv;
 	int st = 0;
@@ -437,4 +434,23 @@ TEST(FlexRIO, GetSetAuxDIO) {
 	}
 
     closeDriver(&drv);
+}
+TEST(FlexRIO, GetDevTemp) {
+    irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
+	startFPGA(&drv);
+
+	if (verbose_test) cout << "[TEST] Reading temperature from device" << endl;
+	int32_t reading = -1;
+	int st = irio_getDevTemp(&drv, &reading, &status);
+	float temp = 0.25f * reading;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) cout << "[TEST] Temperature = " << std::setprecision(4) << temp << "°C" << endl;
+
+	closeDriver(&drv);
 }
