@@ -467,6 +467,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetSetSGSignalType
  * - GetSetEnableAO0
  * - GetSetAO0
+ * - CleanDMA
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -591,6 +592,24 @@ TEST(FlexRIO, GetSetAO0) {
 		EXPECT_EQ(st, IRIO_success);
 		EXPECT_EQ(read, v);
 	}
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, CleanDMA) {
+    irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	if (verbose_test) cout << "[TEST] Cleaning DMAs" << endl;
+	int st = irio_cleanDMAsTtoHost(&drv,&status);
+	if (verbose_test) cout << "[TEST] DMAs cleaned " << (st ? "unsuccessfully" : "successfully") << endl;
+	logErrors(st, status);
+	ASSERT_EQ(st, IRIO_success);
 
 	closeDriver(&drv);
 }
