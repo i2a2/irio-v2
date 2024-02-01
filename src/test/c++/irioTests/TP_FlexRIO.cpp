@@ -482,6 +482,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetSetDMAToHostSamplingRate
  * - GetSetAICoupling
  * - GetSetDMAToHostEnable
+ * - GetSetDAQStartStop
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -704,6 +705,27 @@ TEST(FlexRIO, GetSetDMAToHostEnable) {
 	int reading = -1;
 	int st = irio_getDMATtoHostEnable(&drv, 0, &reading, &status);
 	if (verbose_test) cout << "[TEST] DMATtoHostEnable0 read = " << reading << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(reading, 1);
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, GetSetDAQStartStop) {
+	irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	DMAHost::setStartStop(&drv, 1);
+
+	int reading = -1;
+	int st = irio_getDAQStartStop(&drv, &reading, &status);
+	if (verbose_test) cout << "[TEST] DAQStartStop read = " << reading << (reading ? " (ON)" : " (OFF)") << endl;
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(reading, 1);

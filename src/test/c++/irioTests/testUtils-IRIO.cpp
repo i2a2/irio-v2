@@ -254,3 +254,15 @@ void TestUtilsIRIO::DMAHost::setEnable(irioDrv_t* drv, int channel, int enable) 
     TestUtilsIRIO::logErrors(st, status);
     EXPECT_EQ(st, IRIO_success);
 }
+
+void TestUtilsIRIO::DMAHost::setStartStop(irioDrv_t* drv, int startstop) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+
+	if (verbose_test) cout << "[TEST] Setting DAQStartStop" << " to " << startstop << (startstop ? " (ON)" : " (OFF)")<< endl;
+	int st = irio_setDAQStartStop(drv, startstop, &status);
+	if (verbose_test) cout << "[TEST] DAQStartStop set " << (st ? "unsuccessfully" : "successfully") << endl;
+    TestUtilsIRIO::logErrors(st, status);
+    EXPECT_EQ(st, IRIO_success);
+}
