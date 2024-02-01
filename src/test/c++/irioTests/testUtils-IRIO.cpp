@@ -225,3 +225,19 @@ int TestUtilsIRIO::DMAHost::setSamplingRate(irioDrv_t* drv, int32_t sampling_rat
 
     return fref;
 }
+TIRIOCouplingMode TestUtilsIRIO::setAICoupling(irioDrv_t* drv) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    string couplingStr = TestUtilsIRIO::getEnvVar("VerboseTest");
+    TStatus status;
+    irio_initStatus(&status);
+
+    TIRIOCouplingMode coupling = static_cast<TIRIOCouplingMode>(couplingStr == "1" || couplingStr == "DC");
+
+    if (verbose_test) cout << "[TEST] Setting the AI Coupling to " << coupling << (coupling ? " (DC)" : " (AC)") << endl;
+    int st = irio_setAICoupling(drv, coupling, &status);
+	if (verbose_test) cout << "[TEST] AI coupling set " << (st ? "unsuccessfully" : "successfully") << endl;
+    TestUtilsIRIO::logErrors(st, status);
+    EXPECT_EQ(st, IRIO_success);
+
+    return coupling;
+}

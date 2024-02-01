@@ -480,6 +480,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - CleanDMA
  * - SetupDMAToHost
  * - GetSetDMAToHostSamplingRate
+ * - GetSetAICoupling
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -660,6 +661,30 @@ TEST(FlexRIO, GetSetDMAToHostSamplingRate) {
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(reading, fref/sampling_rate);
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, GetSetAICoupling) {
+	irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	int32_t sampling_rate = 500000; // 50ksps (max 125Msps)
+	if (verbose_test) cout << "[TEST] Sampling rate = " << sampling_rate << endl;
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	TIRIOCouplingMode aic = setAICoupling(&drv);
+
+	TIRIOCouplingMode reading = IRIO_coupling_NULL;
+	int st = irio_getAICoupling(&drv, &reading, &status);
+	if (verbose_test) cout << "[TEST] AI Coupling read = " << static_cast<int>(reading) << (reading == IRIO_coupling_DC ? " (DC)" : " (AC)")<< endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(aic, reading);
 
 	closeDriver(&drv);
 }
