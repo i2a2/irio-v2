@@ -175,3 +175,53 @@ void TestUtilsIRIO::setDebugMode(irioDrv_t* drv, int debug_mode) {
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 }
+
+void TestUtilsIRIO::DMAHost::cleanDMA(irioDrv_t* drv) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+
+	if (verbose_test) cout << "[TEST] Cleaning DMAs" << endl;
+	int st = irio_cleanDMAsTtoHost(drv, &status);
+	if (verbose_test) cout << "[TEST] DMAs cleaned " << (st ? "unsuccessfully" : "successfully") << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+}
+
+void TestUtilsIRIO::DMAHost::setupDMA(irioDrv_t* drv) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+
+	if (verbose_test) cout << "[TEST] Setting up DMAs to host" << endl;
+	int st = irio_setUpDMAsTtoHost(drv, &status);
+	if (verbose_test) cout << "[TEST] DMAs set up " << (st ? "unsuccessfully" : "successfully") << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+}
+
+int TestUtilsIRIO::DMAHost::setSamplingRate(irioDrv_t* drv, int32_t sampling_rate) {
+	// Equation applied to set DMATtoHostSamplingRate: Fref/samplingRate=DecimationFactor
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    int st;
+    int32_t fref;
+    TStatus status;
+    irio_initStatus(&status);
+
+	st = irio_getFref(drv, &fref, &status);
+	if (verbose_test) cout << "[TEST] Fref = " << fref << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_NE(fref, 0);
+	irio_resetStatus(&status);
+
+	int32_t decimation_factor = fref/sampling_rate;
+	if (verbose_test) cout << "[TEST] Setting decimation factor of DMA0 to Fref/SamplingRate = " << decimation_factor << endl;
+	st = irio_setDMATtoHostSamplingRate(drv, 0, decimation_factor, &status);
+	if (verbose_test) cout << "[TEST] Sampling rate set " << (st ? "unsuccessfully" : "successfully") << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+
+    return fref;
+}

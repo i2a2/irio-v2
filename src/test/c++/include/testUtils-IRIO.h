@@ -34,6 +34,11 @@ typedef struct {
 
 void getResources(irioDrv_t* drv, irioResources_t* res);
 
+namespace DMAHost {
+    void cleanDMA(irioDrv_t* drv);
+    void setupDMA(irioDrv_t* drv);
+    int setSamplingRate(irioDrv_t* drv, int32_t sampling_rate);
+}
 }  // namespace TestUtilsIRIO
 
 #endif /* TESTUTILS_H_ */

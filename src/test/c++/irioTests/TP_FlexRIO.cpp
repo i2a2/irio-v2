@@ -618,17 +618,11 @@ TEST(FlexRIO, CleanDMA) {
     irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
-
-	if (verbose_test) cout << "[TEST] Cleaning DMAs" << endl;
-	int st = irio_cleanDMAsTtoHost(&drv,&status);
-	if (verbose_test) cout << "[TEST] DMAs cleaned " << (st ? "unsuccessfully" : "successfully") << endl;
-	logErrors(st, status);
-	EXPECT_EQ(st, IRIO_success);
+	DMAHost::cleanDMA(&drv);
 
 	closeDriver(&drv);
 }
@@ -636,26 +630,15 @@ TEST(FlexRIO, SetupDMAToHost) {
 	irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
-	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
 	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
-
-	if (verbose_test) cout << "[TEST] Setting up DMAs to host" << endl;
-	int st = irio_setUpDMAsTtoHost(&drv, &status);
-	if (verbose_test) cout << "[TEST] DMAs set up " << (st ? "unsuccessfully" : "successfully") << endl;
-	logErrors(st, status);
-	EXPECT_EQ(st, IRIO_success);
+	DMAHost::setupDMA(&drv);
 
 	closeDriver(&drv);
 }
 TEST(FlexRIO, GetSetDMAToHostSamplingRate) {
-	// Equation applied to set DMATtoHostSamplingRate: Fref/samplingRate=DecimationFactor
-	// Where - Fref is p_DrvPvt.Fref, this value is read from FPGA by irioDriver initialization
-	//		 - SamplingRate is the sampling rate desired to be configured
-	//		 - decimationFactor, is the value configured in the FPGA to obtain the sampling rate desired
-	// E.g., If you want 10000 Samples/s then configure (p_DrvPvt.Fref/10000) in third parameter of irio_setDMATtoHostSamplingRate
 	irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -663,33 +646,20 @@ TEST(FlexRIO, GetSetDMAToHostSamplingRate) {
 	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
 	int32_t sampling_rate = 500000; // 50ksps (max 125Msps)
-	int32_t fref = 0;
 	if (verbose_test) cout << "[TEST] Sampling rate = " << sampling_rate << endl;
 
 	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
-	st = irio_getFref(&drv, &fref, &status);
-	if (verbose_test) cout << "[TEST] Fref = " << fref << endl;
-	logErrors(st, status);
-	EXPECT_EQ(st, IRIO_success);
-	EXPECT_NE(fref, 0);
-	irio_resetStatus(&status);
-
-	int32_t decimation_factor = fref/sampling_rate;
-	if (verbose_test) cout << "[TEST] Setting decimation factor of DMA0 to Fref/SamplingRate = " << decimation_factor << endl;
-	st = irio_setDMATtoHostSamplingRate(&drv, 0, decimation_factor, &status);
-	if (verbose_test) cout << "[TEST] Sampling rate set " << (st ? "unsuccessfully" : "successfully") << endl;
-	logErrors(st, status);
-	EXPECT_EQ(st, IRIO_success);
-	irio_resetStatus(&status);
+	int fref = DMAHost::setSamplingRate(&drv, sampling_rate);
 
 	int32_t reading = -1;
 	st = irio_getDMATtoHostSamplingRate(&drv, 0, &reading, &status);
 	if (verbose_test) cout << "[TEST] Sampling rate of DMA0 set to " << reading << ". Sampling freq = " << fref/reading << " Samples/s" << endl;
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(reading, fref/sampling_rate);
 
 	closeDriver(&drv);
 }
