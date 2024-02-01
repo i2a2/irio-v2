@@ -307,6 +307,7 @@ TEST(FlexRIO, StartFPGA) {
 	int st = irio_getFPGAStart(&drv, &running, &status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(running, 1);
+	irio_resetStatus(&status);
 
     closeDriver(&drv);
 }
@@ -334,6 +335,7 @@ TEST(FlexRIO, GetSetAuxAIO32) {
 			st = irio_setAuxAO(&drv, i, v, &status);
 			logErrors(st, status);
 			EXPECT_EQ(st, IRIO_success);
+			irio_resetStatus(&status);
 
 			// Read written value
 			int32_t written = -1;
@@ -341,6 +343,7 @@ TEST(FlexRIO, GetSetAuxAIO32) {
 			logErrors(st, status);
 			EXPECT_EQ(st, IRIO_success);
 			EXPECT_EQ(written, v);
+			irio_resetStatus(&status);
 
 			// Read value from input
 			int32_t read = -1;
@@ -349,6 +352,7 @@ TEST(FlexRIO, GetSetAuxAIO32) {
 			EXPECT_EQ(st, IRIO_success);
 			if (verbose_test) cout << "Read " << v << " from AuxAI" << i << endl;
 			EXPECT_EQ(read, v);
+			irio_resetStatus(&status);
 		}
 	}
 
@@ -378,6 +382,7 @@ TEST(FlexRIO, GetSetAuxAIO64) {
 			st = irio_setAuxAO_64(&drv, i, v, &status);
 			logErrors(st, status);
 			EXPECT_EQ(st, IRIO_success);
+			irio_resetStatus(&status);
 
 			// Read written value
 			int64_t written = -1;
@@ -385,6 +390,7 @@ TEST(FlexRIO, GetSetAuxAIO64) {
 			logErrors(st, status);
 			EXPECT_EQ(st, IRIO_success);
 			EXPECT_EQ(written, v);
+			irio_resetStatus(&status);
 
 			// Read value from input
 			int64_t read = -1;
@@ -393,6 +399,7 @@ TEST(FlexRIO, GetSetAuxAIO64) {
 			EXPECT_EQ(st, IRIO_success);
 			if (verbose_test) cout << "Read " << v << " from AuxAI" << i << endl;
 			EXPECT_EQ(read, v);
+			irio_resetStatus(&status);
 		}
 	}
 
@@ -415,6 +422,7 @@ TEST(FlexRIO, GetSetAuxDIO) {
 			st = irio_setAuxDO(&drv, i, v, &status);
 			logErrors(st, status);
 			EXPECT_EQ(st, IRIO_success);
+			irio_resetStatus(&status);
 
 			// Read written value
 			int written = -1;
@@ -422,6 +430,7 @@ TEST(FlexRIO, GetSetAuxDIO) {
 			logErrors(st, status);
 			EXPECT_EQ(st, IRIO_success);
 			EXPECT_EQ(written, v);
+			irio_resetStatus(&status);
 
 			// Read value from input
 			int read = -1;
@@ -430,6 +439,7 @@ TEST(FlexRIO, GetSetAuxDIO) {
 			EXPECT_EQ(st, IRIO_success);
 			if (verbose_test) cout << "Read " << v << " from AuxAI" << i << endl;
 			EXPECT_EQ(read, v);
+			irio_resetStatus(&status);
 		}
 	}
 
@@ -490,6 +500,7 @@ TEST(FlexRIO, GetSetDebugMode) {
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(mode_read, 0);
+	irio_resetStatus(&status);
 
 	closeDriver(&drv);
 }
@@ -509,6 +520,7 @@ TEST(FlexRIO, GetSetSGSignalType) {
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	if (verbose_test) cout << "[TEST] SGSignalType0 set " << (st ? "unsuccessfully" : "successfully") << endl;
+	irio_resetStatus(&status);
 
 	int read = -1;
 	st = irio_getSGSignalType(&drv,0,&read,&status);
@@ -534,6 +546,7 @@ TEST(FlexRIO, GetSetEnableAO0) {
 	if (verbose_test) cout << "[TEST] EnableAO0 set" << (st ? " unsuccessfully" : " successfully") << endl;
 	logErrors(st, status);
 	ASSERT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
 
 	int read = -1;
 	if (verbose_test) cout << "[TEST] Reading EnableAO0" << endl;
@@ -567,6 +580,7 @@ TEST(FlexRIO, GetSetAO0) {
 	if (verbose_test) cout << "[TEST] EnableAO0 set" << (st ? " unsuccessfully" : " successfully") << endl;
 	logErrors(st, status);
 	ASSERT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
 
 	// Write and read min, max and 5 random values in-between
 	for (int32_t v: {min, dist(gen), dist(gen), dist(gen), dist(gen), dist(gen), max}) {
@@ -575,6 +589,7 @@ TEST(FlexRIO, GetSetAO0) {
 		st = irio_setAO(&drv, 0, v, &status);
 		logErrors(st, status);
 		EXPECT_EQ(st, IRIO_success);
+		irio_resetStatus(&status);
 
 		// Check
 		int32_t check = -1;
@@ -583,6 +598,7 @@ TEST(FlexRIO, GetSetAO0) {
 		logErrors(st, status);
 		EXPECT_EQ(st, IRIO_success);
 		EXPECT_EQ(check, v);
+		irio_resetStatus(&status);
 
 		// The value can be read on auxAI9
 		if (verbose_test) cout << "[TEST] Reading from auxAI9" << endl;
@@ -592,6 +608,7 @@ TEST(FlexRIO, GetSetAO0) {
 		logErrors(st, status);
 		EXPECT_EQ(st, IRIO_success);
 		EXPECT_EQ(read, v);
+		irio_resetStatus(&status);
 	}
 
 	closeDriver(&drv);
