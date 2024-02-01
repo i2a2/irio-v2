@@ -1,66 +1,86 @@
-#!/usr/bin python3 
-import os    
+#!/bin/python3
 import argparse
+import subprocess
+import os 
+import re
 
-os.chdir(os.getcwd()+"/target/test/c++/irioTests/")
+if __name__ != "__main__":
+    exit(1)
 
-shuffleAndBreak = " --gtest_shuffle"
+def searchSerial(device, order):
+    if device not in ['7961','7965','7966','7975','9159']:
+        raise Exception("Invalid device type")
+    
+    results = re.findall(f'--Model Name:[^\\n]*{device}[^\\n]*\\n\\s*--Serial Number:\\s*(\\S+)\\n', subprocess.check_output(['lsrio']).decode())
 
-parser = argparse.ArgumentParser(prog="automatize_GT.py",description='Declare environment variables to automatize GoogleTests execution.')
+    if len(results) == 0:
+        raise Exception("No devices found")
+    else:
+        return results[max(min(int(order) - 1, len(results) - 1), 0)]
+    
 
-parser.add_argument('--RIODevice',help='RIO device model. Use $lsrio command to display it',choices=['7961','7965','7966','7975','9159'],required='True')
-parser.add_argument('--RIOSerial',help='RIO device serial number. Use $lsrio command to display it',required='True')
-parser.add_argument('--allTests',help='Decide if run only funcional tests or funcional tests and error tests. 0 functional ; 1 functional+errors',choices=['1','0'],default='0')
-parser.add_argument('--AM',help='Indicate which adapter module is used. It is mandatory that the adapter module match with the RIODevice and RIOSerial used.',choices=['ANALOG','DIG'],default='0')
-parser.add_argument('--iterations',help='Select number of iterations of the tests. Pass a negative number to run indefinitely.',default='1')
-parser.add_argument('--Coupling',help='Coupling mode for mod5761 test. 1 = DC, 0 = AC',choices=['1','0','DC','AC'],default='0')
+# Parameters
+binary = "driver-irio"
 
-# Verbosity
+# Parse arguments
+parser = argparse.ArgumentParser(
+    prog="automatize_GT.py",
+    description='Declare environment variables to automatize GoogleTests execution.',
+)
+
+parser.add_argument('--RIODevice',help='RIO device model. Use lsrio command to display it. If no serial number is provided, the first device is selected',choices=['7961','7965','7966','7975','9159'], default='7966')
+parser.add_argument('--RIOSerial',help='RIO device serial number. Use $lsrio command to display it')
+# parser.add_argument('--AM',help='Indicate which adapter module is used. It is mandatory that the adapter module match with the RIODevice and RIOSerial used.',choices=['ANALOG','DIG'],default='0')
+parser.add_argument('-d', '--device-number',help='If no RIOSerial is provided and there are multiple devices, select which one to use. Bounded between 0 and the number of devices',default='1')
+parser.add_argument('-i', '--iterations',help='Select number of iterations of the tests. Pass a negative number to run indefinitely.',default='1')
+parser.add_argument('-s', '--shuffle',help='Shuffle the test execution', action='store_true')
+parser.add_argument('-c', '--coupling',help='Coupling mode for mod5761 test. 1 = DC, 0 = AC',choices=['1','0','DC','AC'],default='0')
 parser.add_argument('-v', '--verbose',help='Print all traces', action='store_true')
 parser.add_argument('--verbose-init',help='Print driver startup trace', action='store_true')
 parser.add_argument('--verbose-test',help='Print test traces', action='store_true')
+parser.add_argument('-f', '--filter', help='Filter the text execution', )
+parser.add_argument('-l', '--list', help='List all the tests', action='store_true')
+parser.add_argument('-S', '--summary',help='Summarize the execution', action='store_true')
 
 args = parser.parse_args()
 
-# Number of iterations
-iterations = " --gtest_repeat="+args.iterations
-
-commonFlexRIOTests = "TP_FlexRIO_onlyResources.*:TP_FlexRIO_noModule.*"
-if (args.RIODevice=="7966"):
-    commonFlexRIOTests += ":TP_FlexRIO_perf.*"
-
-commonCRIOTests = "TP_cRIO_PBP.*:TP_cRIO_DAQ.*"
-
-if (args.RIODevice == "9159"):
-    commonTests = commonCRIOTests
+# Build command
+if args.list:
+    command = f"./{binary} --gtest_list_tests"
 else:
-    commonTests = commonFlexRIOTests
+    if args.RIOSerial is not None:
+        serial = args.RIOSerial
+    else:
+        serial = searchSerial(args.RIODevice, args.device_number)
 
-tests_5761 = "TP_FlexRIO_mod5761.*"
-tests_6581 = "TP_FlexRIO_mod6581.*"
-errorTests = "TP_errorTests.*"
+    if args.filter is not None:
+        gfilter = " --gtest_filter=" + args.filter
+    else:
+        gfilter = "" 
 
-tests = {"ANALOG": commonTests+":"+tests_5761,
-        "DIG": commonTests+":"+tests_6581,
-        "0": commonTests}
+    if args.shuffle:
+        gshuffle = " --gtest_shuffle"
+    else:
+        gshuffle = ""
 
-if (args.verbose_init or args.verbose):
-    verbose_init = "1"
-else:
-    verbose_init = "0"
+    if args.iterations != '1':
+        giterations = " --gtest-repeat=" + args.iterations
+    else:
+        giterations = ""
 
-if (args.verbose_test or args.verbose):
-    verbose_test = "1"
-else:
-    verbose_test = "0"
+    if args.summary:
+        summary = r' | grep -A9999 "Global test environment tear-down"'
+    else:
+        summary = ""
 
-# if (int(args.allTests)):
-#     os.system("env -S RIOSerial="+args.RIOSerial+" env RIODevice="+args.RIODevice+" env Coupling="+args.Coupling+
-#               " ./driver-irio --gtest_filter="+tests[args.AM]+":"+errorTests+iterations+shuffleAndBreak)
-# else:
-#     os.system("env -S RIOSerial="+args.RIOSerial+" env RIODevice="+args.RIODevice+" env Coupling="+args.Coupling+
-#               " ./driver-irio --gtest_filter="+tests[args.AM]+iterations+shuffleAndBreak)
+    command = f"\
+env -S RIOSerial={serial} \
+env -S RIODevice={args.RIODevice} \
+env -S VerboseInit={int(args.verbose_init or args.verbose)} \
+env -S VerboseTest={int(args.verbose_test or args.verbose)} \
+env -S Coupling={args.coupling} \
+./{binary}{gfilter}{giterations}{gshuffle}{summary}" 
 
-# TODO: Remove this, only for test
-# TODO: Add verbose variable to previous os.system calls
-os.system("env -S RIOSerial="+args.RIOSerial+" env RIODevice="+args.RIODevice+" env VerboseInit="+verbose_init+" env VerboseTest="+verbose_test+" env Coupling="+args.Coupling+ " ./driver-irio")
+# Runnning tests
+os.chdir(os.getcwd()+"/target/test/c++/irioTests/")
+os.system(command)
