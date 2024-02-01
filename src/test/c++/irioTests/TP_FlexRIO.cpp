@@ -468,6 +468,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetSetEnableAO0
  * - GetSetAO0
  * - CleanDMA
+ * - SetupDMAToHost
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -608,6 +609,24 @@ TEST(FlexRIO, CleanDMA) {
 	if (verbose_test) cout << "[TEST] Cleaning DMAs" << endl;
 	int st = irio_cleanDMAsTtoHost(&drv,&status);
 	if (verbose_test) cout << "[TEST] DMAs cleaned " << (st ? "unsuccessfully" : "successfully") << endl;
+	logErrors(st, status);
+	ASSERT_EQ(st, IRIO_success);
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, SetupDMAToHost) {
+	irioDrv_t drv;
+	TStatus status;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	if (verbose_test) cout << "[TEST] Setting up DMAs to host" << endl;
+	int st = irio_setUpDMAsTtoHost(&drv, &status);
+	if (verbose_test) cout << "[TEST] DMAs set up " << (st ? "unsuccessfully" : "successfully") << endl;
 	logErrors(st, status);
 	ASSERT_EQ(st, IRIO_success);
 
