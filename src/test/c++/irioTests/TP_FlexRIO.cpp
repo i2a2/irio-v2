@@ -545,7 +545,7 @@ TEST(FlexRIO, GetSetEnableAO0) {
 	st = irio_setAOEnable(&drv, 0, 1, &status);
 	if (verbose_test) cout << "[TEST] EnableAO0 set" << (st ? " unsuccessfully" : " successfully") << endl;
 	logErrors(st, status);
-	ASSERT_EQ(st, IRIO_success);
+	EXPECT_EQ(st, IRIO_success);
 	irio_resetStatus(&status);
 
 	int read = -1;
@@ -553,8 +553,8 @@ TEST(FlexRIO, GetSetEnableAO0) {
 	st = irio_getAOEnable(&drv, 0, &read, &status);
 	if (verbose_test) cout << "[TEST] EnableAO0 = " << read << endl;
 	logErrors(st, status);
-	ASSERT_EQ(st, IRIO_success);
-	ASSERT_EQ(read, 1);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(read, 1);
 
 	closeDriver(&drv);
 }
@@ -579,7 +579,7 @@ TEST(FlexRIO, GetSetAO0) {
 	st = irio_setAOEnable(&drv, 0, 1, &status);
 	if (verbose_test) cout << "[TEST] EnableAO0 set" << (st ? " unsuccessfully" : " successfully") << endl;
 	logErrors(st, status);
-	ASSERT_EQ(st, IRIO_success);
+	EXPECT_EQ(st, IRIO_success);
 	irio_resetStatus(&status);
 
 	// Write and read min, max and 5 random values in-between
@@ -627,7 +627,7 @@ TEST(FlexRIO, CleanDMA) {
 	int st = irio_cleanDMAsTtoHost(&drv,&status);
 	if (verbose_test) cout << "[TEST] DMAs cleaned " << (st ? "unsuccessfully" : "successfully") << endl;
 	logErrors(st, status);
-	ASSERT_EQ(st, IRIO_success);
+	EXPECT_EQ(st, IRIO_success);
 
 	closeDriver(&drv);
 }
