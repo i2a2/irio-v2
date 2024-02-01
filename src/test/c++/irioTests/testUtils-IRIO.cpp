@@ -225,6 +225,7 @@ int TestUtilsIRIO::DMAHost::setSamplingRate(irioDrv_t* drv, int32_t sampling_rat
 
     return fref;
 }
+
 TIRIOCouplingMode TestUtilsIRIO::setAICoupling(irioDrv_t* drv) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
     string couplingStr = TestUtilsIRIO::getEnvVar("VerboseTest");
@@ -240,4 +241,16 @@ TIRIOCouplingMode TestUtilsIRIO::setAICoupling(irioDrv_t* drv) {
     EXPECT_EQ(st, IRIO_success);
 
     return coupling;
+}
+
+void TestUtilsIRIO::DMAHost::setEnable(irioDrv_t* drv, int channel, int enable) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+
+	if (verbose_test) cout << "[TEST] Setting DMA" << channel << " enable to " << enable << endl;
+	int st = irio_setDMATtoHostEnable(drv, channel, enable, &status);
+	if (verbose_test) cout << "[TEST] DMA enable set up " << (st ? "unsuccessfully" : "successfully") << endl;
+    TestUtilsIRIO::logErrors(st, status);
+    EXPECT_EQ(st, IRIO_success);
 }
