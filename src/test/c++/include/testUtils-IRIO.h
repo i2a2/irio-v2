@@ -41,7 +41,7 @@ namespace DMAHost {
     int  setSamplingRate(irioDrv_t* drv, int32_t sampling_rate);
     void setEnable(irioDrv_t* drv, int channel, int enable);
     void setStartStop(irioDrv_t* drv, int startstop);
-}
+}  // namespace DMAHost
 }  // namespace TestUtilsIRIO
 
 #endif /* TESTUTILS_H_ */

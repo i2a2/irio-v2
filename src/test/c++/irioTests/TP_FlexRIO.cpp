@@ -483,6 +483,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetSetAICoupling
  * - GetSetDMAToHostEnable
  * - GetSetDAQStartStop
+ * - GetDMAToHostParameters
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -729,6 +730,37 @@ TEST(FlexRIO, GetSetDAQStartStop) {
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(reading, 1);
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, GetDMAToHostParameters) {
+	irioDrv_t drv;
+	TStatus status;
+	int st = 0;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	DMAHost::setEnable(&drv, 0, 1);
+
+	uint16_t BlockNWords = 0;
+	if (verbose_test) cout << "[TEST] Reading DMA to Host BlockNWords" << endl;
+	st = irio_getDMATtoHOSTBlockNWords(&drv, &BlockNWords, &status);
+	if (verbose_test) cout << "[TEST] BlockNWords read = " << BlockNWords << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+
+	uint16_t NCh = 0;
+	if (verbose_test) cout << "[TEST] Reading DMA to Host NChannels" << endl;
+	st = irio_getDMATtoHOSTNCh(&drv, &BlockNWords, &status);
+	if (verbose_test) cout << "[TEST] NChannels read = " << NCh << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
 
 	closeDriver(&drv);
 }
