@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <irioDataTypes.h>
+#include <functional>
 
 using std::string;
 
@@ -40,7 +41,8 @@ namespace DMAHost {
     void setupDMA(irioDrv_t* drv);
     int  setSamplingRate(irioDrv_t* drv, int32_t sampling_rate);
     void setEnable(irioDrv_t* drv, int channel, int enable);
-    void setStartStop(irioDrv_t* drv, int startstop);
+    void setDAQStartStop(irioDrv_t* drv, int startstop);
+    std::vector<uint64_t> readDMAData(irioDrv_t* drv, int dmaN, int blocksToRead, int wordsPerBlock, int sampling_freq);
 }  // namespace DMAHost
 }  // namespace TestUtilsIRIO
 

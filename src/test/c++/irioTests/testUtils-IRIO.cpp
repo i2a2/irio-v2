@@ -1,6 +1,7 @@
 #include <irioDataTypes.h>
 #include <irioError.h>
 #include <testUtils-IRIO.h>
+#include <memory>
 
 extern "C" {
 #include <irioDataTypes.h>
@@ -255,7 +256,7 @@ void TestUtilsIRIO::DMAHost::setEnable(irioDrv_t* drv, int channel, int enable) 
     EXPECT_EQ(st, IRIO_success);
 }
 
-void TestUtilsIRIO::DMAHost::setStartStop(irioDrv_t* drv, int startstop) {
+void TestUtilsIRIO::DMAHost::setDAQStartStop(irioDrv_t* drv, int startstop) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
     TStatus status;
     irio_initStatus(&status);
@@ -265,4 +266,37 @@ void TestUtilsIRIO::DMAHost::setStartStop(irioDrv_t* drv, int startstop) {
 	if (verbose_test) cout << "[TEST] DAQStartStop set " << (st ? "unsuccessfully" : "successfully") << endl;
     TestUtilsIRIO::logErrors(st, status);
     EXPECT_EQ(st, IRIO_success);
+}
+
+std::vector<uint64_t> TestUtilsIRIO::DMAHost::readDMAData(irioDrv_t* drv, int dmaN, int blocksToRead, int wordsPerBlock, int sampling_freq) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    if (verbose_test) cout << "[TEST] Reading " << blocksToRead << " blocks of " << wordsPerBlock << " words each from DMA" << dmaN << endl; 
+    TStatus status;
+    irio_initStatus(&status);
+
+	int blocksRead = 0;
+	int tries = 0, maxTries = 10;
+
+    // Buffer = blocks * (words/block) * (bytes/word)
+    std::vector<uint64_t> dataBuffer(blocksToRead * wordsPerBlock);
+
+    while (tries < maxTries) {
+        int st = irio_getDMATtoHostData(drv, blocksToRead, dmaN, dataBuffer.data(), &blocksRead, &status);
+        TestUtilsIRIO::logErrors(st, status);
+        if (verbose_test) cout << "[TEST] " << blocksRead << " blocks read" << (st ? " unsuccessfully" : " successfully") << endl; 
+        EXPECT_EQ(st, IRIO_success);
+        irio_resetStatus(&status);
+
+        if (blocksRead == blocksToRead) {
+            return dataBuffer;
+        } else {
+            int time = wordsPerBlock * 500000/sampling_freq;
+            if (verbose_test) cout << "[TEST] Read failed. Waiting " << time << " us." << endl;
+            usleep(time); // Wait Half block duration
+        }
+        ++tries;
+        if (verbose_test) cout << "[TEST] DMA read try " << tries << " failed." << endl; 
+    }
+    ADD_FAILURE() << "[ERROR] No blocks read after " << maxTries << " tries"; 
+    return dataBuffer;
 }
