@@ -365,10 +365,24 @@ void TestUtilsIRIO::SG::setSignalType(irioDrv_t* drv, int channel, int signal_ty
     TStatus status;
     irio_initStatus(&status);
 
-	if (verbose_test) cout << "[TEST] Settings SGSignalType" << channel << " to " << signal_type << endl;
+	if (verbose_test) cout << "[TEST] Setting SGSignalType" << channel << " to " << signal_type << endl;
 	int st = irio_setSGSignalType(drv, channel, signal_type, &status);
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	if (verbose_test) cout << "[TEST] SGSignalType" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
 	irio_resetStatus(&status);
+}
+
+void TestUtilsIRIO::SG::setFsig(irioDrv_t* drv, int channel, uint32_t update_rate, uint32_t fsig) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+	// Equation to apply to obtain freq_desired is:
+	// SGFreq = Freq_desired*((2to32)/(Samples/s))
+	int SGFreq = fsig*(UINT_MAX/update_rate);
+	if (verbose_test) cout << "[TEST] Setting SGFreq" << channel << " to " << SGFreq << ", meaning " << fsig << " Hz" << endl;
+	int st = irio_setSGFreq(drv,0,SGFreq,&status);
+	if (verbose_test) cout << "[TEST] SGFreq" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
+    logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
 }

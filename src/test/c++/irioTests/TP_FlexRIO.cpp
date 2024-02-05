@@ -487,7 +487,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - ReadDMADCNoTimeout
  * - ReadDMADCTimeout
  * - GetSetSGUpdateRate
- * - GetSetSGFreq
+ * - GetSetSGSignalFreq
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -905,11 +905,39 @@ TEST(FlexRIO, GetSetSGUpdateRate) {
 	SG::setUpdateRate(&drv, channel, update_rate, fref);
 
 	int32_t read = -1;
-	st = irio_getSGUpdateRate(&drv, 0, &read, &status);
+	st = irio_getSGUpdateRate(&drv, channel, &read, &status);
 	logErrors(st, status);
-	if (verbose_test) cout << "[TEST] SGUpdateRate0 read =" << read << ", meaning " << fref/read << " Samples/s" << endl;
+	if (verbose_test) cout << "[TEST] SGUpdateRate" << channel << " read =" << read << ", meaning " << fref/read << " Samples/s" << endl;
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(update_rate, fref/read);
+
+	closeDriver(&drv);
+}
+TEST(FlexRIO, GetSetSGSignalFreq) {
+	irioDrv_t drv;
+	TStatus status;
+	int st = IRIO_success;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	int sig_freq = 10000; // 10 kHz
+	int update_rate = 10000000; // 10 MSps
+	int channel = 0;
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	SG::setFsig(&drv, channel, update_rate, sig_freq);
+
+
+	int32_t read = -1;
+	st = irio_getSGFreq(&drv, channel, &read, &status);
+	int read_fsig = read/(UINT_MAX/update_rate);
+	logErrors(st, status);
+	if (verbose_test) cout << "[TEST] SGFreq" << channel << " read =" << read << ", meaning " << read_fsig << " Hz" << endl;
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(sig_freq, read_fsig);
 
 	closeDriver(&drv);
 }
