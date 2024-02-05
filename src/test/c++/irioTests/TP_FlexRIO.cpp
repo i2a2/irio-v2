@@ -485,6 +485,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetSetDAQStartStop
  * - GetDMAToHostParameters
  * - ReadDMADCNoTimeout
+ * - ReadDMADCTimeout
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -809,6 +810,68 @@ TEST(FlexRIO, ReadDMADCNoTimeout) {
 
 	int positiveTest = 0, negativeTest = 0;
 	std::vector<uint64_t> vec = DMAHost::readDMAData(&drv, 0, blocksToRead, BlockNWords, sampling_freq); 
+	uint16_t* data = reinterpret_cast<uint16_t*>(vec.data());
+	for (int i = 0; i < blocksToRead * BlockNWords; i++) {
+		if (data[(i * NCh) + channel] == desired_value) {
+			positiveTest++;
+		} else {
+			negativeTest++;
+		}
+	}
+
+	if (verbose_test) cout << "[TEST] Correct samples = " << positiveTest << ". Incorrect samples = " << negativeTest << endl;
+	EXPECT_EQ(positiveTest, blocksToRead * BlockNWords);
+	EXPECT_EQ(negativeTest, 0);
+
+	DMAHost::setEnable(&drv, 0, 0);
+	DMAHost::setDAQStartStop(&drv, 0);
+	DMAHost::cleanDMA(&drv);
+	closeDriver(&drv);
+}
+TEST(FlexRIO, ReadDMADCTimeout) {
+	irioDrv_t drv;
+	TStatus status;
+	int st = IRIO_success;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	// Parameters
+	int blocksToRead = 1;
+	int sampling_freq = 500000;
+	int channel = 2;
+	int desired_value = 2048;
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+	setAICoupling(&drv);
+
+	// Enable AO0 and set to 2048 and configure SGSignalType0
+	if (verbose_test) cout << "[TEST] Configuring the signal generator to output a DC of 2048" << endl;
+	st  = irio_setSGSignalType(&drv,0,0,&status);
+	st |= irio_setAO(&drv, 0, 2048, &status);
+	st |= irio_setAOEnable(&drv, 0, 1, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+	if (verbose_test) cout << "[TEST] SG set" << (st ? " unsuccessfully" : " successfully") << endl;
+
+	// Get Parameters
+	uint16_t NCh = 0, BlockNWords = 0;
+	st  = irio_getDMATtoHOSTNCh(&drv, &NCh, &status);
+	st |= irio_getDMATtoHOSTBlockNWords(&drv, &BlockNWords, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+
+	// Setup DMA
+	DMAHost::setupDMA(&drv);
+	DMAHost::setSamplingRate(&drv, sampling_freq);
+	DMAHost::setEnable(&drv, 0, 1);
+	DMAHost::setDAQStartStop(&drv, 1);
+
+	int positiveTest = 0, negativeTest = 0;
+	std::vector<uint64_t> vec = DMAHost::readDMADataTimeout(&drv, 0, blocksToRead, BlockNWords, sampling_freq); 
 	uint16_t* data = reinterpret_cast<uint16_t*>(vec.data());
 	for (int i = 0; i < blocksToRead * BlockNWords; i++) {
 		if (data[(i * NCh) + channel] == desired_value) {

@@ -43,6 +43,7 @@ namespace DMAHost {
     void setEnable(irioDrv_t* drv, int channel, int enable);
     void setDAQStartStop(irioDrv_t* drv, int startstop);
     std::vector<uint64_t> readDMAData(irioDrv_t* drv, int dmaN, int blocksToRead, int wordsPerBlock, int sampling_freq);
+    std::vector<uint64_t> readDMADataTimeout(irioDrv_t* drv, int dmaN, int blocksToRead, int wordsPerBlock, int sampling_freq);
 }  // namespace DMAHost
 }  // namespace TestUtilsIRIO
 
