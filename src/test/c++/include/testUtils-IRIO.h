@@ -45,6 +45,10 @@ namespace DMAHost {
     std::vector<uint64_t> readDMAData(irioDrv_t* drv, int dmaN, int blocksToRead, int wordsPerBlock, int sampling_freq);
     std::vector<uint64_t> readDMADataTimeout(irioDrv_t* drv, int dmaN, int blocksToRead, int wordsPerBlock, int sampling_freq);
 }  // namespace DMAHost
+
+namespace SG {
+    void setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate);
+}  // namespace SG
 }  // namespace TestUtilsIRIO
 
 #endif /* TESTUTILS_H_ */

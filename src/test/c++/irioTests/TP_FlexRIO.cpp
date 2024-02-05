@@ -486,6 +486,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetDMAToHostParameters
  * - ReadDMADCNoTimeout
  * - ReadDMADCTimeout
+ * - GetSetSGUpdateRate
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -888,5 +889,29 @@ TEST(FlexRIO, ReadDMADCTimeout) {
 	DMAHost::setEnable(&drv, 0, 0);
 	DMAHost::setDAQStartStop(&drv, 0);
 	DMAHost::cleanDMA(&drv);
+	closeDriver(&drv);
+}
+TEST(FlexRIO, GetSetSGUpdateRate) {
+	irioDrv_t drv;
+	TStatus status;
+	int st = IRIO_success;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	int update_rate = 10000000; // 10 MSps
+	int channel = 0;
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+
+	SG::setUpdateRate(&drv, channel, update_rate);
+
+	int32_t read = -1;
+	st = irio_getSGUpdateRate(&drv, 0, &read, &status);
+	logErrors(st, status);
+	if (verbose_test) cout << "[TEST] SGUpdateRate0 read =" << read << ", meaning " << read*update_rate << " Samples/s" << endl;
+	EXPECT_EQ(st, IRIO_success);
+
 	closeDriver(&drv);
 }

@@ -331,3 +331,22 @@ std::vector<uint64_t> TestUtilsIRIO::DMAHost::readDMADataTimeout(irioDrv_t* drv,
     ADD_FAILURE() << "[ERROR] No blocks read after " << maxTries << " tries"; 
     return dataBuffer;
 }
+
+void TestUtilsIRIO::SG::setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+	uint32_t SGFref = 0;
+    TStatus status;
+    irio_initStatus(&status);
+
+	int st = irio_getSGFref(drv, channel, &SGFref, &status);
+    logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) cout << "[TEST] Read SG FRef = " << SGFref << " Hz" << endl;
+	// Equation applied to set SGUpdateRate: SGUpdateRate=(SGFref/(Samples/s))
+	if (verbose_test) cout << "[TEST] Setting SGUpdateRate" << channel << " to " << SGFref/update_rate
+		 << ", meaning " << update_rate << " Samples/s" << endl;
+	st = irio_setSGUpdateRate(drv, channel, SGFref/update_rate, &status);
+    if (verbose_test) cout << "[TEST] SGUpdateRate" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+}
