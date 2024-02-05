@@ -347,6 +347,21 @@ uint32_t TestUtilsIRIO::SG::getFref(irioDrv_t* drv, int channel) {
     return fref;
 }
 
+double TestUtilsIRIO::SG::getCVDAC(irioDrv_t* drv) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+
+    if (verbose_test) cout << "[TEST] Reading CVDAC of SG" << endl;
+    double CVDAC = -1;
+	int st = irio_getSGCVDAC(drv, &CVDAC, &status);
+    logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) cout << "[TEST] Read CVDAC  = " << std::setprecision(6) << CVDAC << " 1/V" << endl;
+
+    return CVDAC;
+}
+
 void TestUtilsIRIO::SG::setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate, uint32_t fref) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
     TStatus status;
@@ -385,4 +400,17 @@ void TestUtilsIRIO::SG::setFsig(irioDrv_t* drv, int channel, uint32_t update_rat
 	if (verbose_test) cout << "[TEST] SGFreq" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
     logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
+}
+
+void TestUtilsIRIO::SG::setSigAmp(irioDrv_t* drv, int channel, int32_t amp) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+
+	if (verbose_test) cout << "[TEST] Setting SGSignalAmp" << channel << " to " << amp << endl;
+	int st = irio_setSGAmp(drv, channel, amp, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) cout << "[TEST] SGSignalAmp" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
+	irio_resetStatus(&status);
 }
