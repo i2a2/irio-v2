@@ -523,12 +523,7 @@ TEST(FlexRIO, GetSetSGSignalType) {
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
-	if (verbose_test) cout << "[TEST] Settings SGSignalType0 to 0 (DC)" << endl;
-	st = irio_setSGSignalType(&drv,0,0,&status);
-	logErrors(st, status);
-	EXPECT_EQ(st, IRIO_success);
-	if (verbose_test) cout << "[TEST] SGSignalType0 set " << (st ? "unsuccessfully" : "successfully") << endl;
-	irio_resetStatus(&status);
+	SG::setSignalType(&drv, 0, 0);
 
 	int read = -1;
 	st = irio_getSGSignalType(&drv,0,&read,&status);

@@ -48,6 +48,7 @@ namespace DMAHost {
 
 namespace SG {
     void setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate);
+    void setSignalType(irioDrv_t* drv, int channel, int signal_type);
 }  // namespace SG
 }  // namespace TestUtilsIRIO
 
