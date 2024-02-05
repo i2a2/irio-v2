@@ -489,6 +489,8 @@ TEST(FlexRIO, GetDevTemp) {
  * - GetSetSGUpdateRate
  * - GetSetSGSignalFreq
  * - GetSetSGSignalAmp
+ * - ReadDMASineTimeout
+ * - ReadDMASineNoTimeout
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -966,5 +968,143 @@ TEST(FlexRIO, GetSetSGSignalAmp) {
 	EXPECT_EQ(st, IRIO_success);
 	EXPECT_EQ(read, sig_amp);
 
+	closeDriver(&drv);
+}
+TEST(FlexRIO, ReadDMASineNoTimeout) {
+	irioDrv_t drv;
+	TStatus status;
+	int st = IRIO_success;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	// Parameters
+	int blocksToRead = 1;
+	int sampling_freq = 500000;
+	int dma_channel = 2;
+	int sg_channel = 0;
+	int sg_amp = 2048;
+	int sg_sigfreq = 10000;
+	int sg_updrate = 10000000; 
+	int ignore_first_samples = 10;
+	int compare_samples = 100;
+	double corr_threshold = 0.99;
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+	setAICoupling(&drv);
+
+	// Configure signal generator
+	int32_t sg_fref = SG::getFref(&drv, sg_channel);
+	SG::setUpdateRate(&drv, sg_channel, sg_updrate, sg_fref);
+	SG::setFsig(&drv, sg_channel, sg_updrate, sg_sigfreq);
+	SG::setSigAmp(&drv, sg_channel, sg_amp);
+	SG::setSignalType(&drv, sg_channel, 1); // Sine function
+
+	if (verbose_test) cout << "[TEST] Enabling AO0" << endl;
+	st = irio_setAOEnable(&drv, 0, 1, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+    if (verbose_test) cout << "[TEST] AO0 enabled" << ((st) ? "unsuccessfully" : "successfully") << endl;
+
+	// Get Parameters
+	uint16_t NCh = 0, BlockNWords = 0;
+	st  = irio_getDMATtoHOSTNCh(&drv, &NCh, &status);
+	st |= irio_getDMATtoHOSTBlockNWords(&drv, &BlockNWords, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+
+	// Setup DMA
+	DMAHost::setupDMA(&drv);
+	DMAHost::setSamplingRate(&drv, sampling_freq);
+	DMAHost::setEnable(&drv, 0, 1);
+	DMAHost::setDAQStartStop(&drv, 1);
+
+	std::vector<uint64_t> vec = DMAHost::readDMAData(&drv, 0, blocksToRead, BlockNWords, sampling_freq); 
+	uint16_t* data = reinterpret_cast<uint16_t*>(vec.data());
+	
+	// Normalize signal
+	std::vector<double> signal;
+	for (int i = ignore_first_samples; i < ignore_first_samples + compare_samples; ++i) {
+		signal.push_back(static_cast<float>(reinterpret_cast<int16_t*>(data)[(i * NCh) + dma_channel])/sg_amp);
+	}
+
+	double corrCoef = sineCorrelation(signal, sg_sigfreq, sampling_freq);
+	if (verbose_test) cout << "[TEST] Correlation coefficient to a sine: " << corrCoef << endl;
+	EXPECT_GE(corrCoef, corr_threshold);
+
+	DMAHost::setEnable(&drv, 0, 0);
+	DMAHost::setDAQStartStop(&drv, 0);
+	DMAHost::cleanDMA(&drv);
+	closeDriver(&drv);
+}
+TEST(FlexRIO, ReadDMASineTimeout) {
+	irioDrv_t drv;
+	TStatus status;
+	int st = IRIO_success;
+	irio_initStatus(&status);
+	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	// Parameters
+	int blocksToRead = 1;
+	int sampling_freq = 500000;
+	int dma_channel = 2;
+	int sg_channel = 0;
+	int sg_amp = 2048;
+	int sg_sigfreq = 10000;
+	int sg_updrate = 10000000; 
+	int ignore_first_samples = 10;
+	int compare_samples = 100;
+	double corr_threshold = 0.99;
+
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+	setDebugMode(&drv, 0);
+	setAICoupling(&drv);
+
+	// Configure signal generator
+	int32_t sg_fref = SG::getFref(&drv, sg_channel);
+	SG::setUpdateRate(&drv, sg_channel, sg_updrate, sg_fref);
+	SG::setFsig(&drv, sg_channel, sg_updrate, sg_sigfreq);
+	SG::setSigAmp(&drv, sg_channel, sg_amp);
+	SG::setSignalType(&drv, sg_channel, 1); // Sine function
+
+	if (verbose_test) cout << "[TEST] Enabling AO0" << endl;
+	st = irio_setAOEnable(&drv, 0, 1, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+    if (verbose_test) cout << "[TEST] AO0 enabled" << ((st) ? "unsuccessfully" : "successfully") << endl;
+
+	// Get Parameters
+	uint16_t NCh = 0, BlockNWords = 0;
+	st  = irio_getDMATtoHOSTNCh(&drv, &NCh, &status);
+	st |= irio_getDMATtoHOSTBlockNWords(&drv, &BlockNWords, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+
+	// Setup DMA
+	DMAHost::setupDMA(&drv);
+	DMAHost::setSamplingRate(&drv, sampling_freq);
+	DMAHost::setEnable(&drv, 0, 1);
+	DMAHost::setDAQStartStop(&drv, 1);
+
+	std::vector<uint64_t> vec = DMAHost::readDMADataTimeout(&drv, 0, blocksToRead, BlockNWords, sampling_freq); 
+	uint16_t* data = reinterpret_cast<uint16_t*>(vec.data());
+	
+	// Normalize signal
+	std::vector<double> signal;
+	for (int i = ignore_first_samples; i < ignore_first_samples + compare_samples; ++i) {
+		signal.push_back(static_cast<float>(reinterpret_cast<int16_t*>(data)[(i * NCh) + dma_channel])/sg_amp);
+	}
+
+	double corrCoef = sineCorrelation(signal, sg_sigfreq, sampling_freq);
+	if (verbose_test) cout << "[TEST] Correlation coefficient to a sine: " << corrCoef << endl;
+	EXPECT_GE(corrCoef, corr_threshold);
+
+	DMAHost::setEnable(&drv, 0, 0);
+	DMAHost::setDAQStartStop(&drv, 0);
+	DMAHost::cleanDMA(&drv);
 	closeDriver(&drv);
 }

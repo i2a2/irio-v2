@@ -15,12 +15,10 @@ const string RST  = "\x1B[0m";   // Foreground color, Reset
 const string FCYN = "\x1b[36m";  // Foreground color, Cyan
 const string FRED = "\x1b[31m";  // Foreground color, Red
 
-void displayTitle(const string& msg, const string& forecolor = FWHT,
-                  const string& backcolor = BBLA);
-
-string getEnvVar(const string& shellVarName);
-
+void displayTitle(const string& msg, const string& forecolor = FWHT, const string& backcolor = BBLA);
 void logErrors(const int ret_status, const TStatus& out_status);
+string getEnvVar(const string& shellVarName);
+double sineCorrelation(const std::vector<double>& vec, int f, int fs);
 
 void initDriver(string bitfile_prefix, irioDrv_t* drv);
 void closeDriver(irioDrv_t* drv);

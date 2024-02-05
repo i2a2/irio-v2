@@ -414,3 +414,30 @@ void TestUtilsIRIO::SG::setSigAmp(irioDrv_t* drv, int channel, int32_t amp) {
 	if (verbose_test) cout << "[TEST] SGSignalAmp" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
 	irio_resetStatus(&status);
 }
+
+double TestUtilsIRIO::sineCorrelation(const std::vector<double>& signal, int f, int fs) {
+    double max_corr = 0;
+
+    // Generate sine
+    std::vector<double> sine;
+    for (int n = 0; n < fs/f; n++) {
+        sine.push_back(sin(static_cast<float>(2)*M_PI*f/fs*n));
+    }
+
+    // Calculate autocorrelation
+    double autocorrelation = 0;
+    for (int n = 0; n < static_cast<int>(sine.size()); n++)
+        autocorrelation += sine[n] * sine[n];
+
+    // Calculate max correlation
+    for (int n = -sine.size(); n < static_cast<int>(signal.size()); n++) {
+        double corr = 0;
+        for (int m = 0; m < static_cast<int>(signal.size()); m++) {
+            if (!((m+n) < 0 || (m+n) >= static_cast<int>(sine.size())))
+                corr += signal[m] * sine[m + n];
+        }
+        if (corr > max_corr) max_corr = corr;
+    }
+
+    return max_corr/autocorrelation;
+}
