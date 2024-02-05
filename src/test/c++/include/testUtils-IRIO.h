@@ -47,9 +47,11 @@ namespace DMAHost {
 }  // namespace DMAHost
 
 namespace SG {
-    void setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate);
-    void setSignalType(irioDrv_t* drv, int channel, int signal_type);
-}  // namespace SG
+    void     setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate, uint32_t fref);
+    void     setSignalType(irioDrv_t* drv, int channel, int signal_type);
+    void     setFsig(irioDrv_t* drv, int channel, uint32_t update_rate, uint32_t freq);
+    uint32_t getFref(irioDrv_t* drv, int channel);
+}  // namespace SG 
 }  // namespace TestUtilsIRIO
 
 #endif /* TESTUTILS_H_ */

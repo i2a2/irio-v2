@@ -487,6 +487,7 @@ TEST(FlexRIO, GetDevTemp) {
  * - ReadDMADCNoTimeout
  * - ReadDMADCTimeout
  * - GetSetSGUpdateRate
+ * - GetSetSGFreq
 */
 TEST(FlexRIO, GetSetDebugMode) {
 	int st = 0;
@@ -900,13 +901,15 @@ TEST(FlexRIO, GetSetSGUpdateRate) {
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
-	SG::setUpdateRate(&drv, channel, update_rate);
+	uint32_t fref = SG::getFref(&drv, channel);
+	SG::setUpdateRate(&drv, channel, update_rate, fref);
 
 	int32_t read = -1;
 	st = irio_getSGUpdateRate(&drv, 0, &read, &status);
 	logErrors(st, status);
-	if (verbose_test) cout << "[TEST] SGUpdateRate0 read =" << read << ", meaning " << read*update_rate << " Samples/s" << endl;
+	if (verbose_test) cout << "[TEST] SGUpdateRate0 read =" << read << ", meaning " << fref/read << " Samples/s" << endl;
 	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(update_rate, fref/read);
 
 	closeDriver(&drv);
 }

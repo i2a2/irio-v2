@@ -332,20 +332,29 @@ std::vector<uint64_t> TestUtilsIRIO::DMAHost::readDMADataTimeout(irioDrv_t* drv,
     return dataBuffer;
 }
 
-void TestUtilsIRIO::SG::setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate) {
+uint32_t TestUtilsIRIO::SG::getFref(irioDrv_t* drv, int channel) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-	uint32_t SGFref = 0;
     TStatus status;
     irio_initStatus(&status);
 
-	int st = irio_getSGFref(drv, channel, &SGFref, &status);
+    if (verbose_test) cout << "[TEST] Reading Fref of SG" << channel << endl;
+    uint32_t fref = -1;
+	int st = irio_getSGFref(drv, channel, &fref, &status);
     logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
-	if (verbose_test) cout << "[TEST] Read SG FRef = " << SGFref << " Hz" << endl;
+	if (verbose_test) cout << "[TEST] Read SG FRef" << channel << " = " << fref << " Hz" << endl;
+
+    return fref;
+}
+
+void TestUtilsIRIO::SG::setUpdateRate(irioDrv_t* drv, int channel, int32_t update_rate, uint32_t fref) {
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    TStatus status;
+    irio_initStatus(&status);
+
 	// Equation applied to set SGUpdateRate: SGUpdateRate=(SGFref/(Samples/s))
-	if (verbose_test) cout << "[TEST] Setting SGUpdateRate" << channel << " to " << SGFref/update_rate
-		 << ", meaning " << update_rate << " Samples/s" << endl;
-	st = irio_setSGUpdateRate(drv, channel, SGFref/update_rate, &status);
+	if (verbose_test) cout << "[TEST] Setting SGUpdateRate" << channel << " to " << fref/update_rate << ", meaning " << update_rate << " Samples/s" << endl;
+	int st = irio_setSGUpdateRate(drv, channel, fref/update_rate, &status);
     if (verbose_test) cout << "[TEST] SGUpdateRate" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
