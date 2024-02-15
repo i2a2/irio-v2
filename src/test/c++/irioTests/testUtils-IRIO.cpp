@@ -72,7 +72,7 @@ void TestUtilsIRIO::initDriver(string bitfile_prefix, irioDrv_t* drv) {
     string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
     string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
 
-    string NIRIOmodel = "PXIe-" + RIODevice + "R";
+    string NIRIOmodel = "PXIe-" + RIODevice;
     string bitfileName = bitfile_prefix + RIODevice;
     string filePath = "../resources/" + RIODevice + "/";
     string testName = ("Test_" + bitfileName);
@@ -170,8 +170,8 @@ void TestUtilsIRIO::setDebugMode(irioDrv_t* drv, int debug_mode) {
 	TStatus status;
 	irio_initStatus(&status);
 
-	if (verbose_test) cout << "[TEST] Setting debug mode to 0" << endl;
-	int st = irio_setDebugMode(drv, 0, &status);
+	if (verbose_test) cout << "[TEST] Setting debug mode to " << endl;
+	int st = irio_setDebugMode(drv, debug_mode, &status);
 	if (verbose_test) cout << "[TEST] Debug mode set " << (st ? "unsuccessfully" : "successfully") << endl;
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
@@ -325,7 +325,8 @@ std::vector<uint64_t> TestUtilsIRIO::DMAHost::readDMADataTimeout(irioDrv_t* drv,
 
         if (blocksRead == blocksToRead) {
             return dataBuffer;
-        }         ++tries;
+        }         
+        ++tries;
         if (verbose_test) cout << "[TEST] DMA read try " << tries << " failed." << endl; 
     }
     ADD_FAILURE() << "[ERROR] No blocks read after " << maxTries << " tries"; 
