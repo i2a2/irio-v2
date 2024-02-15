@@ -19,9 +19,6 @@ def searchSerial(device, order):
         return results[max(min(int(order) - 1, len(results) - 1), 0)]
     
 
-# Parameters
-binary = "driver-irio"
-
 # Parse arguments
 parser = argparse.ArgumentParser(
     prog="automatize_GT.py",
@@ -41,8 +38,17 @@ parser.add_argument('--verbose-test',help='Print test traces', action='store_tru
 parser.add_argument('-f', '--filter', help='Filter the text execution', )
 parser.add_argument('-l', '--list', help='List all the tests', action='store_true')
 parser.add_argument('-S', '--summary',help='Summarize the execution', action='store_true')
+parser.add_argument('-p', '--perf', help='Test performance', action='store_true')
 
 args = parser.parse_args()
+
+# Parameters
+if args.perf:
+    binary = "perf-test"
+    path = "/target/test/c++/perfTest/"
+else:
+    binary = "driver-irio"
+    path = "/target/test/c++/irioTests/"
 
 # Build command
 if args.list:
@@ -53,22 +59,22 @@ else:
     else:
         serial = searchSerial(args.RIODevice, args.device_number)
 
-    if args.filter is not None:
+    if args.filter is not None and not args.perf:
         gfilter = " --gtest_filter=" + args.filter
     else:
         gfilter = "" 
 
-    if args.shuffle:
+    if args.shuffle and not args.perf:
         gshuffle = " --gtest_shuffle"
     else:
         gshuffle = ""
 
-    if args.iterations != '1':
+    if args.iterations != '1' and not args.perf:
         giterations = " --gtest-repeat=" + args.iterations
     else:
         giterations = ""
 
-    if args.summary:
+    if args.summary and not args.perf:
         summary = r' | grep -A9999 "Global test environment tear-down"'
     else:
         summary = ""
@@ -82,5 +88,5 @@ env -S Coupling={args.coupling} \
 ./{binary}{gfilter}{giterations}{gshuffle}{summary}" 
 
 # Runnning tests
-os.chdir(os.getcwd()+"/target/test/c++/irioTests/")
+os.chdir(os.getcwd()+path)
 os.system(command)
