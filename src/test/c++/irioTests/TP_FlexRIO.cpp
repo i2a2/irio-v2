@@ -1115,7 +1115,8 @@ TEST(FlexRIO, ReadDMASineTimeout) {
  * This test checks the iRIO library functions: irio_setDO, irio_getDI, irio_getDO.
  * 
  * Implemented in:
- * - 
+ * - GetSetAuxDIO6581
+ * - GetSetDIO
 */
 TEST(FlexRIO, GetSetAuxDIO6581) {
     irioDrv_t drv;
@@ -1134,16 +1135,52 @@ TEST(FlexRIO, GetSetAuxDIO6581) {
 		logErrors(st, status);
 		EXPECT_EQ(st, IRIO_success);
 		irio_resetStatus(&status);
-		if (verbose_test) cout <<  "[TEST] Write " << (st ? "unsuccessful" : "successful") << endl;
 
-		if (verbose_test) cout << "[TEST] Reading from AuxDI" << auxN << endl;
 		int32_t reading = -1;
 		st = irio_getAuxDO(&drv, auxN, &reading, &status);
 		logErrors(st, status);
 		EXPECT_EQ(st, IRIO_success);
 		EXPECT_EQ(reading, b);
 		irio_resetStatus(&status);
-		if (verbose_test) cout << "[TEST] Got " << reading << " from AuxDI" << auxN << endl;
+		if (verbose_test) cout <<  "[TEST] Write " << ((st || reading != b) ? "unsuccessful" : "successful") << endl;
+	}
+    closeDriver(&drv);
+}
+TEST(FlexRIO, GetSetDIO) {
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+	startFPGA(&drv);
+
+	for (int32_t i = 0; i < 8; i++) {
+		for (int32_t b: {0, 1}) {
+			if (verbose_test) cout << "[TEST] Writing " << b << " to DO" << i << endl; 
+			st = irio_setDO(&drv, i, b, &status);	
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			irio_resetStatus(&status);
+
+			int32_t DOreading = -1;
+			st = irio_getDO(&drv, i, &DOreading, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			EXPECT_EQ(DOreading, b);
+			irio_resetStatus(&status);
+			if (verbose_test) cout <<  "[TEST] Write " << ((st || DOreading != b) ? "unsuccessful" : "successful") << endl;
+
+			if (verbose_test) cout << "[TEST] Reading from DI" << i << endl;
+			int32_t reading = -1;
+			st = irio_getDI(&drv, i, &reading, &status);
+			logErrors(st, status);
+			EXPECT_EQ(st, IRIO_success);
+			EXPECT_EQ(reading, b);
+			irio_resetStatus(&status);
+			if (verbose_test) cout << "[TEST] Got " << reading << " from DI" << i << endl;
+		}
 	}
 
     closeDriver(&drv);
