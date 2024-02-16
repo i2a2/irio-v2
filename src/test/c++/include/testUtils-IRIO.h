@@ -20,7 +20,7 @@ void logErrors(const int ret_status, const TStatus& out_status);
 string getEnvVar(const string& shellVarName);
 double sineCorrelation(const std::vector<double>& vec, int f, int fs);
 
-void initDriver(string bitfile_prefix, irioDrv_t* drv);
+void initFlexRIODriver(string bitfile_prefix, irioDrv_t* drv);
 void closeDriver(irioDrv_t* drv);
 int  loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* status);
 void freeHeaderFile(irioDrv_t* drv);

@@ -64,7 +64,7 @@ void TestUtilsIRIO::logErrors(const int ret_status, const TStatus& out_status) {
     detailStr = nullptr;
 }
 
-void TestUtilsIRIO::initDriver(string bitfile_prefix, irioDrv_t* drv) {
+void TestUtilsIRIO::initFlexRIODriver(string bitfile_prefix, irioDrv_t* drv) {
     int st = IRIO_success;
 
     int verbose_init = std::stoi(TestUtilsIRIO::getEnvVar("VerboseInit"));

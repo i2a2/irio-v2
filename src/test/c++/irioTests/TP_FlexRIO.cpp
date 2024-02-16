@@ -29,7 +29,7 @@ using std::endl;
 // Test init and close functions
 TEST(FlexRIO, InitClose) {
     irioDrv_t drv;
-    initDriver("FlexRIOnoModule_", &drv);
+    initFlexRIODriver("FlexRIOnoModule_", &drv);
     closeDriver(&drv);
 }
 
@@ -53,7 +53,7 @@ TEST(FlexRIO, ResourcesCPUDAQ) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
-    initDriver(std::string("FlexRIO_CPUDAQ_"), &drv);
+    initFlexRIODriver(std::string("FlexRIO_CPUDAQ_"), &drv);
 
 	irioResources_t res;
 	getResources(&drv, &res);
@@ -96,7 +96,7 @@ TEST(FlexRIO, ResourcesIMAQ) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
-    initDriver(std::string("FlexRIO_CPUIMAQ_"), &drv);
+    initFlexRIODriver(std::string("FlexRIO_CPUIMAQ_"), &drv);
 
 	irioResources_t res;
 	getResources(&drv, &res);
@@ -136,7 +136,7 @@ TEST(FlexRIO, ResourcesMAXIO) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
-    initDriver(std::string("FlexRIOonlyResources_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOonlyResources_"), &drv);
 
 	irioResources_t res;
 	getResources(&drv, &res);
@@ -298,7 +298,7 @@ TEST(FlexRIO, ResourcesMissing) {
 TEST(FlexRIO, StartFPGA) {
     irioDrv_t drv;
 
-    initDriver(std::string("FlexRIOnoModule_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	TStatus status;
@@ -318,7 +318,7 @@ TEST(FlexRIO, GetSetAuxAIO32) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(std::string("FlexRIOnoModule_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	// Initialize random engine
@@ -365,7 +365,7 @@ TEST(FlexRIO, GetSetAuxAIO64) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(std::string("FlexRIOnoModule_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	// Initialize random engine
@@ -412,7 +412,7 @@ TEST(FlexRIO, GetSetAuxDIO) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(std::string("FlexRIOnoModule_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	for (int i = 0; i < 6; ++i) {
@@ -451,7 +451,7 @@ TEST(FlexRIO, GetDevTemp) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(std::string("FlexRIOnoModule_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	if (verbose_test) cout << "[TEST] Reading temperature from device" << endl;
@@ -499,7 +499,7 @@ TEST(FlexRIO, GetSetDebugMode) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(std::string("FlexRIOMod5761_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 
 	// Setting debug mode
@@ -523,7 +523,7 @@ TEST(FlexRIO, GetSetSGSignalType) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(std::string("FlexRIOMod5761_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -545,7 +545,7 @@ TEST(FlexRIO, GetSetEnableAO0) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(std::string("FlexRIOMod5761_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 
 	if (verbose_test) cout << "[TEST] Setting EnableAO0 to 1" << endl;
@@ -577,7 +577,7 @@ TEST(FlexRIO, GetSetAO0) {
 	std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
 	std::uniform_int_distribution<int32_t> dist(min + 1, max - 1);
 
-    initDriver(std::string("FlexRIOMod5761_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -625,7 +625,7 @@ TEST(FlexRIO, CleanDMA) {
 	TStatus status;
 	irio_initStatus(&status);
 
-    initDriver(std::string("FlexRIOMod5761_"), &drv);
+    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	DMAHost::cleanDMA(&drv);
@@ -637,7 +637,7 @@ TEST(FlexRIO, SetupDMAToHost) {
 	TStatus status;
 	irio_initStatus(&status);
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	DMAHost::setupDMA(&drv);
@@ -654,7 +654,7 @@ TEST(FlexRIO, GetSetDMAToHostSamplingRate) {
 	int32_t sampling_rate = 500000; // 50ksps (max 125Msps)
 	if (verbose_test) cout << "[TEST] Sampling rate = " << sampling_rate << endl;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -678,7 +678,7 @@ TEST(FlexRIO, GetSetAICoupling) {
 	int32_t sampling_rate = 500000; // 50ksps (max 125Msps)
 	if (verbose_test) cout << "[TEST] Sampling rate = " << sampling_rate << endl;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -699,7 +699,7 @@ TEST(FlexRIO, GetSetDMAToHostEnable) {
 	irio_initStatus(&status);
 	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -720,7 +720,7 @@ TEST(FlexRIO, GetSetDAQStartStop) {
 	irio_initStatus(&status);
 	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -742,7 +742,7 @@ TEST(FlexRIO, GetDMAToHostParameters) {
 	irio_initStatus(&status);
 	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -779,7 +779,7 @@ TEST(FlexRIO, ReadDMADCNoTimeout) {
 	int channel = 2;
 	int desired_value = 2048;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
@@ -841,7 +841,7 @@ TEST(FlexRIO, ReadDMADCTimeout) {
 	int channel = 2;
 	int desired_value = 2048;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
@@ -900,7 +900,7 @@ TEST(FlexRIO, GetSetSGUpdateRate) {
 	int update_rate = 10000000; // 10 MSps
 	int channel = 0;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -927,7 +927,7 @@ TEST(FlexRIO, GetSetSGSignalFreq) {
 	int update_rate = 10000000; // 10 MSps
 	int channel = 0;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -954,7 +954,7 @@ TEST(FlexRIO, GetSetSGSignalAmp) {
 	int sig_amp = 4096; // 0.517563 V
 	int channel = 0;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -989,7 +989,7 @@ TEST(FlexRIO, ReadDMASineNoTimeout) {
 	int compare_samples = 100;
 	double corr_threshold = 0.99;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
@@ -1058,7 +1058,7 @@ TEST(FlexRIO, ReadDMASineTimeout) {
 	int compare_samples = 100;
 	double corr_threshold = 0.99;
 
-	initDriver(std::string("FlexRIOMod5761_"), &drv);
+	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
