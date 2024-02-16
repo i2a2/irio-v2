@@ -1108,3 +1108,43 @@ TEST(FlexRIO, ReadDMASineTimeout) {
 	DMAHost::cleanDMA(&drv);
 	closeDriver(&drv);
 }
+
+/**
+ * TP-IRL-3003   Checking for FlexRIO PXIe7961/NI6581 digital I/O using FlexRIOModule6581 template
+ * 
+ * This test checks the iRIO library functions: irio_setDO, irio_getDI, irio_getDO.
+ * 
+ * Implemented in:
+ * - 
+*/
+TEST(FlexRIO, GetSetAuxDIO6581) {
+    irioDrv_t drv;
+	int st = 0;
+	int auxN = 6; // Test on AuxDIO6
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+	startFPGA(&drv);
+
+	for (int32_t b: {0, 1}) {
+		if (verbose_test) cout << "[TEST] Writing " << b << " to AuxDO" << auxN << endl; 
+		st = irio_setAuxDO(&drv, auxN, b, &status);	
+		logErrors(st, status);
+		EXPECT_EQ(st, IRIO_success);
+		irio_resetStatus(&status);
+		if (verbose_test) cout <<  "[TEST] Write " << (st ? "unsuccessful" : "successful") << endl;
+
+		if (verbose_test) cout << "[TEST] Reading from AuxDI" << auxN << endl;
+		int32_t reading = -1;
+		st = irio_getAuxDO(&drv, auxN, &reading, &status);
+		logErrors(st, status);
+		EXPECT_EQ(st, IRIO_success);
+		EXPECT_EQ(reading, b);
+		irio_resetStatus(&status);
+		if (verbose_test) cout << "[TEST] Got " << reading << " from AuxDI" << auxN << endl;
+	}
+
+    closeDriver(&drv);
+}
