@@ -1185,3 +1185,37 @@ TEST(FlexRIO, GetSetDIO) {
 
     closeDriver(&drv);
 }
+
+/**
+ * TP-IRL-3004    iRIO library functions checking for FlexRIO template FlexRIOMod1483-7966
+ * 
+ * This test checks the iRIO library functions: irio_setUARTBaudRate, irio_sendCLuart, 
+ * irio_getCLuart and irio_getDMATtoHOSTImage.  This test verifies: The image acquisition
+ * using the FlexRIO PXIe-7966R + NI 1483 bundle and the CameraLink Simulator. The simulator
+ * will be configured to send test images with an embedded frame counter. Using the library,
+ * 1000 images will be acquired from the camera and check the integrity of the frame counter
+ * value during the acquisition.  The UART communication between FlexRIO and CameraLink
+ * Simulator. The simulator is configured to echo every message received back to the FlexRIO.
+ * Then, a message is sent and wait to receive a response. Finally the messages sent and
+ * received are compared.
+ * 
+ * Implemented in:
+ * - InitConfigCL
+*/
+TEST(FlexRIO, InitConfigCL) {
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+
+	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
+	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful");
+
+    closeDriver(&drv);
+}
