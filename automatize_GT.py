@@ -39,6 +39,7 @@ parser.add_argument('-f', '--filter', help='Filter the text execution', )
 parser.add_argument('-l', '--list', help='List all the tests', action='store_true')
 parser.add_argument('-S', '--summary',help='Summarize the execution', action='store_true')
 parser.add_argument('-p', '--perf', help='Test performance', action='store_true')
+parser.add_argument('--max-counter',help='Max counter for the IMAQ tests',default='65536')
 
 args = parser.parse_args()
 
@@ -85,7 +86,11 @@ env -S RIODevice={args.RIODevice} \
 env -S VerboseInit={int(args.verbose_init or args.verbose)} \
 env -S VerboseTest={int(args.verbose_test or args.verbose)} \
 env -S Coupling={args.coupling} \
+env -S maxCounter={args.max_counter} \
 ./{binary}{gfilter}{giterations}{gshuffle}{summary}" 
+
+if args.verbose or args.verbose_test:
+    print(f"Running command: {command}")
 
 # Runnning tests
 os.chdir(os.getcwd()+path)

@@ -1201,6 +1201,7 @@ TEST(FlexRIO, GetSetDIO) {
  * 
  * Implemented in:
  * - InitConfigCL
+ * - GetImages
 */
 TEST(FlexRIO, InitConfigCL) {
     irioDrv_t drv;
@@ -1215,7 +1216,65 @@ TEST(FlexRIO, InitConfigCL) {
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
-	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful");
+	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful") << endl;
+
+    closeDriver(&drv);
+}
+TEST(FlexRIO, GetImages) {
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+    int maxCounter = std::stoi(TestUtilsIRIO::getEnvVar("maxCounter"));
+
+	const int totalImages = 1000;
+	const int dmaN = 0;
+	const int imageWidth = 256, imageHeight = 256;
+	std::unique_ptr<uint64_t[]> buffer(new uint64_t[imageWidth * imageHeight / 8]);
+
+    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+
+	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
+	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful") << endl;
+	irio_resetStatus(&status);
+
+	startFPGA(&drv);
+
+	if (verbose_test) {
+		cout << "[TEST] Reading " << totalImages << " images from DMA" << dmaN << ". Images are " << imageWidth << "x" << imageHeight << " pixels and have " << drv.DMATtoHOSTSampleSize[dmaN] << " bits per pixel." << endl;
+	}
+
+	DMAHost::setEnable(&drv, dmaN, 1);
+	DMAHost::setDAQStartStop(&drv, 1);
+
+	int imageCount = 0;
+	int readCount = -1;
+	uint16_t current_counter = 0, last_counter = 0;
+	
+	st = IRIO_success;
+	while (imageCount < totalImages && st == IRIO_success) {
+		st |= irio_getDMATtoHostImage(&drv, imageHeight * imageWidth, dmaN, buffer.get(), &readCount, &status);
+		logErrors(st, status);
+		EXPECT_EQ(st, IRIO_success);
+
+		if (readCount == imageHeight * imageWidth) {
+			current_counter = reinterpret_cast<uint16_t*>(buffer.get())[0]; // Assuming the counter is the first two bytes
+			if (imageCount != 0 && (last_counter + 1)%maxCounter != current_counter) { // Don't compare first image
+				if (verbose_test) std::cerr << "[TEST] Error on image " << imageCount << " counter" << endl;
+				EXPECT_EQ((last_counter + 1)%maxCounter, current_counter); // Alredy tested, only to print formatted 
+			}
+			if (verbose_test) cout << "[TEST] Frame " << std::setw(3) << std::setfill('0') << imageCount << ": Counter = " <<  current_counter << endl;
+			last_counter = current_counter;
+			imageCount++;
+		} else {
+			usleep(1000);
+		}
+	}
+	EXPECT_EQ(st, IRIO_success);
 
     closeDriver(&drv);
 }
