@@ -1204,6 +1204,7 @@ TEST(FlexRIO, GetSetDIO) {
  * - GetImages
  * - GetUARTBaudRate
  * - GetUARTBreakIndicator
+ * - GetUARTFrammingError
 */
 TEST(FlexRIO, InitConfigCL) {
     irioDrv_t drv;
@@ -1333,6 +1334,33 @@ TEST(FlexRIO, GetUARTBreakIndicator) {
 	EXPECT_NE(uartBI, -1);
 	irio_resetStatus(&status);
 	if (verbose_test) cout << "[TEST] UARTBreakIndicator = " << uartBI << endl;
+
+    closeDriver(&drv);
+}
+TEST(FlexRIO, GetUARTFrammingError) {
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+
+	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
+	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful") << endl;
+
+	if (verbose_test) cout << "[TEST] Reading UARTBreakIndicator" << endl;
+	int32_t uartFE = -1;
+	st = irio_getUARTFrammingError(&drv, &uartFE, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_NE(uartFE, -1);
+	irio_resetStatus(&status);
+	if (verbose_test) cout << "[TEST] UARTFrammingError = " << uartFE << endl;
 
     closeDriver(&drv);
 }
