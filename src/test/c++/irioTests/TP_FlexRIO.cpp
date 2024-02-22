@@ -1207,6 +1207,7 @@ TEST(FlexRIO, GetSetDIO) {
  * - GetUARTFrammingError
  * - GetUARTOverrunError
  * - SetUARTBaudRate
+ * - SendCLUART
 */
 TEST(FlexRIO, InitConfigCL) {
     irioDrv_t drv;
@@ -1430,5 +1431,47 @@ TEST(FlexRIO, SetUARTBaudRate) {
 	irio_resetStatus(&status);
 	if (verbose_test) cout << "[TEST] UARTBaudRate = " << uartBR << " => Baud Rate = " << baudRateConversion[uartBR] << " sps" << endl;
 
+    closeDriver(&drv);
+}
+TEST(FlexRIO, SendCLUART) {
+	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // baud
+	const int targetBR = 0;
+
+	const string charactersToSend = "HELO\n";
+
+    irioDrv_t drv;
+	int st = 0;
+	TStatus status;
+	irio_initStatus(&status);
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+
+	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
+	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful") << endl;
+
+	DMAHost::setupDMA(&drv);
+	startFPGA(&drv);
+
+	if (verbose_test) cout << "[TEST] Setting UARTBaudRate to " << baudRateConversion[targetBR] << " baud" << endl;
+	st = irio_setUARTBaudRate(&drv, targetBR, &status);
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful") << endl;
+
+	if (verbose_test) cout << "[TEST] Sending the message: " << charactersToSend << endl;
+	st = irio_sendCLuart(&drv, charactersToSend.c_str(), charactersToSend.length(), &status );
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+
+	cout << "[TEST] Message send " << (st ? "unsuccessfully" : "successfully. Check EDTpdv terminal application") << endl;
+
+	sleep(1);
     closeDriver(&drv);
 }
