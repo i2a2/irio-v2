@@ -26,13 +26,6 @@ using namespace TestUtilsIRIO;
 using std::cout; 
 using std::endl;
 
-// Test init and close functions
-TEST(FlexRIO, InitClose) {
-    irioDrv_t drv;
-    initFlexRIODriver("FlexRIOnoModule_", &drv);
-    closeDriver(&drv);
-}
-
 /**
  * TP-IRL-3000 Checking for FlexRIO basic initialization and close functions.
  * 
@@ -44,12 +37,18 @@ TEST(FlexRIO, InitClose) {
  * configuration.
  *
  * Implemented in tests:
- * - ResourcesCPUDAQ
- * - ResourcesCPUIMAQ
- * - ResourcesMAXIO
- * - ResourcesMissing
+ * - FlexRIOResources.InitClose
+ * - FlexRIOResources.ResourcesCPUDAQ
+ * - FlexRIOResources.ResourcesCPUIMAQ
+ * - FlexRIOResources.ResourcesMAXIO
+ * - FlexRIOResources.ResourcesMissing
  */
-TEST(FlexRIO, ResourcesCPUDAQ) {
+TEST(FlexRIOResources, InitClose) {
+    irioDrv_t drv;
+    initFlexRIODriver("FlexRIO_CPUDAQ_", &drv);
+    closeDriver(&drv);
+}
+TEST(FlexRIOResources, ResourcesCPUDAQ) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
@@ -92,7 +91,7 @@ TEST(FlexRIO, ResourcesCPUDAQ) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, ResourcesIMAQ) {
+TEST(FlexRIOResources, ResourcesIMAQ) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
@@ -132,7 +131,7 @@ TEST(FlexRIO, ResourcesIMAQ) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, ResourcesMAXIO) {
+TEST(FlexRIOResources, ResourcesMAXIO) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
@@ -172,7 +171,7 @@ TEST(FlexRIO, ResourcesMAXIO) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, ResourcesMissing) {
+TEST(FlexRIOResources, ResourcesMissing) {
 	irioDrv_t drv;
 
 	// Manual initialization to load a failResources file and test for error instead of success
@@ -289,13 +288,19 @@ TEST(FlexRIO, ResourcesMissing) {
  * described in the FlexRIO template FlexRIOnoModule
  * 
  * Implemented in tests:
- * - StartFPGA
- * - GetSetAuxAIO32
- * - GetSetAuxAIO64
- * - GetSetAuxDIO
- * - GetDevTemp
+ * - FlexRIOnoModule.InitClose
+ * - FlexRIOnoModule.StartFPGA
+ * - FlexRIOnoModule.GetSetAuxAIO32
+ * - FlexRIOnoModule.GetSetAuxAIO64
+ * - FlexRIOnoModule.GetSetAuxDIO
+ * - FlexRIOnoModule.GetDevTemp
 */
-TEST(FlexRIO, StartFPGA) {
+TEST(FlexRIOnoModule, InitClose) {
+    irioDrv_t drv;
+    initFlexRIODriver("FlexRIOnoModule_", &drv);
+    closeDriver(&drv);
+}
+TEST(FlexRIOnoModule, StartFPGA) {
     irioDrv_t drv;
 
     initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
@@ -311,7 +316,7 @@ TEST(FlexRIO, StartFPGA) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetAuxAIO32) {
+TEST(FlexRIOnoModule, GetSetAuxAIO32) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -358,7 +363,7 @@ TEST(FlexRIO, GetSetAuxAIO32) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetAuxAIO64) {
+TEST(FlexRIOnoModule, GetSetAuxAIO64) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -405,7 +410,7 @@ TEST(FlexRIO, GetSetAuxAIO64) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetAuxDIO) {
+TEST(FlexRIOnoModule, GetSetAuxDIO) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -445,7 +450,7 @@ TEST(FlexRIO, GetSetAuxDIO) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetDevTemp) {
+TEST(FlexRIOnoModule, GetDevTemp) {
     irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
@@ -473,26 +478,47 @@ TEST(FlexRIO, GetDevTemp) {
  * irio_getDMATtoHostData, irio_setDebugMode, irio_getDMATtoHostOverflow.
  * 
  * Implemented in:
- * - GetSetDebugMode
- * - GetSetSGSignalType
- * - GetSetEnableAO0
- * - GetSetAO0
- * - CleanDMA
- * - SetupDMAToHost
- * - GetSetDMAToHostSamplingRate
- * - GetSetAICoupling
- * - GetSetDMAToHostEnable
- * - GetSetDAQStartStop
- * - GetDMAToHostParameters
- * - ReadDMADCNoTimeout
- * - ReadDMADCTimeout
- * - GetSetSGUpdateRate
- * - GetSetSGSignalFreq
- * - GetSetSGSignalAmp
- * - ReadDMASineTimeout
- * - ReadDMASineNoTimeout
+ * - FlexRIODAQ5761.GetSetDebugMode
+ * - FlexRIODAQ5761.GetSetSGSignalType
+ * - FlexRIODAQ5761.GetSetEnableAO0
+ * - FlexRIODAQ5761.GetSetAO0
+ * - FlexRIODAQ5761.CleanDMA
+ * - FlexRIODAQ5761.SetupDMAToHost
+ * - FlexRIODAQ5761.GetSetDMAToHostSamplingRate
+ * - FlexRIODAQ5761.GetSetAICoupling
+ * - FlexRIODAQ5761.GetSetDMAToHostEnable
+ * - FlexRIODAQ5761.GetSetDAQStartStop
+ * - FlexRIODAQ5761.GetDMAToHostParameters
+ * - FlexRIODAQ5761.ReadDMADCNoTimeout
+ * - FlexRIODAQ5761.ReadDMADCTimeout
+ * - FlexRIODAQ5761.GetSetSGUpdateRate
+ * - FlexRIODAQ5761.GetSetSGSignalFreq
+ * - FlexRIODAQ5761.GetSetSGSignalAmp
+ * - FlexRIODAQ5761.ReadDMASineTimeout
+ * - FlexRIODAQ5761.ReadDMASineNoTimeout
 */
-TEST(FlexRIO, GetSetDebugMode) {
+TEST(FlexRIODAQ5761, InitClose) {
+    irioDrv_t drv;
+    initFlexRIODriver("FlexRIOMod5761_", &drv);
+    closeDriver(&drv);
+}
+TEST(FlexRIODAQ5761, StartFPGA) {
+    irioDrv_t drv;
+
+    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	startFPGA(&drv);
+
+	TStatus status;
+	irio_initStatus(&status);
+	int running = 0;
+	int st = irio_getFPGAStart(&drv, &running, &status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(running, 1);
+	irio_resetStatus(&status);
+
+    closeDriver(&drv);
+}
+TEST(FlexRIODAQ5761, GetSetDebugMode) {
 	int st = 0;
     irioDrv_t drv;
 	TStatus status;
@@ -516,7 +542,7 @@ TEST(FlexRIO, GetSetDebugMode) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetSGSignalType) {
+TEST(FlexRIODAQ5761, GetSetSGSignalType) {
 	int st = 0;
     irioDrv_t drv;
 	TStatus status;
@@ -538,7 +564,7 @@ TEST(FlexRIO, GetSetSGSignalType) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetEnableAO0) {
+TEST(FlexRIODAQ5761, GetSetEnableAO0) {
 	int st = 0;
     irioDrv_t drv;
 	TStatus status;
@@ -565,7 +591,7 @@ TEST(FlexRIO, GetSetEnableAO0) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetAO0) {
+TEST(FlexRIODAQ5761, GetSetAO0) {
 	int st = 0;
     irioDrv_t drv;
 	TStatus status;
@@ -620,7 +646,7 @@ TEST(FlexRIO, GetSetAO0) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, CleanDMA) {
+TEST(FlexRIODAQ5761, CleanDMA) {
     irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
@@ -632,7 +658,7 @@ TEST(FlexRIO, CleanDMA) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, SetupDMAToHost) {
+TEST(FlexRIODAQ5761, SetupDMAToHost) {
 	irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
@@ -644,7 +670,7 @@ TEST(FlexRIO, SetupDMAToHost) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetDMAToHostSamplingRate) {
+TEST(FlexRIODAQ5761, GetSetDMAToHostSamplingRate) {
 	irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -669,7 +695,7 @@ TEST(FlexRIO, GetSetDMAToHostSamplingRate) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetAICoupling) {
+TEST(FlexRIODAQ5761, GetSetAICoupling) {
 	irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
@@ -693,7 +719,7 @@ TEST(FlexRIO, GetSetAICoupling) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetDMAToHostEnable) {
+TEST(FlexRIODAQ5761, GetSetDMAToHostEnable) {
 	irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
@@ -714,7 +740,7 @@ TEST(FlexRIO, GetSetDMAToHostEnable) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetDAQStartStop) {
+TEST(FlexRIODAQ5761, GetSetDAQStartStop) {
 	irioDrv_t drv;
 	TStatus status;
 	irio_initStatus(&status);
@@ -735,7 +761,7 @@ TEST(FlexRIO, GetSetDAQStartStop) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetDMAToHostParameters) {
+TEST(FlexRIODAQ5761, GetDMAToHostParameters) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = 0;
@@ -766,7 +792,7 @@ TEST(FlexRIO, GetDMAToHostParameters) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, ReadDMADCNoTimeout) {
+TEST(FlexRIODAQ5761, ReadDMADCNoTimeout) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = IRIO_success;
@@ -828,7 +854,7 @@ TEST(FlexRIO, ReadDMADCNoTimeout) {
 	DMAHost::cleanDMA(&drv);
 	closeDriver(&drv);
 }
-TEST(FlexRIO, ReadDMADCTimeout) {
+TEST(FlexRIODAQ5761, ReadDMADCTimeout) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = IRIO_success;
@@ -890,7 +916,7 @@ TEST(FlexRIO, ReadDMADCTimeout) {
 	DMAHost::cleanDMA(&drv);
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetSGUpdateRate) {
+TEST(FlexRIODAQ5761, GetSetSGUpdateRate) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = IRIO_success;
@@ -916,7 +942,7 @@ TEST(FlexRIO, GetSetSGUpdateRate) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetSGSignalFreq) {
+TEST(FlexRIODAQ5761, GetSetSGSignalFreq) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = IRIO_success;
@@ -944,7 +970,7 @@ TEST(FlexRIO, GetSetSGSignalFreq) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetSGSignalAmp) {
+TEST(FlexRIODAQ5761, GetSetSGSignalAmp) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = IRIO_success;
@@ -970,7 +996,7 @@ TEST(FlexRIO, GetSetSGSignalAmp) {
 
 	closeDriver(&drv);
 }
-TEST(FlexRIO, ReadDMASineNoTimeout) {
+TEST(FlexRIODAQ5761, ReadDMASineNoTimeout) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = IRIO_success;
@@ -1039,7 +1065,7 @@ TEST(FlexRIO, ReadDMASineNoTimeout) {
 	DMAHost::cleanDMA(&drv);
 	closeDriver(&drv);
 }
-TEST(FlexRIO, ReadDMASineTimeout) {
+TEST(FlexRIODAQ5761, ReadDMASineTimeout) {
 	irioDrv_t drv;
 	TStatus status;
 	int st = IRIO_success;
@@ -1115,10 +1141,33 @@ TEST(FlexRIO, ReadDMASineTimeout) {
  * This test checks the iRIO library functions: irio_setDO, irio_getDI, irio_getDO.
  * 
  * Implemented in:
- * - GetSetAuxDIO6581
- * - GetSetDIO
+ * - FlexRIODIO6181.InitClose
+ * - FlexRIODIO6181.StartFPGA
+ * - FlexRIODIO6181.GetSetAuxDIO6581
+ * - FlexRIODIO6181.GetSetDIO
 */
-TEST(FlexRIO, GetSetAuxDIO6581) {
+TEST(FlexRIODIO6181, InitClose) {
+    irioDrv_t drv;
+    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+    closeDriver(&drv);
+}
+TEST(FlexRIODIO6181, StartFPGA) {
+    irioDrv_t drv;
+
+    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+	startFPGA(&drv);
+
+	TStatus status;
+	irio_initStatus(&status);
+	int running = 0;
+	int st = irio_getFPGAStart(&drv, &running, &status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(running, 1);
+	irio_resetStatus(&status);
+
+    closeDriver(&drv);
+}
+TEST(FlexRIODIO6581, GetSetAuxDIO6581) {
     irioDrv_t drv;
 	int st = 0;
 	int auxN = 6; // Test on AuxDIO6
@@ -1146,7 +1195,7 @@ TEST(FlexRIO, GetSetAuxDIO6581) {
 	}
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetSetDIO) {
+TEST(FlexRIODIO6581, GetSetDIO) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1200,17 +1249,40 @@ TEST(FlexRIO, GetSetDIO) {
  * received are compared.
  * 
  * Implemented in:
- * - InitConfigCL
- * - GetImages
- * - GetUARTBaudRate
- * - GetUARTBreakIndicator
- * - GetUARTFrammingError
- * - GetUARTOverrunError
- * - SetUARTBaudRate
- * - SendCLUART
- * - GetCLUART
+ * - FlexRIOIMAQ1483.InitClose
+ * - FlexRIOIMAQ1483.StartFPGA
+ * - FlexRIOIMAQ1483.InitConfigCL
+ * - FlexRIOIMAQ1483.GetImages
+ * - FlexRIOIMAQ1483.GetUARTBaudRate
+ * - FlexRIOIMAQ1483.GetUARTBreakIndicator
+ * - FlexRIOIMAQ1483.GetUARTFrammingError
+ * - FlexRIOIMAQ1483.GetUARTOverrunError
+ * - FlexRIOIMAQ1483.SetUARTBaudRate
+ * - FlexRIOIMAQ1483.SendCLUART
+ * - FlexRIOIMAQ1483.GetCLUART
 */
-TEST(FlexRIO, InitConfigCL) {
+TEST(FlexRIOIMAQ1483, InitClose) {
+    irioDrv_t drv;
+    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    closeDriver(&drv);
+}
+TEST(FlexRIOIMAQ1483, StartFPGA) {
+    irioDrv_t drv;
+
+    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+	startFPGA(&drv);
+
+	TStatus status;
+	irio_initStatus(&status);
+	int running = 0;
+	int st = irio_getFPGAStart(&drv, &running, &status);
+	EXPECT_EQ(st, IRIO_success);
+	EXPECT_EQ(running, 1);
+	irio_resetStatus(&status);
+
+    closeDriver(&drv);
+}
+TEST(FlexRIOIMAQ1483, InitConfigCL) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1227,7 +1299,7 @@ TEST(FlexRIO, InitConfigCL) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetImages) {
+TEST(FlexRIOIMAQ1483, GetImages) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1285,7 +1357,7 @@ TEST(FlexRIO, GetImages) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetUARTBaudRate) {
+TEST(FlexRIOIMAQ1483, GetUARTBaudRate) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // sps
 	
     irioDrv_t drv;
@@ -1314,7 +1386,7 @@ TEST(FlexRIO, GetUARTBaudRate) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetUARTBreakIndicator) {
+TEST(FlexRIOIMAQ1483, GetUARTBreakIndicator) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1341,7 +1413,7 @@ TEST(FlexRIO, GetUARTBreakIndicator) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetUARTFrammingError) {
+TEST(FlexRIOIMAQ1483, GetUARTFrammingError) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1368,7 +1440,7 @@ TEST(FlexRIO, GetUARTFrammingError) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetUARTOverrunError) {
+TEST(FlexRIOIMAQ1483, GetUARTOverrunError) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1395,7 +1467,7 @@ TEST(FlexRIO, GetUARTOverrunError) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, SetUARTBaudRate) {
+TEST(FlexRIOIMAQ1483, SetUARTBaudRate) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // sps
 	const int targetBR = 0;
 	
@@ -1434,7 +1506,7 @@ TEST(FlexRIO, SetUARTBaudRate) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIO, SendCLUART) {
+TEST(FlexRIOIMAQ1483, SendCLUART) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // baud
 	const int targetBR = 0;
 
@@ -1476,7 +1548,7 @@ TEST(FlexRIO, SendCLUART) {
 	sleep(1);
     closeDriver(&drv);
 }
-TEST(FlexRIO, GetCLUART) {
+TEST(FlexRIOIMAQ1483, GetCLUART) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // baud
 	const int targetBR = 0;
 	const int msgsize = 11;
