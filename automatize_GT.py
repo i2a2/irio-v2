@@ -72,12 +72,12 @@ parser.add_argument('-l', '--list', help='List all the tests', action='store_tru
 parser.add_argument('-S', '--summary',help='Summarize the execution', action='store_true')
 parser.add_argument('-p', '--perf', help='Test performance', action='store_true')
 parser.add_argument('--max-counter',help='Max counter for the IMAQ tests',default='65536')
-parser.add_argument('TESTPLAN', help='XML file that contains the test plan', nargs='?')
-parser.add_argument('RESULTFILE', help='XML file that contains the results of the plan. If a value is not provided, the same file is used', nargs='?')
+parser.add_argument('--input-config-file', help='XML file that contains the test plan', nargs='?')
+parser.add_argument('--results-file', help='XML file that contains the results of the plan. If a value is not provided, the same file is used', nargs='?')
 
 args = parser.parse_args()
 
-if args.TESTPLAN is None:
+if args.input_config_file is None:
     # Parameters
     if args.perf:
         binary = "perf-test"
@@ -131,12 +131,12 @@ if args.TESTPLAN is None:
     os.chdir(os.getcwd()+path)
     os.system(command)
 else:
-    if not os.path.exists(args.TESTPLAN):
-        print(f"Could not find the file {args.TESTPLAN}")
+    if not os.path.exists(args.input_config_file):
+        print(f"Could not find the file {args.input_config_file}")
         exit(-1)
     originaldir = os.getcwd()
 
-    tree = minidom.parse(args.TESTPLAN)
+    tree = minidom.parse(args.input_config_file)
     os.chdir(os.getcwd()+"/target/test/c++/irioTests/")
 
     for test in tree.getElementsByTagName('test'):
@@ -175,6 +175,6 @@ else:
         test.appendChild(summaryElement)
 
     os.chdir(originaldir)
-    targetFile = args.RESULTFILE if args.RESULTFILE is not None else args.TESTPLAN
+    targetFile = args.results_file if args.results_file is not None else args.input_config_file
     with open(targetFile, 'wt') as fd:
         fd.write("".join([s for s in tree.toprettyxml().strip().splitlines(True) if s.strip("\r\n").strip()]))
