@@ -39,18 +39,30 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="moduleType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="noModule" />
+            <xs:enumeration value="NI5761" />
+            <xs:enumeration value="NI5781" />
+            <xs:enumeration value="NI6581" />
+            <xs:enumeration value="NI5734" />
+            <xs:enumeration value="NI92xx" />
+        </xs:restriction>
+    </xs:simpleType>
+
     <xs:complexType name="testType">
-        <xs:sequence>
+        <xs:all>
             <xs:element name="name"              type="xs:string"/>
             <xs:element name="TestFilter"        type="xs:string"/>
-            <xs:element name="RIODevice"         type="RIODeviceType"/> <!-- Could be optional -->
+            <xs:element name="RIODevice"         type="RIODeviceType"/>
             <xs:element name="RIOSerial"         type="RIOSerialType"/>
+            <xs:element name="RIOModule"         type="moduleType" />
             <xs:element name="verbose"           type="xs:boolean"     minOccurs="0"/>
             <xs:element name="coupling"          type="couplingType"   minOccurs="0"/>
             <xs:element name="maxIMAQiterations" type="xs:unsignedInt" minOccurs="0"/>
             <xs:element name="results"           type="resultsType"    minOccurs="0"/>
             <xs:element name="summary"           type="summaryType"    minOccurs="0"/>
-        </xs:sequence>
+        </xs:all>
     </xs:complexType>
 
     <xs:element name="testplan">
