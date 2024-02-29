@@ -86,7 +86,7 @@ void TestUtilsIRIO::initFlexRIODriver(string bitfile_prefix, irioDrv_t* drv) {
                          verbose_init, filePath.c_str(), filePath.c_str(), drv,
                          &status);
     TestUtilsIRIO::logErrors(st, status);
-    EXPECT_EQ(st, IRIO_success);
+    ASSERT_EQ(st, IRIO_success);
     if (verbose_test) cout << "[TEST] Driver initialized " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
 }
 
