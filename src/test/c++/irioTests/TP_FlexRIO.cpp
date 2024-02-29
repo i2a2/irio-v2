@@ -1146,12 +1146,12 @@ TEST(FlexRIODAQ5761, ReadDMASineTimeout) {
  * - FlexRIODIO6181.GetSetAuxDIO6581
  * - FlexRIODIO6181.GetSetDIO
 */
-TEST(FlexRIODIO6181, InitClose) {
+TEST(FlexRIODIO6581, InitClose) {
     irioDrv_t drv;
     initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
     closeDriver(&drv);
 }
-TEST(FlexRIODIO6181, StartFPGA) {
+TEST(FlexRIODIO6581, StartFPGA) {
     irioDrv_t drv;
 
     initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
