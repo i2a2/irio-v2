@@ -31,12 +31,11 @@ env -S VerboseTest={1 if Verbose=='true' else 0} \
 env -S Coupling={Coupling} \
 env -S maxCounter={MaxCounter} \
     ./{binary} --gtest_filter={filterText}" 
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True, bufsize=1)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, bufsize=1)
     while True:
         line = process.stdout.readline().rstrip()
 
-        # TODO: This creates an infinite loop if the command is incorrect
-        if not line and passed is not None:
+        if not line and process.poll() is not None:
             break
 
         if line: 
