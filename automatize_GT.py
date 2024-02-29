@@ -144,6 +144,9 @@ else:
         RIODevice  = test.getElementsByTagName('RIODevice')[0].firstChild.data
         RIOSerial  = test.getElementsByTagName('RIOSerial')[0].firstChild.data
 
+        if "UART" in filterText:
+            print("\033[91m[TEST] Warning: The UART tests need human interaction \033[00m")
+
         try: # Optional argument
             verbose = test.getElementsByTagName('verbose')[0].firstChild.data
         except:
