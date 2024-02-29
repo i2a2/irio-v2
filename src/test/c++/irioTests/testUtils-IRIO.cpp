@@ -90,6 +90,28 @@ void TestUtilsIRIO::initFlexRIODriver(string bitfile_prefix, irioDrv_t* drv) {
     if (verbose_test) cout << "[TEST] Driver initialized " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
 }
 
+void TestUtilsIRIO::initCRIODriver(string bitfile_prefix, irioDrv_t* drv) {
+    string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
+	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+    int verbose_init = std::stoi(TestUtilsIRIO::getEnvVar("VerboseInit"));
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+	string NIRIOmodel  = "NI " + RIODevice;
+	string bitfileName = bitfile_prefix; // In cRIO, the bitfile name does not contain the Device Model
+	string FPGAversion = "V1.2";
+	string filePath    = "../resources/"+RIODevice+"/";
+    string appCallID   = "Test_" + bitfileName;
+
+	TStatus status;
+	irio_initStatus(&status);
+
+    if (verbose_test) cout << "[TEST] Initializing driver with bitfile \"" << bitfileName << "\"" << endl;
+    int st = irio_initDriver(appCallID.c_str(), RIOSerial.c_str(), NIRIOmodel.c_str(), bitfileName.c_str(), FPGAversion.c_str(), verbose_init, filePath.c_str(), filePath.c_str(), drv, &status);
+    TestUtilsIRIO::logErrors(st, status);
+    ASSERT_EQ(st, IRIO_success);
+    if (verbose_test) cout << "[TEST] Driver initialized " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
+}
+
 void TestUtilsIRIO::closeDriver(irioDrv_t* drv) {
     int st = IRIO_success;
     TStatus status;
