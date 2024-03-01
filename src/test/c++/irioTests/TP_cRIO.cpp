@@ -53,7 +53,19 @@ TEST(cRIO, InitCloseDriver) {
 }
 TEST(cRIO, StartFPGA) {
     irioDrv_t drv;
+    TStatus status;   
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
     initCRIODriver("cRIO_PBP", &drv);
     startFPGA(&drv);
+
+    int32_t start = -1;
+    if (verbose_test) cout << "[TEST] Getting FPGAStart" << endl;
+    int st = irio_getFPGAStart(&drv, &start, &status);
+    logErrors(st, status);
+    if (verbose_test) cout << "[TEST] FPGAStart read = " << start << endl;
+    EXPECT_EQ(st, IRIO_success);
+    EXPECT_EQ(start, 1);
+
     closeDriver(&drv);
 }
