@@ -44,9 +44,16 @@ using std::endl;
  * 
  * Implemented in:
  * - cRIO.InitCloseDriver
+ * - cRIO.StartFPGA
 */
 TEST(cRIO, InitCloseDriver) {
     irioDrv_t drv;
     initCRIODriver("cRIO_PBP", &drv);
+    closeDriver(&drv);
+}
+TEST(cRIO, StartFPGA) {
+    irioDrv_t drv;
+    initCRIODriver("cRIO_PBP", &drv);
+    startFPGA(&drv);
     closeDriver(&drv);
 }
