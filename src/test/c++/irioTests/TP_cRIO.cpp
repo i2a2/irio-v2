@@ -44,11 +44,54 @@ using std::endl;
  * 
  * Implemented in:
  * - cRIO.InitCloseDriver
+ * - cRIO.IOResources
  * - cRIO.StartFPGA
 */
 TEST(cRIO, InitCloseDriver) {
     irioDrv_t drv;
     initCRIODriver("cRIOIO_9159", &drv);
+    closeDriver(&drv);
+}
+TEST(cRIO, IOResources) {
+    irioDrv_t drv;
+    irioResources_t res;
+    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
+
+    initCRIODriver("cRIOIO_9159", &drv);
+    getResources(&drv, &res);
+
+    // Expected resources:
+    // 3 AI
+	if (verbose_test) cout << "[TEST] Found " << res.AI << " AIs. Expected 3" << endl;
+	EXPECT_EQ(res.AI, 3);
+    // 3 AO
+	if (verbose_test) cout << "[TEST] Found " << res.AO << " AOs. Expected 3" << endl;
+	EXPECT_EQ(res.AO, 3);
+    // 3 DI
+	if (verbose_test) cout << "[TEST] Found " << res.DI << " DIs. Expected 3" << endl;
+	EXPECT_EQ(res.DI, 3);
+    // 3 DO
+	if (verbose_test) cout << "[TEST] Found " << res.DO << " DOs. Expected 3" << endl;
+	EXPECT_EQ(res.DO, 3);
+    // 2 auxAI
+	if (verbose_test) cout << "[TEST] Found " << res.auxAI << " auxAIs. Expected 2" << endl;
+	EXPECT_EQ(res.auxAI, 2);
+    // 2 auxAO
+	if (verbose_test) cout << "[TEST] Found " << res.auxAO << " auxAOs. Expected 2" << endl;
+	EXPECT_EQ(res.auxAO, 2);
+    // 2 auxDI
+	if (verbose_test) cout << "[TEST] Found " << res.auxDI << " auxDIs. Expected 2" << endl;
+	EXPECT_EQ(res.auxDI, 2);
+    // 2 auxDO
+	if (verbose_test) cout << "[TEST] Found " << res.auxDO << " auxDOs. Expected 2" << endl;
+	EXPECT_EQ(res.auxDO, 2);
+    // 0 SG
+	if (verbose_test) cout << "[TEST] Found " << res.SG << " SGs. Expected 0" << endl;
+	EXPECT_EQ(res.SG, 0);
+    // 1 Sampling Rate
+	if (verbose_test) cout << "[TEST] Found " << res.samplingRate << " sampling rates. Expected 1" << endl;
+	EXPECT_EQ(res.samplingRate, 1);
+
     closeDriver(&drv);
 }
 TEST(cRIO, StartFPGA) {

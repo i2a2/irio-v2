@@ -30,7 +30,7 @@ void setDebugMode(irioDrv_t* drv, int debug_mode);
 TIRIOCouplingMode setAICoupling(irioDrv_t* drv);
 
 typedef struct {
-    int AI, AO, auxAI, auxAO, DI, DO, auxDI, auxDO, SG, DMA, CLConfig, CLUART;
+    int AI, AO, auxAI, auxAO, DI, DO, auxDI, auxDO, SG, DMA, CLConfig, CLUART, samplingRate;
 } irioResources_t;
 
 void getResources(irioDrv_t* drv, irioResources_t* res);

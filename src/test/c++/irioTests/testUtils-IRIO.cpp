@@ -152,6 +152,9 @@ void TestUtilsIRIO::getResources(irioDrv_t* drv, irioResources_t* res) {
 
 	res->CLConfig = drv->enumConfiguration.found;
 	res->CLUART = drv->enumuartByteMode.found;
+
+    // Only cRIO
+    res->samplingRate = getResourceCount(drv->enumSamplingRate, CRIO_MAX_MODULES);
 }
 
 int TestUtilsIRIO::loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* status) {
