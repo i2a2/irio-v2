@@ -48,7 +48,7 @@ using std::endl;
 */
 TEST(cRIO, InitCloseDriver) {
     irioDrv_t drv;
-    initCRIODriver("cRIO_PBP", &drv);
+    initCRIODriver("cRIOIO_9159", &drv);
     closeDriver(&drv);
 }
 TEST(cRIO, StartFPGA) {
@@ -56,7 +56,7 @@ TEST(cRIO, StartFPGA) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initCRIODriver("cRIO_PBP", &drv);
+    initCRIODriver("cRIOIO_9159", &drv);
     startFPGA(&drv);
 
     int32_t start = -1;
