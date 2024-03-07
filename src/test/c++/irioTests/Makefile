@@ -25,7 +25,6 @@ PROGNAME=driver-irio
 
 TARGET=../../../../target
 SRC=../../../
-COVERAGE=true
 
 LIBRARIES=NiFpga niflexrio irioCore pthread gtest 
 LIBRARY_DIRS=$(TARGET)/lib

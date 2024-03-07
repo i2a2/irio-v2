@@ -27,12 +27,33 @@
 #
 #-======================================================================
 
-SUBDIRS:= src/main/c src/test/c src/test/c++
+SRCDIR  := src/
+COPYDIR := target/
+SUBDIRS := $(COPYDIR)main/c $(COPYDIR)test/c++
 
 BOLD=\e[1m
 NC=\e[0m
 
-all:
+.PHONY: all clean copy build compile coverage debug
 
-%:
-	@$(foreach dir, $(SUBDIRS), echo -e "$(BOLD)Building $(dir:/=)...$(NC)" && $(MAKE) -C $(dir) $@ &&) :
+all: copy build
+
+clean:
+	@echo -e "$(BOLD)Cleaning \"$(COPYDIR)\"...$(NC)"
+	rm -rf $(COPYDIR)
+	@echo "\"$(COPYDIR)\" cleaned."
+
+copy:
+	@echo "Copying $(SRCDIR) to $(COPYDIR)..."
+	rsync -a --inplace $(SRCDIR) $(COPYDIR)
+	@echo "Copying complete."
+
+build: copy
+	@$(foreach dir, $(SUBDIRS), echo -e "$(BOLD)Building $(dir:/=)...$(NC)" && $(MAKE) -C $(dir) $(DEBUG) &&) :
+
+compile: build
+
+coverage:
+	$(MAKE) build DEBUG="COVERAGE=true"
+
+debug: coverage

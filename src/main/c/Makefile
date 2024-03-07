@@ -29,7 +29,7 @@
 
 #SUBDIRS=$(dir $(wildcard */Makefile))
 SUBDIRS:= lib 
-SUBDIRS += examples
+# SUBDIRS += examples
 BOLD=\e[1m
 NC=\e[0m
 

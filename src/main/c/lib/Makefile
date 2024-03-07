@@ -32,7 +32,6 @@ LIBNAME=irioCore
 
 TARGET=../../../../target
 SRC=../../../../src
-COVERAGE=true
 
 LIBRARIES=NiFpga niflexrio
 
@@ -88,6 +87,8 @@ endif
 ifeq ($(COVERAGE),true)
 	CFLAGS+=-O0 -g --coverage
 	LDFLAGS+=--coverage
+else
+	CFLAGS+=-O3
 endif
 
 .PHONY: all clean run 
