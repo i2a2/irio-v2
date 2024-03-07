@@ -420,7 +420,7 @@ void TestUtilsIRIO::SG::setFsig(irioDrv_t* drv, int channel, uint32_t update_rat
     irio_initStatus(&status);
 	// Equation to apply to obtain freq_desired is:
 	// SGFreq = Freq_desired*((2to32)/(Samples/s))
-	int SGFreq = fsig*(UINT_MAX/update_rate);
+	int SGFreq = static_cast<int>(fsig*(UINT_MAX/static_cast<double>(update_rate)));
 	if (verbose_test) cout << "[TEST] Setting SGFreq" << channel << " to " << SGFreq << ", meaning " << fsig << " Hz" << endl;
 	int st = irio_setSGFreq(drv,0,SGFreq,&status);
 	if (verbose_test) cout << "[TEST] SGFreq" << channel << " set " << (st ? "unsuccessfully" : "successfully") << endl;
@@ -447,7 +447,7 @@ double TestUtilsIRIO::sineCorrelation(const std::vector<double>& signal, int f, 
     // Generate sine
     std::vector<double> sine;
     for (int n = 0; n < fs/f; n++) {
-        sine.push_back(sin(static_cast<float>(2)*M_PI*f/fs*n));
+        sine.push_back(sin(2.0*M_PI*f/fs*n));
     }
 
     // Calculate autocorrelation
