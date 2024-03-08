@@ -33,22 +33,24 @@ env -S maxCounter={MaxCounter} \
     ./{binary} --gtest_filter={filterText}" 
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, bufsize=1)
     while True:
-        line = process.stdout.readline().rstrip()
+        line = process.stdout.readline()
 
-        if not line and process.poll() is not None:
-            break
+        if not line:
+           break
 
-        if line: 
-            print(line.decode('utf-8'))
+        line = line.rstrip()
 
-            failmatch = re.findall(r"\[\s+FAILED\s+\] (\d+) test.*", line.decode('utf-8'))
-            if len(failmatch) > 0:
-                failed = int(failmatch[0])
+        print(line.decode('utf-8').rstrip())
 
-            passmatch = re.findall(r"\[\s+PASSED\s+\] (\d+) test.*", line.decode('utf-8'))
-            if len(passmatch) > 0:
-                passed = int(passmatch[0])
+        failmatch = re.findall(r"\[\s+FAILED\s+\] (\d+) test.*", line.decode('utf-8'))
+        if len(failmatch) > 0:
+            failed = int(failmatch[0])
 
+        passmatch = re.findall(r"\[\s+PASSED\s+\] (\d+) test.*", line.decode('utf-8'))
+        if len(passmatch) > 0:
+            passed = int(passmatch[0])
+
+    process.kill()
     return (passed, (failed if failed is not None else 0) + passed, (failed == 0) or (failed is None))
 
 # Parse arguments
