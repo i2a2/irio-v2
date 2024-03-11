@@ -169,12 +169,22 @@ else:
             continue
         
         result = runCommand(filterText, RIODevice, RIOSerial, verbose, coupling, maxIterations)
-        resultElement = tree.createElement("results")
-        resultElement.appendChild(tree.createTextNode(f"{result[0]}/{result[1]}"))
-        test.appendChild(resultElement)
-        summaryElement = tree.createElement("summary")
-        summaryElement.appendChild(tree.createTextNode("PASS" if result[2] else "FAIL"))
-        test.appendChild(summaryElement)
+
+        resultElement = tree.getElementsByTagName("results")
+        if resultElement:
+            resultElement[0].firstChild.data = f"{result[0]}/{result[1]}";
+        else:
+            resultElement = tree.createElement("results")
+            resultElement.appendChild(tree.createTextNode(f"{result[0]}/{result[1]}"))
+            test.appendChild(resultElement)
+
+        summaryElement = tree.getElementsByTagName("summary")
+        if summaryElement:
+            summaryElement[0].firstChild.data = "PASS" if result[2] else "FAIL"
+        else:
+            summaryElement = tree.createElement("summary")
+            summaryElement.appendChild(tree.createTextNode("PASS" if result[2] else "FAIL"))
+            test.appendChild(summaryElement)
 
     os.chdir(originaldir)
     targetFile = args.results_file if args.results_file is not None else args.input_config_file
