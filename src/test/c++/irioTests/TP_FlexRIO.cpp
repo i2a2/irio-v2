@@ -1205,6 +1205,12 @@ TEST(FlexRIODIO6581, GetSetDIO) {
     initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
 	startFPGA(&drv);
 
+	if (verbose_test) cout << "[TEST] Writing true to AuxDO6" << endl; 
+	st = irio_setAuxDO(&drv, 6, 1, &status);	
+	logErrors(st, status);
+	EXPECT_EQ(st, IRIO_success);
+	irio_resetStatus(&status);
+
 	for (int32_t i = 0; i < 8; i++) {
 		for (int32_t b: {0, 1}) {
 			if (verbose_test) cout << "[TEST] Writing " << b << " to DO" << i << endl; 
