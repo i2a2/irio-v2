@@ -1543,6 +1543,9 @@ TEST(FlexRIOUART1483, SendCLUART) {
 	irio_resetStatus(&status);
 	if (verbose_test) cout << "[TEST] Configuration " << (st ? "unsuccessful" : "successful") << endl;
 
+	cout << "[TEST] Open the EDTpdv terminal and press enter here." << endl;
+	std::cin.get();
+
 	if (verbose_test) cout << "[TEST] Sending the message: " << charactersToSend << endl;
 	st = irio_sendCLuart(&drv, charactersToSend.c_str(), charactersToSend.length(), &status );
 	logErrors(st, status);
@@ -1586,14 +1589,17 @@ TEST(FlexRIOUART1483, GetCLUART) {
 
 	int rcvsize = -1;
 	char buffer[msgsize] = {};
-	// TODO: Try to remove the user pressing enter
 	cout << "[TEST] Write a message up to " << msgsize - 1 << " characters on the EDTpdv terminal and press enter here" << endl;
 	std::cin.get();
 	st = irio_getCLuart(&drv, msgsize, buffer, &rcvsize, &status);
 	logErrors(st, status);
 	EXPECT_EQ(st, IRIO_success);
 	irio_resetStatus(&status);
-	cout << "[TEST] Got " << rcvsize - 1 << " characters from UART. Message: " << buffer << endl;
+
+	if (buffer[rcvsize] == '\n') { // Remove last line break 
+		buffer[rcvsize] = '\0';
+	}
+	cout << "[TEST] Message received: " << buffer << " (" << rcvsize << " characters)" << endl;
 
     closeDriver(&drv);
 }
