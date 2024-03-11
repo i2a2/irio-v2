@@ -1259,13 +1259,13 @@ TEST(FlexRIODIO6581, GetSetDIO) {
  * - FlexRIOIMAQ1483.StartFPGA
  * - FlexRIOIMAQ1483.InitConfigCL
  * - FlexRIOIMAQ1483.GetImages
- * - FlexRIOIMAQ1483.GetUARTBaudRate
- * - FlexRIOIMAQ1483.GetUARTBreakIndicator
- * - FlexRIOIMAQ1483.GetUARTFrammingError
- * - FlexRIOIMAQ1483.GetUARTOverrunError
- * - FlexRIOIMAQ1483.SetUARTBaudRate
- * - FlexRIOIMAQ1483.SendCLUART
- * - FlexRIOIMAQ1483.GetCLUART
+ * - FlexRIOUART1483.GetUARTBaudRate
+ * - FlexRIOUART1483.GetUARTBreakIndicator
+ * - FlexRIOUART1483.GetUARTFrammingError
+ * - FlexRIOUART1483.GetUARTOverrunError
+ * - FlexRIOUART1483.SetUARTBaudRate
+ * - FlexRIOUART1483.SendCLUART
+ * - FlexRIOUART1483.GetCLUART
 */
 TEST(FlexRIOIMAQ1483, InitClose) {
     irioDrv_t drv;
@@ -1350,7 +1350,7 @@ TEST(FlexRIOIMAQ1483, GetImages) {
 			current_counter = reinterpret_cast<uint16_t*>(buffer.get())[0]; // Assuming the counter is the first two bytes
 			if (imageCount != 0 && (last_counter + 1)%maxCounter != current_counter) { // Don't compare first image
 				if (verbose_test) std::cerr << "[TEST] Error on image " << imageCount << " counter" << endl;
-				EXPECT_EQ((last_counter + 1)%maxCounter, current_counter); // Alredy tested, only to print formatted 
+				EXPECT_EQ(current_counter, (last_counter + 1)%maxCounter); // Alredy tested, only to print formatted 
 			}
 			if (verbose_test) cout << "[TEST] Frame " << std::setw(3) << std::setfill('0') << imageCount << ": Counter = " <<  current_counter << endl;
 			last_counter = current_counter;
@@ -1363,7 +1363,7 @@ TEST(FlexRIOIMAQ1483, GetImages) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIOIMAQ1483, GetUARTBaudRate) {
+TEST(FlexRIOUART1483, GetUARTBaudRate) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // sps
 	
     irioDrv_t drv;
@@ -1392,7 +1392,7 @@ TEST(FlexRIOIMAQ1483, GetUARTBaudRate) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIOIMAQ1483, GetUARTBreakIndicator) {
+TEST(FlexRIOUART1483, GetUARTBreakIndicator) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1419,7 +1419,7 @@ TEST(FlexRIOIMAQ1483, GetUARTBreakIndicator) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIOIMAQ1483, GetUARTFrammingError) {
+TEST(FlexRIOUART1483, GetUARTFrammingError) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1446,7 +1446,7 @@ TEST(FlexRIOIMAQ1483, GetUARTFrammingError) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIOIMAQ1483, GetUARTOverrunError) {
+TEST(FlexRIOUART1483, GetUARTOverrunError) {
     irioDrv_t drv;
 	int st = 0;
 	TStatus status;
@@ -1473,7 +1473,7 @@ TEST(FlexRIOIMAQ1483, GetUARTOverrunError) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIOIMAQ1483, SetUARTBaudRate) {
+TEST(FlexRIOUART1483, SetUARTBaudRate) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // sps
 	const int targetBR = 0;
 	
@@ -1512,7 +1512,7 @@ TEST(FlexRIOIMAQ1483, SetUARTBaudRate) {
 
     closeDriver(&drv);
 }
-TEST(FlexRIOIMAQ1483, SendCLUART) {
+TEST(FlexRIOUART1483, SendCLUART) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // baud
 	const int targetBR = 0;
 
@@ -1554,7 +1554,7 @@ TEST(FlexRIOIMAQ1483, SendCLUART) {
 	sleep(1);
     closeDriver(&drv);
 }
-TEST(FlexRIOIMAQ1483, GetCLUART) {
+TEST(FlexRIOUART1483, GetCLUART) {
 	const int baudRateConversion[] = { 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 }; // baud
 	const int targetBR = 0;
 	const int msgsize = 11;
