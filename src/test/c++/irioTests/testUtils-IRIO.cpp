@@ -21,6 +21,14 @@ using std::cerr;
 using std::cout;
 using std::endl;
 using std::string;
+using TestUtilsIRIO::IRIOFamily;
+
+static const std::map<string, IRIOFamily> familyMap = {
+	{"7966", IRIOFamily::FlexRIO },
+	{"7965", IRIOFamily::FlexRIO },
+	{"7961", IRIOFamily::FlexRIO },
+	{"9159", IRIOFamily::cRIO }
+};
 
 static int getResourceCount(TResourcePort* arr, int max);
 
@@ -64,16 +72,29 @@ void TestUtilsIRIO::logErrors(const int ret_status, const TStatus& out_status) {
     detailStr = nullptr;
 }
 
-void TestUtilsIRIO::initFlexRIODriver(string bitfile_prefix, irioDrv_t* drv) {
+void TestUtilsIRIO::initDriver(string bitfile_prefix, irioDrv_t* drv) {
     int st = IRIO_success;
 
     int verbose_init = std::stoi(TestUtilsIRIO::getEnvVar("VerboseInit"));
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
     string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
     string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
+	string FPGAversion = "V1.2";
+    string IRIOmodel, bitfileName;
 
-    string NIRIOmodel = "PXIe-" + RIODevice;
-    string bitfileName = bitfile_prefix + RIODevice;
+    switch (TestUtilsIRIO::getIRIOFamily(RIODevice)) {
+        case IRIOFamily::FlexRIO:
+            IRIOmodel = "PXIe-" + RIODevice;
+            bitfileName = bitfile_prefix + RIODevice;
+            break;
+        case IRIOFamily::cRIO:
+            IRIOmodel  = "NI " + RIODevice;
+            bitfileName = bitfile_prefix; // In cRIO, the bitfile name does not contain the Device Model
+            break;
+        default: case IRIOFamily::NONE:
+            FAIL() << "Invalid RIODevice " << RIODevice << endl;
+            break;
+    }
     string filePath = "../resources/" + RIODevice + "/";
     string testName = ("Test_" + bitfileName);
 
@@ -82,31 +103,9 @@ void TestUtilsIRIO::initFlexRIODriver(string bitfile_prefix, irioDrv_t* drv) {
 
     if (verbose_test) cout << "[TEST] Initializing driver with bitfile \"" << bitfileName << "\"" << endl;
     st = irio_initDriver(testName.c_str(), RIOSerial.c_str(),
-                         NIRIOmodel.c_str(), bitfileName.c_str(), "V1.2",
+                         IRIOmodel.c_str(), bitfileName.c_str(), FPGAversion.c_str(),
                          verbose_init, filePath.c_str(), filePath.c_str(), drv,
                          &status);
-    TestUtilsIRIO::logErrors(st, status);
-    ASSERT_EQ(st, IRIO_success);
-    if (verbose_test) cout << "[TEST] Driver initialized " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
-}
-
-void TestUtilsIRIO::initCRIODriver(string bitfile_prefix, irioDrv_t* drv) {
-    string RIODevice = TestUtilsIRIO::getEnvVar("RIODevice");
-	string RIOSerial = TestUtilsIRIO::getEnvVar("RIOSerial");
-    int verbose_init = std::stoi(TestUtilsIRIO::getEnvVar("VerboseInit"));
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-
-	string NIRIOmodel  = "NI " + RIODevice;
-	string bitfileName = bitfile_prefix; // In cRIO, the bitfile name does not contain the Device Model
-	string FPGAversion = "V1.2";
-	string filePath    = "../resources/"+RIODevice+"/";
-    string appCallID   = "Test_" + bitfileName;
-
-	TStatus status;
-	irio_initStatus(&status);
-
-    if (verbose_test) cout << "[TEST] Initializing driver with bitfile \"" << bitfileName << "\"" << endl;
-    int st = irio_initDriver(appCallID.c_str(), RIOSerial.c_str(), NIRIOmodel.c_str(), bitfileName.c_str(), FPGAversion.c_str(), verbose_init, filePath.c_str(), filePath.c_str(), drv, &status);
     TestUtilsIRIO::logErrors(st, status);
     ASSERT_EQ(st, IRIO_success);
     if (verbose_test) cout << "[TEST] Driver initialized " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
@@ -467,4 +466,12 @@ double TestUtilsIRIO::sineCorrelation(const std::vector<double>& signal, int f, 
     }
 
     return max_corr/autocorrelation;
+}
+
+IRIOFamily TestUtilsIRIO::getIRIOFamily(string device) {
+    try {
+        return familyMap.at(device);
+    } catch (const std::out_of_range& e) {
+        return IRIOFamily::NONE;
+    }
 }

@@ -4,11 +4,13 @@
 #include <gtest/gtest.h>
 #include <irioDataTypes.h>
 #include <functional>
+#include <map>
 
 using std::string;
 
 namespace TestUtilsIRIO {
 
+enum class IRIOFamily { FlexRIO, cRIO, NONE };
 const string FWHT = "\x1b[37m";  // Foreground color, White
 const string BBLA = "\x1b[40m";  // Background color, Black
 const string RST  = "\x1B[0m";   // Foreground color, Reset
@@ -20,14 +22,14 @@ void logErrors(const int ret_status, const TStatus& out_status);
 string getEnvVar(const string& shellVarName);
 double sineCorrelation(const std::vector<double>& vec, int f, int fs);
 
-void initFlexRIODriver(string bitfile_prefix, irioDrv_t* drv);
-void initCRIODriver(string bitfile_prefix, irioDrv_t* drv);
+void initDriver(string bitfile_prefix, irioDrv_t* drv);
 void closeDriver(irioDrv_t* drv);
 int  loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* status);
 void freeHeaderFile(irioDrv_t* drv);
 void startFPGA(irioDrv_t* drv);
 void setDebugMode(irioDrv_t* drv, int debug_mode);
 TIRIOCouplingMode setAICoupling(irioDrv_t* drv);
+IRIOFamily getIRIOFamily(string device);
 
 typedef struct {
     int AI, AO, auxAI, auxAO, DI, DO, auxDI, auxDO, SG, DMA, CLConfig, CLUART, samplingRate;

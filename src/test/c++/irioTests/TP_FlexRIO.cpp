@@ -45,14 +45,14 @@ using std::endl;
  */
 TEST(FlexRIOResources, InitClose) {
     irioDrv_t drv;
-    initFlexRIODriver("FlexRIO_CPUDAQ_", &drv);
+    initDriver("FlexRIO_CPUDAQ_", &drv);
     closeDriver(&drv);
 }
 TEST(FlexRIOResources, ResourcesCPUDAQ) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
-    initFlexRIODriver(std::string("FlexRIO_CPUDAQ_"), &drv);
+    initDriver(std::string("FlexRIO_CPUDAQ_"), &drv);
 
 	irioResources_t res;
 	getResources(&drv, &res);
@@ -95,7 +95,7 @@ TEST(FlexRIOResources, ResourcesIMAQ) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
-    initFlexRIODriver(std::string("FlexRIO_CPUIMAQ_"), &drv);
+    initDriver(std::string("FlexRIO_CPUIMAQ_"), &drv);
 
 	irioResources_t res;
 	getResources(&drv, &res);
@@ -135,7 +135,7 @@ TEST(FlexRIOResources, ResourcesMAXIO) {
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
     irioDrv_t drv;
-    initFlexRIODriver(std::string("FlexRIOonlyResources_"), &drv);
+    initDriver(std::string("FlexRIOonlyResources_"), &drv);
 
 	irioResources_t res;
 	getResources(&drv, &res);
@@ -297,13 +297,13 @@ TEST(FlexRIOResources, ResourcesMissing) {
 */
 TEST(FlexRIOnoModule, InitClose) {
     irioDrv_t drv;
-    initFlexRIODriver("FlexRIOnoModule_", &drv);
+    initDriver("FlexRIOnoModule_", &drv);
     closeDriver(&drv);
 }
 TEST(FlexRIOnoModule, StartFPGA) {
     irioDrv_t drv;
 
-    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	TStatus status;
@@ -323,7 +323,7 @@ TEST(FlexRIOnoModule, GetSetAuxAIO32) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	// Initialize random engine
@@ -370,7 +370,7 @@ TEST(FlexRIOnoModule, GetSetAuxAIO64) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	// Initialize random engine
@@ -417,7 +417,7 @@ TEST(FlexRIOnoModule, GetSetAuxDIO) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	for (int i = 0; i < 6; ++i) {
@@ -456,7 +456,7 @@ TEST(FlexRIOnoModule, GetDevTemp) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOnoModule_"), &drv);
+    initDriver(std::string("FlexRIOnoModule_"), &drv);
 	startFPGA(&drv);
 
 	if (verbose_test) cout << "[TEST] Reading temperature from device" << endl;
@@ -499,13 +499,13 @@ TEST(FlexRIOnoModule, GetDevTemp) {
 */
 TEST(FlexRIODAQ5761, InitClose) {
     irioDrv_t drv;
-    initFlexRIODriver("FlexRIOMod5761_", &drv);
+    initDriver("FlexRIOMod5761_", &drv);
     closeDriver(&drv);
 }
 TEST(FlexRIODAQ5761, StartFPGA) {
     irioDrv_t drv;
 
-    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 
 	TStatus status;
@@ -525,7 +525,7 @@ TEST(FlexRIODAQ5761, GetSetDebugMode) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 
 	// Setting debug mode
@@ -549,7 +549,7 @@ TEST(FlexRIODAQ5761, GetSetSGSignalType) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -571,7 +571,7 @@ TEST(FlexRIODAQ5761, GetSetEnableAO0) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 
 	if (verbose_test) cout << "[TEST] Setting EnableAO0 to 1" << endl;
@@ -603,7 +603,7 @@ TEST(FlexRIODAQ5761, GetSetAO0) {
 	std::mt19937 gen(std::chrono::system_clock::now().time_since_epoch().count());
 	std::uniform_int_distribution<int32_t> dist(min + 1, max - 1);
 
-    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -651,7 +651,7 @@ TEST(FlexRIODAQ5761, CleanDMA) {
 	TStatus status;
 	irio_initStatus(&status);
 
-    initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+    initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	DMAHost::cleanDMA(&drv);
@@ -663,7 +663,7 @@ TEST(FlexRIODAQ5761, SetupDMAToHost) {
 	TStatus status;
 	irio_initStatus(&status);
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	DMAHost::setupDMA(&drv);
@@ -680,7 +680,7 @@ TEST(FlexRIODAQ5761, GetSetDMAToHostSamplingRate) {
 	int32_t sampling_rate = 500000; // 50ksps (max 125Msps)
 	if (verbose_test) cout << "[TEST] Sampling rate = " << sampling_rate << endl;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -704,7 +704,7 @@ TEST(FlexRIODAQ5761, GetSetAICoupling) {
 	int32_t sampling_rate = 500000; // 50ksps (max 125Msps)
 	if (verbose_test) cout << "[TEST] Sampling rate = " << sampling_rate << endl;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -725,7 +725,7 @@ TEST(FlexRIODAQ5761, GetSetDMAToHostEnable) {
 	irio_initStatus(&status);
 	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -746,7 +746,7 @@ TEST(FlexRIODAQ5761, GetSetDAQStartStop) {
 	irio_initStatus(&status);
 	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -768,7 +768,7 @@ TEST(FlexRIODAQ5761, GetDMAToHostParameters) {
 	irio_initStatus(&status);
 	int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -805,7 +805,7 @@ TEST(FlexRIODAQ5761, ReadDMADCNoTimeout) {
 	int channel = 2;
 	int desired_value = 2048;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
@@ -867,7 +867,7 @@ TEST(FlexRIODAQ5761, ReadDMADCTimeout) {
 	int channel = 2;
 	int desired_value = 2048;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
@@ -926,7 +926,7 @@ TEST(FlexRIODAQ5761, GetSetSGUpdateRate) {
 	int update_rate = 10000000; // 10 MSps
 	int channel = 0;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -953,7 +953,7 @@ TEST(FlexRIODAQ5761, GetSetSGSignalFreq) {
 	int update_rate = 10000000; // 10 MSps
 	int channel = 0;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -980,7 +980,7 @@ TEST(FlexRIODAQ5761, GetSetSGSignalAmp) {
 	int sig_amp = 4096; // 0.517563 V
 	int channel = 0;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 
@@ -1015,7 +1015,7 @@ TEST(FlexRIODAQ5761, ReadDMASineNoTimeout) {
 	int compare_samples = 100;
 	double corr_threshold = 0.99;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
@@ -1084,7 +1084,7 @@ TEST(FlexRIODAQ5761, ReadDMASineTimeout) {
 	int compare_samples = 100;
 	double corr_threshold = 0.99;
 
-	initFlexRIODriver(std::string("FlexRIOMod5761_"), &drv);
+	initDriver(std::string("FlexRIOMod5761_"), &drv);
 	startFPGA(&drv);
 	setDebugMode(&drv, 0);
 	setAICoupling(&drv);
@@ -1148,13 +1148,13 @@ TEST(FlexRIODAQ5761, ReadDMASineTimeout) {
 */
 TEST(FlexRIODIO6581, InitClose) {
     irioDrv_t drv;
-    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+    initDriver(std::string("FlexRIOMod6581_"), &drv);
     closeDriver(&drv);
 }
 TEST(FlexRIODIO6581, StartFPGA) {
     irioDrv_t drv;
 
-    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+    initDriver(std::string("FlexRIOMod6581_"), &drv);
 	startFPGA(&drv);
 
 	TStatus status;
@@ -1175,7 +1175,7 @@ TEST(FlexRIODIO6581, GetSetAuxDIO6581) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+    initDriver(std::string("FlexRIOMod6581_"), &drv);
 	startFPGA(&drv);
 
 	for (int32_t b: {0, 1}) {
@@ -1202,7 +1202,7 @@ TEST(FlexRIODIO6581, GetSetDIO) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod6581_"), &drv);
+    initDriver(std::string("FlexRIOMod6581_"), &drv);
 	startFPGA(&drv);
 
 	if (verbose_test) cout << "[TEST] Writing true to AuxDO6" << endl; 
@@ -1269,13 +1269,13 @@ TEST(FlexRIODIO6581, GetSetDIO) {
 */
 TEST(FlexRIOIMAQ1483, InitClose) {
     irioDrv_t drv;
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
     closeDriver(&drv);
 }
 TEST(FlexRIOIMAQ1483, StartFPGA) {
     irioDrv_t drv;
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 	startFPGA(&drv);
 
 	TStatus status;
@@ -1295,7 +1295,7 @@ TEST(FlexRIOIMAQ1483, InitConfigCL) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1318,7 +1318,7 @@ TEST(FlexRIOIMAQ1483, GetImages) {
 	const int imageWidth = 256, imageHeight = 256;
 	std::unique_ptr<uint64_t[]> buffer(new uint64_t[imageWidth * imageHeight / 8]);
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1372,7 +1372,7 @@ TEST(FlexRIOUART1483, GetUARTBaudRate) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1399,7 +1399,7 @@ TEST(FlexRIOUART1483, GetUARTBreakIndicator) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1426,7 +1426,7 @@ TEST(FlexRIOUART1483, GetUARTFrammingError) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1453,7 +1453,7 @@ TEST(FlexRIOUART1483, GetUARTOverrunError) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1483,7 +1483,7 @@ TEST(FlexRIOUART1483, SetUARTBaudRate) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1524,7 +1524,7 @@ TEST(FlexRIOUART1483, SendCLUART) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
@@ -1568,7 +1568,7 @@ TEST(FlexRIOUART1483, GetCLUART) {
 	irio_initStatus(&status);
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initFlexRIODriver(std::string("FlexRIOMod1483_"), &drv);
+    initDriver(std::string("FlexRIOMod1483_"), &drv);
 
 	if (verbose_test) cout << "[TEST] Configuring CL with FVAL, LVAL, DVAL and SPARE High, control signals from the FPGA and no linescan. Signal mapping is STANDARD and the configuration is FULL mode" << endl;
 	st = irio_configCL(&drv, 1, 1, 1, 1, 1, 0, CL_STANDARD, CL_FULL, &status);
