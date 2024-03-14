@@ -19,7 +19,7 @@ def searchSerial(device, order):
     else:
         return results[max(min(int(order) - 1, len(results) - 1), 0)]
 
-def runCommand(filterText, RIODevice, RIOSerial, Verbose, Coupling, MaxCounter):
+def runCommand(filterText, RIODevice, RIOSerial, Verbose, Coupling, MaxCounter, Summary=False):
     failed = None
     passed = None
     binary = "driver-irio"
@@ -40,7 +40,8 @@ env -S maxCounter={MaxCounter} \
 
         line = line.rstrip()
 
-        print(line.decode('utf-8').rstrip())
+        if not Summary:
+            print(line.decode('utf-8').rstrip())
 
         failmatch = re.findall(r"\[\s+FAILED\s+\] (\d+) test.*", line.decode('utf-8'))
         if len(failmatch) > 0:
@@ -97,25 +98,10 @@ if args.input_config_file is None:
         else:
             serial = searchSerial(args.RIODevice, args.device_number)
 
-        if args.filter is not None and not args.perf:
-            gfilter = " --gtest_filter=" + args.filter
-        else:
-            gfilter = "" 
-
-        if args.shuffle and not args.perf:
-            gshuffle = " --gtest_shuffle"
-        else:
-            gshuffle = ""
-
-        if args.iterations != '1' and not args.perf:
-            giterations = " --gtest-repeat=" + args.iterations
-        else:
-            giterations = ""
-
-        if args.summary and not args.perf:
-            summary = r' | grep -A9999 "Global test environment tear-down"'
-        else:
-            summary = ""
+        gfilter = (" --gtest_filter=" + args.filter) if args.filter is not None and not args.perf else ""
+        gshuffle = " --gtest_shuffle" if args.shuffle and not args.perf else ""
+        giterations = (" --gtest-repeat=" + args.iterations) if args.iterations != '1' and not args.perf else ""
+        summary = r' | grep -A9999 "Global test environment tear-down"' if args.summary and not args.perf else ""
 
         command = f"\
     env -S RIOSerial={serial} \
@@ -136,12 +122,16 @@ else:
     if not os.path.exists(args.input_config_file):
         print(f"Could not find the file {args.input_config_file}")
         exit(-1)
+
+    summary = True if args.summary else False
+
     originaldir = os.getcwd()
 
     tree = minidom.parse(args.input_config_file)
     os.chdir(os.getcwd()+"/target/test/c++/irioTests/")
 
     for test in tree.getElementsByTagName('test'):
+        testName   = test.getElementsByTagName('name')[0].firstChild.data
         filterText = test.getElementsByTagName('TestFilter')[0].firstChild.data
         RIODevice  = test.getElementsByTagName('RIODevice')[0].firstChild.data
         RIOSerial  = test.getElementsByTagName('RIOSerial')[0].firstChild.data
@@ -168,7 +158,13 @@ else:
             print("Malformatted test in XML, omitting it")
             continue
         
-        result = runCommand(filterText, RIODevice, RIOSerial, verbose, coupling, maxIterations)
+        if summary: 
+            print(f"Running test \"{testName}\" with filter \"{filterText}\"")
+        result = runCommand(filterText, RIODevice, RIOSerial, verbose, coupling, maxIterations, summary)
+        if summary:
+            pass_word = "\033[32mPASS\033[00m"
+            fail_word = "\033[91mFAIL\033[00m"
+            print(f"{pass_word if result[2] else fail_word} - {result[0]}/{result[1]}")
 
         resultElement = test.getElementsByTagName("results")
         if resultElement:
