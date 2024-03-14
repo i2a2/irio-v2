@@ -102,6 +102,7 @@ void TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
 
     IRIOFamily family = TestUtilsIRIO::getIRIOFamily(RIODevice);
     string bitfile_prefix = getBitfilePrefix(family, profile);
+    ASSERT_GE(bitfile_prefix.length(), 1) << "No bitfile found for family-profile pair" << endl;
     switch (family) {
         case IRIOFamily::FlexRIO:
             IRIOmodel = "PXIe-" + RIODevice;
