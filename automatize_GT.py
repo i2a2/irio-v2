@@ -170,7 +170,7 @@ else:
         
         result = runCommand(filterText, RIODevice, RIOSerial, verbose, coupling, maxIterations)
 
-        resultElement = tree.getElementsByTagName("results")
+        resultElement = test.getElementsByTagName("results")
         if resultElement:
             resultElement[0].firstChild.data = f"{result[0]}/{result[1]}";
         else:
@@ -178,7 +178,7 @@ else:
             resultElement.appendChild(tree.createTextNode(f"{result[0]}/{result[1]}"))
             test.appendChild(resultElement)
 
-        summaryElement = tree.getElementsByTagName("summary")
+        summaryElement = test.getElementsByTagName("summary")
         if summaryElement:
             summaryElement[0].firstChild.data = "PASS" if result[2] else "FAIL"
         else:
