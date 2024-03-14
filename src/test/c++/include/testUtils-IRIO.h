@@ -11,6 +11,7 @@ using std::string;
 namespace TestUtilsIRIO {
 
 enum class IRIOFamily { FlexRIO, cRIO, NONE };
+enum class IRIOProfile { NoModule, OnlyResources, IO, CPUDAQ, CPUIMAQ, Mod5761DAQ, Mod6581DIO, Mod1483IMAQ };
 const string FWHT = "\x1b[37m";  // Foreground color, White
 const string BBLA = "\x1b[40m";  // Background color, Black
 const string RST  = "\x1B[0m";   // Foreground color, Reset
@@ -22,7 +23,7 @@ void logErrors(const int ret_status, const TStatus& out_status);
 string getEnvVar(const string& shellVarName);
 double sineCorrelation(const std::vector<double>& vec, int f, int fs);
 
-void initDriver(string bitfile_prefix, irioDrv_t* drv);
+void initDriver(IRIOProfile profile, irioDrv_t* drv);
 void closeDriver(irioDrv_t* drv);
 int  loadHeaderFile(irioDrv_t* drv, string file_path, TStatus* status);
 void freeHeaderFile(irioDrv_t* drv);

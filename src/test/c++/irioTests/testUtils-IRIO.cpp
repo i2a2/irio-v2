@@ -22,6 +22,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using TestUtilsIRIO::IRIOFamily;
+using TestUtilsIRIO::IRIOProfile;
 
 static const std::map<string, IRIOFamily> familyMap = {
 	{"7966", IRIOFamily::FlexRIO },
@@ -30,7 +31,24 @@ static const std::map<string, IRIOFamily> familyMap = {
 	{"9159", IRIOFamily::cRIO }
 };
 
+static const std::map<IRIOFamily, std::map<IRIOProfile, string>> bitfiles = {
+    { IRIOFamily::FlexRIO, {
+        { IRIOProfile::NoModule,      "FlexRIOnoModule_"      },
+        { IRIOProfile::OnlyResources, "FlexRIOonlyResources_" },
+        { IRIOProfile::CPUDAQ,        "FlexRIO_CPUDAQ_"       },
+        { IRIOProfile::CPUIMAQ,       "FlexRIO_CPUIMAQ_"      },
+        { IRIOProfile::Mod1483IMAQ,   "FlexRIOMod1483_"       },
+        { IRIOProfile::Mod5761DAQ,    "FlexRIOMod5761_"       },
+        { IRIOProfile::Mod6581DIO,    "FlexRIOMod6581_"       },
+    }},
+    { IRIOFamily::cRIO, {
+        { IRIOProfile::NoModule, "cRIO_PBP" },
+        { IRIOProfile::IO,       "cRIOIO_9159" },
+    }},
+};
+
 static int getResourceCount(TResourcePort* arr, int max);
+static string getBitfilePrefix(const IRIOFamily& family, const IRIOProfile& profile);
 
 void TestUtilsIRIO::displayTitle(const string& msg, const string& forecolor,
                                  const string& backcolor) {
@@ -72,7 +90,7 @@ void TestUtilsIRIO::logErrors(const int ret_status, const TStatus& out_status) {
     detailStr = nullptr;
 }
 
-void TestUtilsIRIO::initDriver(string bitfile_prefix, irioDrv_t* drv) {
+void TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
     int st = IRIO_success;
 
     int verbose_init = std::stoi(TestUtilsIRIO::getEnvVar("VerboseInit"));
@@ -82,7 +100,9 @@ void TestUtilsIRIO::initDriver(string bitfile_prefix, irioDrv_t* drv) {
 	string FPGAversion = "V1.2";
     string IRIOmodel, bitfileName;
 
-    switch (TestUtilsIRIO::getIRIOFamily(RIODevice)) {
+    IRIOFamily family = TestUtilsIRIO::getIRIOFamily(RIODevice);
+    string bitfile_prefix = getBitfilePrefix(family, profile);
+    switch (family) {
         case IRIOFamily::FlexRIO:
             IRIOmodel = "PXIe-" + RIODevice;
             bitfileName = bitfile_prefix + RIODevice;
@@ -473,5 +493,13 @@ IRIOFamily TestUtilsIRIO::getIRIOFamily(string device) {
         return familyMap.at(device);
     } catch (const std::out_of_range& e) {
         return IRIOFamily::NONE;
+    }
+}
+
+static string getBitfilePrefix(const IRIOFamily& family, const IRIOProfile& profile) {
+    try {
+        return bitfiles.at(family).at(profile);
+    } catch (const std::out_of_range& e) {
+        return "";
     }
 }

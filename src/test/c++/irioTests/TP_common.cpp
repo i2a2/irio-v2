@@ -26,3 +26,7 @@ using namespace TestUtilsIRIO;
 using std::cout; 
 using std::endl;
 
+TEST(Common, InitCloseDriver) {
+    irioDrv_t drv;
+    initDriver(IRIOProfile::NoModule, &drv);
+}

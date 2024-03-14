@@ -51,17 +51,12 @@ using std::endl;
  * - cRIO.GetDevQuality
  * - cRIO.GetDevProfile
 */
-TEST(cRIO, InitCloseDriver) {
-    irioDrv_t drv;
-    initDriver("cRIOIO_9159", &drv);
-    closeDriver(&drv);
-}
 TEST(cRIO, IOResources) {
     irioDrv_t drv;
     irioResources_t res;
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver("cRIOIO_9159", &drv);
+    initDriver(IRIOProfile::IO, &drv);
     getResources(&drv, &res);
 
     // Expected resources:
@@ -103,7 +98,7 @@ TEST(cRIO, StartFPGA) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver("cRIOIO_9159", &drv);
+    initDriver(IRIOProfile::IO, &drv);
     startFPGA(&drv);
 
     int32_t start = -1;
@@ -121,7 +116,7 @@ TEST(cRIO, GetIRIOVersion) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver("cRIO_PBP", &drv);
+    initDriver(IRIOProfile::NoModule, &drv);
     startFPGA(&drv);
 
     std::array<char, 7> version;
@@ -137,7 +132,7 @@ TEST(cRIO, GetFPGAVIVersion) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver("cRIO_PBP", &drv);
+    initDriver(IRIOProfile::NoModule, &drv);
     startFPGA(&drv);
 
     const int VIVersionLength = 4;
@@ -156,7 +151,7 @@ TEST(cRIO, GetDevQualityStatus) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver("cRIO_PBP", &drv);
+    initDriver(IRIOProfile::NoModule, &drv);
     startFPGA(&drv);
 
     int quality = -1;
@@ -174,7 +169,7 @@ TEST(cRIO, GetDevTemp) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver("cRIO_PBP", &drv);
+    initDriver(IRIOProfile::NoModule, &drv);
     startFPGA(&drv);
 
 	if (verbose_test) cout << "[TEST] Reading temperature from device" << endl;
@@ -192,7 +187,7 @@ TEST(cRIO, GetDevProfile) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver("cRIO_PBP", &drv);
+    initDriver(IRIOProfile::NoModule, &drv);
     startFPGA(&drv);
 
 	if (verbose_test) cout << "[TEST] Reading device profile" << endl;
