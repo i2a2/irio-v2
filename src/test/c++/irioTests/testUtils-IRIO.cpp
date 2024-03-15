@@ -90,7 +90,7 @@ void TestUtilsIRIO::logErrors(const int ret_status, const TStatus& out_status) {
     detailStr = nullptr;
 }
 
-void TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
+int TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
     int st = IRIO_success;
 
     int verbose_init = std::stoi(TestUtilsIRIO::getEnvVar("VerboseInit"));
@@ -102,7 +102,12 @@ void TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
 
     IRIOFamily family = TestUtilsIRIO::getIRIOFamily(RIODevice);
     string bitfile_prefix = getBitfilePrefix(family, profile);
-    ASSERT_GE(bitfile_prefix.length(), 1) << "No bitfile found for family-profile pair" << endl;
+    
+    if (bitfile_prefix.length() < 1) {
+        cerr << "No bitfile found for family-profile pair" << endl;
+        return -1;
+    }
+    
     switch (family) {
         case IRIOFamily::FlexRIO:
             IRIOmodel = "PXIe-" + RIODevice;
@@ -113,8 +118,8 @@ void TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
             bitfileName = bitfile_prefix; // In cRIO, the bitfile name does not contain the Device Model
             break;
         default: case IRIOFamily::NONE:
-            FAIL() << "Invalid RIODevice " << RIODevice << endl;
-            break;
+            cerr << "Invalid RIODevice: " << RIODevice << endl;
+            return -1;
     }
     string filePath = "../resources/" + RIODevice + "/";
     string testName = ("Test_" + bitfileName);
@@ -128,11 +133,11 @@ void TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
                          verbose_init, filePath.c_str(), filePath.c_str(), drv,
                          &status);
     TestUtilsIRIO::logErrors(st, status);
-    ASSERT_EQ(st, IRIO_success);
     if (verbose_test) cout << "[TEST] Driver initialized " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
+    return st;
 }
 
-void TestUtilsIRIO::closeDriver(irioDrv_t* drv) {
+int TestUtilsIRIO::closeDriver(irioDrv_t* drv) {
     int st = IRIO_success;
     TStatus status;
     irio_initStatus(&status);
@@ -142,8 +147,8 @@ void TestUtilsIRIO::closeDriver(irioDrv_t* drv) {
     if (verbose_test) cout << "[TEST] Closing driver" << endl;
     st = irio_closeDriver(drv, 0, &status);
     TestUtilsIRIO::logErrors(st, status);
-    ASSERT_EQ(st, IRIO_success);
     if (verbose_test) cout << "[TEST] Driver closed " << ((st == IRIO_success) ? "successfully" : "unsuccessfully") << endl;
+    return st;
 }
 
 static int getResourceCount(TResourcePort* arr, int max) {

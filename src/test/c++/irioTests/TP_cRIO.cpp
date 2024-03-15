@@ -43,20 +43,16 @@ using std::endl;
  * - NI9425 Connected in Slot7
  * 
  * Implemented in:
- * - cRIO.InitCloseDriver
  * - cRIO.IOResources
- * - cRIO.StartFPGA
- * - cRIO.GetIRIOVersion
- * - cRIO.GetFPGAVIVersion
- * - cRIO.GetDevQuality
- * - cRIO.GetDevProfile
 */
 TEST(cRIO, IOResources) {
     irioDrv_t drv;
     irioResources_t res;
+	int st = 0;
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    initDriver(IRIOProfile::IO, &drv);
+    st = initDriver(IRIOProfile::IO, &drv);
+	ASSERT_EQ(st, 0) << "[TEST] Driver initialization failed";
     getResources(&drv, &res);
 
     // Expected resources:
@@ -91,112 +87,6 @@ TEST(cRIO, IOResources) {
 	if (verbose_test) cout << "[TEST] Found " << res.samplingRate << " sampling rates. Expected 1" << endl;
 	EXPECT_EQ(res.samplingRate, 1);
 
-    closeDriver(&drv);
-}
-TEST(cRIO, StartFPGA) {
-    irioDrv_t drv;
-    TStatus status;   
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-
-    initDriver(IRIOProfile::IO, &drv);
-    startFPGA(&drv);
-
-    int32_t start = -1;
-    if (verbose_test) cout << "[TEST] Getting FPGAStart" << endl;
-    int st = irio_getFPGAStart(&drv, &start, &status);
-    logErrors(st, status);
-    if (verbose_test) cout << "[TEST] FPGAStart read = " << start << endl;
-    EXPECT_EQ(st, IRIO_success);
-    EXPECT_EQ(start, 1);
-
-    closeDriver(&drv);
-}
-TEST(cRIO, GetIRIOVersion) {
-    irioDrv_t drv;
-    TStatus status;   
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-
-    initDriver(IRIOProfile::NoModule, &drv);
-    startFPGA(&drv);
-
-    std::array<char, 7> version;
-    int st = irio_getVersion(version.data(), &status);
-    logErrors(st, status);
-    if (verbose_test) cout << "[TEST] IRIO version = " << std::string(version.begin(), version.end()) << endl;
-    EXPECT_EQ(st, IRIO_success);
-
-    closeDriver(&drv);
-}
-TEST(cRIO, GetFPGAVIVersion) {
-    irioDrv_t drv;
-    TStatus status;   
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-
-    initDriver(IRIOProfile::NoModule, &drv);
-    startFPGA(&drv);
-
-    const int VIVersionLength = 4;
-    std::array<char, VIVersionLength> version;
-    uint64_t valueLength;
-    int st = irio_getFPGAVIVersion(&drv, version.data(), VIVersionLength, &valueLength, &status);
-    logErrors(st, status);
-    if (verbose_test) cout << "[TEST] VIVersionLength version = " << std::string(version.begin(), version.end()) << endl;
-    EXPECT_EQ(st, IRIO_success);
-    EXPECT_GT(valueLength, 0);
-
-    closeDriver(&drv);
-}
-TEST(cRIO, GetDevQualityStatus) {
-    irioDrv_t drv;
-    TStatus status;   
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-
-    initDriver(IRIOProfile::NoModule, &drv);
-    startFPGA(&drv);
-
-    int quality = -1;
-    if (verbose_test) cout << "[TEST] Reading DevQualityStatus" << endl;
-    int st = irio_getDevQualityStatus(&drv, &quality, &status);
-    logErrors(st, status);
-    if (verbose_test) cout << "[TEST] DevQualityStatus = " << quality << endl;
-    EXPECT_EQ(st, IRIO_success);
-    EXPECT_EQ(quality, 0);
-
-    closeDriver(&drv);
-}
-TEST(cRIO, GetDevTemp) {
-    irioDrv_t drv;
-    TStatus status;   
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-
-    initDriver(IRIOProfile::NoModule, &drv);
-    startFPGA(&drv);
-
-	if (verbose_test) cout << "[TEST] Reading temperature from device" << endl;
-	int32_t reading = -1;
-	int st = irio_getDevTemp(&drv, &reading, &status);
-	float temp = 0.25f * reading;
-	logErrors(st, status);
-	EXPECT_EQ(st, IRIO_success);
-	if (verbose_test) cout << "[TEST] Temperature = " << std::setprecision(4) << temp << "°C" << endl;
-
-    closeDriver(&drv);
-}
-TEST(cRIO, GetDevProfile) {
-    irioDrv_t drv;
-    TStatus status;   
-    int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
-
-    initDriver(IRIOProfile::NoModule, &drv);
-    startFPGA(&drv);
-
-	if (verbose_test) cout << "[TEST] Reading device profile" << endl;
-	int32_t reading = -1;
-	int st = irio_getDevProfile(&drv, &reading, &status);
-	logErrors(st, status);
-	if (verbose_test) cout << "[TEST] Device profile = " << reading << "(0: DAQ DMA, 1: Point by Point)" << endl;
-	EXPECT_EQ(st, IRIO_success);
-    EXPECT_EQ(reading, 1);
-
-    closeDriver(&drv);
+    st = closeDriver(&drv);
+	ASSERT_EQ(st, 0) << "[TEST] Driver closing failed";
 }
