@@ -52,6 +52,8 @@ env -S maxCounter={MaxCounter} \
             passed = int(passmatch[0])
 
     process.kill()
+    if passed is None:
+        passed = 0
     return (passed, (failed if failed is not None else 0) + passed, (failed == 0) or (failed is None))
 
 # Parse arguments
