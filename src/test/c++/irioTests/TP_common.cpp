@@ -38,7 +38,7 @@ TEST(Common, StartFPGA) {
     TStatus status;   
     int verbose_test = std::stoi(TestUtilsIRIO::getEnvVar("VerboseTest"));
 
-    int st = initDriver(IRIOProfile::IO, &drv);
+    int st = initDriver(IRIOProfile::NoModule, &drv);
 	ASSERT_EQ(st, 0) << "[TEST] Error initializing driver";
     startFPGA(&drv);
 
