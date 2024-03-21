@@ -439,7 +439,6 @@ TEST(FlexRIOnoModule, GetSetAuxDIO) {
  * irio_getDMATtoHostData, irio_setDebugMode, irio_getDMATtoHostOverflow.
  * 
  * Implemented in:
- * - FlexRIODAQ5761.GetSetDebugMode
  * - FlexRIODAQ5761.GetSetSGSignalType
  * - FlexRIODAQ5761.GetSetEnableAO0
  * - FlexRIODAQ5761.GetSetAO0
