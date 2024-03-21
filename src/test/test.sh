@@ -25,6 +25,9 @@ SCRIPTDIR=`dirname $0`
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SCRIPTDIR/../lib
 
+cd ../..
+./automatize_GT.py --input-config-file test.xml --results-file result.xml
+
 #/sbin/modprobe $SCRIPTDIR/../main/c/driver/pxi6259.ko
 
 #if [ `ls /dev | grep 6259 | wc -l` ]; than
@@ -33,7 +36,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SCRIPTDIR/../lib
 #	./c/driver/runner
 
 	# Run library unit tests #
-	./c/lib/runner
+	# ./c/lib/runner
 #}
 
 #/sbin/rmmod pxi6259
