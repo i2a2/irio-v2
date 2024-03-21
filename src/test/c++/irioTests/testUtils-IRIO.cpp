@@ -121,7 +121,7 @@ int TestUtilsIRIO::initDriver(IRIOProfile profile, irioDrv_t* drv) {
             cerr << "Invalid RIODevice: " << RIODevice << endl;
             return -1;
     }
-    string filePath = "../resources/" + RIODevice + "/";
+    string filePath = resourcePath + RIODevice + "/";
     string testName = ("Test_" + bitfileName);
 
     TStatus status;
