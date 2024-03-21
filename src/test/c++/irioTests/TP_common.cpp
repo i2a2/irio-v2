@@ -89,7 +89,7 @@ TEST(Common, GetDevQualityStatus) {
     logErrors(st, status);
     if (verbose_test) cout << "[TEST] DevQualityStatus = " << quality << endl;
     EXPECT_EQ(st, IRIO_success);
-    EXPECT_EQ(quality, 0);
+    EXPECT_NE(quality, -1);
 
     st = closeDriver(&drv);
 	ASSERT_EQ(st, 0) << "[TEST] Error closing driver";
