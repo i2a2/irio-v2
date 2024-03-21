@@ -885,6 +885,7 @@ TEST(FlexRIODAQ5761, GetSetSGSignalFreq) {
 	int sig_freq = 10000; // 10 kHz
 	int update_rate = 10000000; // 10 MSps
 	int channel = 0;
+	double allowed_delta = 0.01;
 
 	int st = initDriver(IRIOProfile::Mod5761DAQ, &drv);
 	ASSERT_EQ(st, 0) << "[TEST] Error initializing driver";
@@ -893,14 +894,13 @@ TEST(FlexRIODAQ5761, GetSetSGSignalFreq) {
 
 	SG::setFsig(&drv, channel, update_rate, sig_freq);
 
-
 	int32_t read = -1;
 	st = irio_getSGFreq(&drv, channel, &read, &status);
-	int read_fsig = read/(UINT_MAX/update_rate);
+	double read_fsig = read/static_cast<double>(UINT_MAX/static_cast<double>(update_rate));
 	logErrors(st, status);
 	if (verbose_test) cout << "[TEST] SGFreq" << channel << " read = " << read << ", meaning " << read_fsig << " Hz" << endl;
 	EXPECT_EQ(st, IRIO_success);
-	EXPECT_EQ(sig_freq, read_fsig);
+	EXPECT_NEAR(read_fsig, static_cast<double>(sig_freq), allowed_delta);
 
 	st = closeDriver(&drv);
 	ASSERT_EQ(st, 0) << "[TEST] Error closing driver";
